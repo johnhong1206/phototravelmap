@@ -71,15 +71,17 @@ export default function Home({ posts }) {
                     onClick={() => setSelectedLocation(post.location.longitude)}
                     className="w-12 text-center  text-white  cursor-pointer"
                   >
-                    <Image
-                      layout="fixed"
-                      width={60}
-                      height={60}
-                      src={urlFor(post.mainImage).url()}
-                      alt="img"
-                      objectFit="contain"
-                      className=""
-                    />
+                    {post.mainImage && (
+                      <Image
+                        layout="fixed"
+                        width={60}
+                        height={60}
+                        src={urlFor(post.mainImage).url()}
+                        alt="img"
+                        objectFit="contain"
+                        className=""
+                      />
+                    )}
                   </div>
                 </Marker>
                 {selectedLocation === post.location.longitude ? (
