@@ -3,7 +3,7 @@ import Link from "next/link";
 
 function Header() {
   return (
-    <header className="sticky top-0 px-3 py-2  ">
+    <header className="sticky top-0 px-3 py-2 flex item-center justify-between">
       <Link href="/">
         <div className="group transition-all hover:duration-700 ease-in-out hover:underline cursor-pointer hover:decoration-rose-400/50 ">
           <h2 className="text-xl font-extralight tracking-widest ">
@@ -15,8 +15,6 @@ function Header() {
           </h2>
         </div>
       </Link>
-
-      <div></div>
     </header>
   );
 }
