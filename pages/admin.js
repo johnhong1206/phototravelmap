@@ -12,6 +12,7 @@ import { sanityClient, urlFor } from "../sanity";
 import { useDispatch, useSelector } from "react-redux";
 import AddLocationModal from "../components/AddLocationModal";
 import { AiOutlinePlusCircle, AiOutlineClose } from "react-icons/ai";
+import toast from "react-hot-toast";
 
 function Admin({ location, categories }) {
   const dispatch = useDispatch();
@@ -33,6 +34,27 @@ function Admin({ location, categories }) {
   };
 
   const post = async () => {
+    const notification = toast.loading("Creating location...");
+
+    if (!title) {
+      toast.error("Error creating post", {
+        id: notification,
+      });
+      false;
+    }
+    if (!selectlocation?._id) {
+      toast.error("Error creating post", {
+        id: notification,
+      });
+      false;
+    }
+    if (!selectCategory?._id) {
+      toast.error("Error creating post", {
+        id: notification,
+      });
+      false;
+    }
+
     const postInfo = {
       title: title,
       author: author,
@@ -46,6 +68,10 @@ function Admin({ location, categories }) {
     await fetch("/api/post", {
       body: JSON.stringify(postInfo),
       method: "POST",
+    }).then(() => {
+      toast.success("Post Success", {
+        id: notification,
+      });
     });
 
     setTitle("");
@@ -54,6 +80,7 @@ function Admin({ location, categories }) {
     setActiveCategory(null);
     setSelectCategory(null);
   };
+
   const openlocationModal = () => {
     if (!locationModalisOpen) {
       dispatch(openLocationModal());
@@ -201,7 +228,7 @@ function Admin({ location, categories }) {
           </div>
 
           <button
-            disabled={!title}
+            disabled={!title || !selectCategory || !selectlocation}
             className=" bg-pink-400 w-full px-1 py-2 rounded-lg mt-10 shadow-lg hover:shadow-xl font-bold hover:text-white"
             onClick={post}
           >

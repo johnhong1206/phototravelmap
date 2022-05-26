@@ -39,7 +39,7 @@ function AddLocationModal() {
   const fetchLocation = () => {};
 
   const addLocation = async () => {
-    const notification = toast.loading("Creating post...");
+    const notification = toast.loading("Creating location...");
 
     const locationInfo = {
       title: selectResult?.properties.name,

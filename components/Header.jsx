@@ -15,6 +15,16 @@ function Header() {
           </h2>
         </div>
       </Link>
+      {/* <p className="scrolldown">
+        <a className="smoothscroll" href="#post">
+          <i className="icon-down-circle">Post</i>
+        </a>
+      </p>
+      <p className="scrolldown">
+        <a className="smoothscroll" href="#map">
+          <i className="icon-down-circle">Map</i>
+        </a>
+      </p> */}
     </header>
   );
 }

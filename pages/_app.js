@@ -7,6 +7,7 @@ import store from "../features/store";
 import { Toaster } from "react-hot-toast";
 
 import dynamic from "next/dynamic";
+import Footer from "../components/Footer";
 const Header = dynamic(() => import("../components/Header"));
 let persistor = persistStore(store);
 
@@ -17,6 +18,7 @@ function MyApp({ Component, pageProps }) {
         <div>
           <Header />
           <Component {...pageProps} />
+          <Footer />
         </div>
         <Toaster />
       </PersistGate>
