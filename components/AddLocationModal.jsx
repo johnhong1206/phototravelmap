@@ -104,64 +104,67 @@ function AddLocationModal() {
             Search Result
           </h2>
           <div className="grid grid-flow-row-dense md:grid-cols-2 ">
-            {searchResult.map((result, idx) => (
-              <div
-                onClick={() => {
-                  setSelectResult(result);
-                  setActiveSelectResult(idx);
-                }}
-                key={idx}
-                className={` bg-white m-12 p-4 lg:p-10 shadow-md cursor-pointer ${
-                  activeSelectResult === idx && "shadow-xl shadow-pink-500/50"
-                }`}
-              >
-                <h1 className="font-bold text-xl">Result {idx + 1}</h1>
-                <div>
-                  <div className="flex items-center space-x-2">
-                    <h2 className="font-semibold">Name:</h2>
-                    <p className="font-light">{result?.properties?.name}</p>
-                  </div>
-                  <div className="mt-4 flex items-center space-x-2">
-                    <h2 className="font-semibold">Address:</h2>
-                    <p className="font-light">
-                      {result?.properties?.address_line1}
-                      {result?.properties?.address_line2}
-                    </p>
-                  </div>
-                  <div className="mt-4 gap-1 grid grid-flow-row-dense md:grid-cols-2 lg:grid-cols-3">
-                    <div className="flex flex-row items-center space-x-2">
-                      <h2 className="font-semibold">City:</h2>
-                      <p className="font-light">{result?.properties?.city}</p>
+            {searchResult &&
+              searchResult?.map((result, idx) => (
+                <div
+                  onClick={() => {
+                    setSelectResult(result);
+                    setActiveSelectResult(idx);
+                  }}
+                  key={idx}
+                  className={` bg-white m-12 p-4 lg:p-10 shadow-md cursor-pointer ${
+                    activeSelectResult === idx && "shadow-xl shadow-pink-500/50"
+                  }`}
+                >
+                  <h1 className="font-bold text-xl">Result {idx + 1}</h1>
+                  <div>
+                    <div className="flex items-center space-x-2">
+                      <h2 className="font-semibold">Name:</h2>
+                      <p className="font-light">{result?.properties?.name}</p>
                     </div>
-                    <div className="flex flex-row items-center space-x-2">
-                      <h2 className="font-semibold">District:</h2>
+                    <div className="mt-4 flex items-center space-x-2">
+                      <h2 className="font-semibold">Address:</h2>
                       <p className="font-light">
-                        {result?.properties?.district}
+                        {result?.properties?.address_line1}
+                        {result?.properties?.address_line2}
                       </p>
                     </div>
-                    <div className="flex flex-row items-center space-x-2">
-                      <h2 className="font-semibold">State:</h2>
-                      <p className="font-light">{result?.properties?.state}</p>
+                    <div className="mt-4 gap-1 grid grid-flow-row-dense md:grid-cols-2 lg:grid-cols-3">
+                      <div className="flex flex-row items-center space-x-2">
+                        <h2 className="font-semibold">City:</h2>
+                        <p className="font-light">{result?.properties?.city}</p>
+                      </div>
+                      <div className="flex flex-row items-center space-x-2">
+                        <h2 className="font-semibold">District:</h2>
+                        <p className="font-light">
+                          {result?.properties?.district}
+                        </p>
+                      </div>
+                      <div className="flex flex-row items-center space-x-2">
+                        <h2 className="font-semibold">State:</h2>
+                        <p className="font-light">
+                          {result?.properties?.state}
+                        </p>
+                      </div>
+                      <div className="flex flex-row items-center space-x-2">
+                        <h2 className="font-semibold">Country:</h2>
+                        <p className="font-light">
+                          {result?.properties?.country}
+                        </p>
+                      </div>
                     </div>
-                    <div className="flex flex-row items-center space-x-2">
-                      <h2 className="font-semibold">Country:</h2>
-                      <p className="font-light">
-                        {result?.properties?.country}
-                      </p>
-                    </div>
-                  </div>
 
-                  <div className="mt-4 flex flex-row items-center space-x-2">
-                    <h2 className="font-semibold">GPS Location:</h2>
-                    <p className="font-light space-x-2">
-                      <span>{result.properties.lon}</span>
-                      <span>,</span>
-                      <span>{result?.properties?.lat}</span>
-                    </p>
+                    <div className="mt-4 flex flex-row items-center space-x-2">
+                      <h2 className="font-semibold">GPS Location:</h2>
+                      <p className="font-light space-x-2">
+                        <span>{result.properties.lon}</span>
+                        <span>,</span>
+                        <span>{result?.properties?.lat}</span>
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
           </div>
         </div>
         {selectResult && (
