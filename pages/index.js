@@ -49,7 +49,7 @@ export default function Home({ posts }) {
         >
           {posts?.map((post) => (
             <>
-              {post.mainImage && (
+              {post?.mainImage && (
                 <PostFeeds
                   id={post._id}
                   key={post._id}
@@ -77,7 +77,7 @@ export default function Home({ posts }) {
             mapStyle="mapbox://styles/zonghong/cks1a85to4kqf18p6zuj5zdx6"
             mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_KEY}
           >
-            {posts.map((post) => (
+            {posts?.map((post) => (
               <div key={post._id}>
                 <Marker
                   longitude={Number(post.location.longitude)}
@@ -89,12 +89,12 @@ export default function Home({ posts }) {
                     onClick={() => setSelectedLocation(post.location.longitude)}
                     className="w-12 text-center  text-white  cursor-pointer"
                   >
-                    {post.mainImage && (
+                    {post?.mainImage && (
                       <Image
                         layout="fixed"
                         width={60}
                         height={60}
-                        src={urlFor(post.mainImage).url()}
+                        src={urlFor(post?.mainImage)?.url()}
                         alt="img"
                         objectFit="contain"
                         className=""

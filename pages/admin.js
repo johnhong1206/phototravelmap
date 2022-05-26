@@ -68,7 +68,7 @@ function Admin({ location, categories }) {
     await fetch("/api/post", {
       body: JSON.stringify(postInfo),
       method: "POST",
-    }).then(() => {
+    }).then((res) => {
       toast.success("Post Success", {
         id: notification,
       });

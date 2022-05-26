@@ -46,9 +46,9 @@ function PostDetails({ slug, post }) {
       <main className="max-w-screen mx-auto">
         <div className="flex flex-col">
           <div className="w-full mb-4 flex flex-col items-center justify-center">
-            {post.mainImage && (
+            {post?.mainImage && (
               <Image
-                src={urlFor(post.mainImage).url()}
+                src={urlFor(post?.mainImage).url()}
                 className={"w-full rounded-lg cursor-pointer"}
                 width={700}
                 height={700}
@@ -58,16 +58,16 @@ function PostDetails({ slug, post }) {
             <div className="p-4 w-full">
               <h1 className="test-center font-bold text-xl">{post.title}</h1>
               <div className=" grid grid-flow-row-dense grid-cols-4">
-                {post.categories.map((category, idx) => (
+                {post?.categories?.map((category, idx) => (
                   <div
                     onClick={() =>
-                      router.push(`/category/${category.slug.current}`)
+                      router.push(`/category/${category?.slug?.current}`)
                     }
                     key={idx}
                     className="hover:underline cursor-pointer"
                   >
                     <p className="font-semibold text-gray-400 italic text-sm">
-                      {category.slug.current}
+                      {category?.slug?.current}
                     </p>
                   </div>
                 ))}

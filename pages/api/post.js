@@ -12,7 +12,7 @@ export default async function handler(req, res) {
   const { title, publishedAt, category, author, location } = JSON.parse(
     req.body
   );
-  console.log("req.body", req.body);
+
   try {
     await client
       .create({
@@ -33,7 +33,7 @@ export default async function handler(req, res) {
         },
       })
       .then((res) => {
-        console.log(res._id);
+        console.log("res._id", res._id);
         client
           .patch(res._id)
           .setIfMissing({ categories: [] })
