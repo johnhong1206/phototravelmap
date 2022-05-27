@@ -12,6 +12,7 @@
     "@reduxjs/toolkit": "^1.8.2",
     "@sanity/image-url": "^1.0.1",
     "add": "^2.0.6",
+    "fs": "^0.0.1-security",
     "geolib": "^3.3.3",
     "mapbox-gl": "^2.8.2",
     "next": "12.1.6",

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import AddCategoryModal from "../components/AddCategoryModal";
+import Head from "next/head";
+
 import {
   openCategoryModal,
   closeCategoryModal,
@@ -9,233 +11,124 @@ import {
   selectLocationModalIsOpen,
 } from "../features/modalSlice";
 import { sanityClient, urlFor } from "../sanity";
-import { useDispatch, useSelector } from "react-redux";
 import AddLocationModal from "../components/AddLocationModal";
 import { AiOutlinePlusCircle, AiOutlineClose } from "react-icons/ai";
-import toast from "react-hot-toast";
+import AddPost from "../components/AddPost";
+import { useDispatch, useSelector } from "react-redux";
+import AdminPostList from "../components/AdminPostList";
+import AddPostCategories from "../components/AddPostCategories";
+import { fetchPost } from "../utils/fetchpost";
+import AddImagetoPost from "../components/AddImagetoPost";
 
-function Admin({ location, categories }) {
+function Admin({ location, categories, posts }) {
   const dispatch = useDispatch();
+  const [phase, setPhase] = useState("Post");
+  const [selectPost, setSelectPost] = useState(null);
+  const [refetchpost, setRefetchPost] = useState(posts);
+
   const locationModalisOpen = useSelector(selectLocationModalIsOpen);
   const categoryModalisOpen = useSelector(selectCategoryModalIsOpen);
-  const [title, setTitle] = useState("");
-  const [image, setImage] = useState("");
-  const [author, setAuthor] = useState("5eecd9d7-38e3-4b5b-ab16-6489274dea76");
 
-  const [selectlocation, setSelectLocation] = useState(null);
-  const [selectCategory, setSelectCategory] = useState(null);
-  const [activeLocation, setActiveLocation] = useState(selectlocation);
-  const [activeCategory, setActiveCategory] = useState(selectCategory);
-
-  const deletePost = async () => {
-    await fetch("/api/deletepost", {
-      method: "POST",
-    });
+  const Phase = ({ name, isActive, setPhase }) => {
+    return (
+      <div
+        onClick={() => setPhase(name)}
+        className={`flex flex-col items-center cursor-pointer`}
+      >
+        <h1
+          className={`font-bold ${
+            isActive ? "text-gray-800" : "text-gray-400"
+          }`}
+        >
+          {name}
+        </h1>
+        <div
+          className={`w-4 h-4 rounded-full ${
+            isActive ? "bg-blue-600" : "bg-gray-400"
+          }`}
+        />
+      </div>
+    );
   };
 
-  const post = async () => {
-    const notification = toast.loading("Creating location...");
-
-    if (!title) {
-      toast.error("Error creating post", {
-        id: notification,
-      });
-      false;
-    }
-    if (!selectlocation?._id) {
-      toast.error("Error creating post", {
-        id: notification,
-      });
-      false;
-    }
-    if (!selectCategory?._id) {
-      toast.error("Error creating post", {
-        id: notification,
-      });
-      false;
-    }
-
-    const postInfo = {
-      title: title,
-      author: author,
-      //   mainImage: "",
-      publishedAt: new Date(),
-      location: selectlocation?._id,
-      category: selectCategory?._id,
-    };
-    console.log("post info: ", postInfo);
-
-    await fetch("/api/post", {
-      body: JSON.stringify(postInfo),
-      method: "POST",
-    }).then((res) => {
-      toast.success("Post Success", {
-        id: notification,
-      });
-    });
-
-    setTitle("");
-    setActiveLocation(null);
-    setSelectLocation(null);
-    setActiveCategory(null);
-    setSelectCategory(null);
+  const fetchsome = async () => {
+    const query = `*[_type == "post"]{
+      _id,
+      title,
+      author->{
+        _id,
+        ...,
+      },
+      slug,
+      publishedAt,
+      categories[]->{
+        ...,
+      },
+      mainImage,
+      location->{
+        ...,
+      },
+    }`;
+    const posts = await sanityClient.fetch(query);
+    console.log(posts);
   };
 
-  const openlocationModal = () => {
-    if (!locationModalisOpen) {
-      dispatch(openLocationModal());
-    } else {
-      dispatch(closeLocationModal());
-    }
-  };
-  const openaddcategoriesModal = () => {
-    if (!categoryModalisOpen) {
-      dispatch(openCategoryModal());
-    } else {
-      dispatch(closeCategoryModal());
-    }
-  };
   return (
     <div className="flex flex-col h-screen max-h-screen">
-      <div className="flex flex-col lg:flex-row p-3 lg:p-4 bg-red-100 h-full">
-        <div className="w-full lg:w-[35vw] bg-white p-4 hover:shadow-md cursor-pointer">
-          <h1 className="font-bold text-3xl text-center">Posting Preview</h1>
-          <div className="flex flex-row items-center space-x-2">
-            <h2 className="font-bold text-2xl">Title:</h2>
-            <p>{title}</p>
-          </div>
-          {image && <image src={image} alt="" />}
-          <div className="mt-4">
-            <h2 className="font-bold text-2xl">Location</h2>
-            {selectlocation && (
-              <div className="space-y-6">
-                <div className="flex flex-row items-center space-x-2">
-                  <h2 className="text-xl font-medium">Title:</h2>
-                  <p className="font-light">{selectlocation?.title}</p>
-                </div>
-                <div className="flex flex-row items-center space-x-2">
-                  <h2 className="text-xl font-medium">State: </h2>
-                  <p className="font-light">{selectlocation?.state}</p>
-                </div>
-                <div className="flex flex-row items-center space-x-2">
-                  <h2 className="text-xl font-medium">GPS: </h2>
-                  <p className="font-light">
-                    <span>{selectlocation?.longitude}</span>
-                    <span>,</span>
-                    <span>{selectlocation?.latitude}</span>
-                  </p>
-                </div>
-                <div className="flex flex-row items-center space-x-2">
-                  <h2 className="text-xl font-medium">Address: </h2>
-                  <p className="font-light">{selectlocation?.address}</p>
-                </div>
-                <div className="flex flex-row items-center space-x-2">
-                  <h2 className="text-xl font-medium">Description: </h2>
-                  <p className="font-light">{selectlocation?.description}</p>
-                </div>
-              </div>
-            )}
-          </div>
-          <div className="mt-4">
-            <h2 className="font-bold text-2xl">Categories</h2>
-            {selectCategory && (
-              <div className="flex flex-row items-center space-x-2 mt-1">
-                <h2 className="text-xl font-medium">Title: </h2>
-                <p className="font-light">{selectCategory?.title}</p>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="hover:shadow-md bg-white flex-1">
-          <div className="  w-full flex-1 rounded-lg px-10">
-            <input
-              placeholder="title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="flex-1 w-full bg-transparent outline-none px-1 py-2 font-bold"
-            />
-          </div>
-          <div>
-            <div className="flex items-center space-x-2 mt-3 mx-2">
-              <h2 className="text-lg font-semibold">Location</h2>
-              {locationModalisOpen ? (
-                <AiOutlineClose
-                  onClick={openlocationModal}
-                  className="w-4 lg:w-5 h-4 lg:h-5 text-red-500"
-                />
-              ) : (
-                <AiOutlinePlusCircle
-                  onClick={openlocationModal}
-                  className="w-4 lg:w-5 h-4 lg:h-5 text-blue-400"
-                />
-              )}
-            </div>
-
-            <div className="grid grid-flow-row-dense md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-10 ">
-              {location?.map((location) => (
-                <div
-                  key={location._id}
-                  value={location._id}
-                  onClick={() => {
-                    setSelectLocation(location);
-                    setActiveLocation(location._id);
-                  }}
-                  className={`transition-all duration-500  ease-in-out flex items-center justify-center h-12 min-h-12 max-h-24 px-2 w-auto text-center cursor-pointer rounded-xl ${
-                    activeLocation === location._id &&
-                    "bg-gray-200 font-semibold shadow-md scale-110"
-                  }`}
-                >
-                  {location.title}
-                </div>
-              ))}
-            </div>
-          </div>
-          <div>
-            <div className="flex items-center space-x-2 mt-3 mx-2">
-              <h2 className="text-lg font-semibold">Categories</h2>
-              {categoryModalisOpen ? (
-                <AiOutlineClose
-                  onClick={openaddcategoriesModal}
-                  className="w-4 lg:w-5 h-4 lg:h-5 text-red-500"
-                />
-              ) : (
-                <AiOutlinePlusCircle
-                  onClick={openaddcategoriesModal}
-                  className="w-4 lg:w-5 h-4 lg:h-5 text-blue-400"
-                />
-              )}
-            </div>
-
-            <div className="grid grid-flow-row-dense md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-10 ">
-              {categories?.map((category) => (
-                <div
-                  className={`transition-all duration-500 ease-in-out flex items-center justify-center h-12 min-h-12 max-h-24 px-2 w-auto text-center cursor-pointer rounded-xl ${
-                    activeCategory === category._id &&
-                    "bg-gray-200 font-semibold shadow-md scale-110"
-                  }`}
-                  key={category._id}
-                  value={category._id}
-                  onClick={() => {
-                    setSelectCategory(category);
-                    setActiveCategory(category._id);
-                  }}
-                >
-                  {category.title}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <button
-            disabled={!title || !selectCategory || !selectlocation}
-            className=" bg-pink-400 w-full px-1 py-2 rounded-lg mt-10 shadow-lg hover:shadow-xl font-bold hover:text-white"
-            onClick={post}
-          >
-            Post
-          </button>
-        </div>
+      <Head>
+        <title>Zong Hong PhotoTravel Map Admin</title>
+        <meta name="description" content="Generated by create next app" />
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+      <button onClick={fetchsome}>fetch</button>
+      <div className="mb-4 flex justify-evenly mt-10">
+        <Phase
+          setPhase={setPhase}
+          name="Post"
+          isActive={phase == "Post" ? true : false}
+        />
+        <Phase
+          setPhase={setPhase}
+          name="AddPost"
+          isActive={phase == "AddPost" ? true : false}
+        />
+        <Phase
+          setPhase={setPhase}
+          name="AddImage"
+          isActive={phase == "AddImage" ? true : false}
+        />
+        <Phase
+          setPhase={setPhase}
+          name="AddPostCategory"
+          isActive={phase == "AddPostCategory" ? true : false}
+        />
       </div>
+      <main className="h-screen">
+        {phase == "Post" && (
+          <AdminPostList
+            posts={posts}
+            setSelectPost={setSelectPost}
+            selectPost={selectPost}
+          />
+        )}
+        {phase == "AddPost" && (
+          <AddPost location={location} categories={categories} />
+        )}
+        {phase == "Add" && (
+          <AddPost location={location} categories={categories} />
+        )}
+        {phase == "AddImage" && (
+          <AddImagetoPost selectPost={selectPost} setPhase={setPhase} />
+        )}
+        {phase == "AddPostCategory" && (
+          <AddPostCategories
+            setPhase={setPhase}
+            selectPost={selectPost}
+            categories={categories}
+          />
+        )}
+      </main>
+
       {locationModalisOpen && <AddLocationModal />}
       {categoryModalisOpen && <AddCategoryModal />}
     </div>
@@ -243,18 +136,37 @@ function Admin({ location, categories }) {
 }
 export default Admin;
 export const getServerSideProps = async (context) => {
+  const query = `*[_type == "post"]{
+    _id,
+    title,
+    author->{
+      _id,
+      ...,
+    },
+    slug,
+    publishedAt,
+    categories[]->{
+      ...,
+    },
+    mainImage,
+    location->{
+      ...,
+    },
+  }`;
+
   const locationquery = `*[_type == "location"]{
      ...
     }`;
   const categoriesquery = `*[_type == "category"]{
         ...
        }`;
-
+  const posts = await sanityClient.fetch(query);
   const location = await sanityClient.fetch(locationquery);
   const categories = await sanityClient.fetch(categoriesquery);
 
   return {
     props: {
+      posts,
       location,
       categories,
     },

@@ -1,0 +1,67 @@
+import React, { useState, useEffect, useRef } from "react";
+import toast from "react-hot-toast";
+
+function AddPostCategories({ selectPost, categories, setPhase }) {
+  const [selectCategory, setSelectCategory] = useState(null);
+  const [activeCategory, setActiveCategory] = useState(selectCategory);
+
+  const addCategory = async () => {
+    if (!selectPost?._id) false;
+    const notification = toast.loading("Creating location...");
+    const categoryInfo = {
+      _id: selectPost?._id,
+      category: selectCategory?._id,
+    };
+    console.log(categoryInfo);
+    await fetch("/api/addcategoriestopost", {
+      body: JSON.stringify(categoryInfo),
+      method: "POST",
+    }).then(() => {
+      toast.success("Categories Add Success", {
+        id: notification,
+      });
+    });
+    setPhase("Post");
+    setSelectCategory("");
+    setActiveCategory("");
+  };
+
+  return (
+    <div>
+      <div className="flex flex-row items-center space-x-2">
+        <h2 className="text-xl font-medium">Title:</h2>
+        <p className="font-light">{selectPost?.title}</p>
+      </div>
+      <div className="flex flex-row items-center space-x-2">
+        <h2 className="text-xl font-medium">Post Id:</h2>
+        <p className="font-light">{selectPost?._id}</p>
+      </div>
+      <div className="flex flex-row items-center space-x-2">
+        <h2 className="text-xl font-medium">category to add</h2>
+        <p className="font-light">{selectCategory?.title}</p>
+        <p className="font-light">{selectCategory?._id}</p>
+      </div>
+      <div className="grid grid-flow-row-dense md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-10 ">
+        {categories?.map((category) => (
+          <div
+            className={`transition-all duration-500 ease-in-out flex items-center justify-center h-12 min-h-12 max-h-24 px-2 w-auto text-center cursor-pointer rounded-xl ${
+              activeCategory === category._id &&
+              "bg-gray-200 font-semibold shadow-md scale-110"
+            }`}
+            key={category._id}
+            value={category._id}
+            onClick={() => {
+              setSelectCategory(category);
+              setActiveCategory(category._id);
+            }}
+          >
+            {category.title}
+          </div>
+        ))}
+      </div>
+      <button onClick={addCategory}>Add</button>
+    </div>
+  );
+}
+
+export default AddPostCategories;
