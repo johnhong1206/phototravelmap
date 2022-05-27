@@ -77,7 +77,10 @@ function AdminPostList({ posts, setSelectPost, selectPost }) {
           <div className="grid grid-flow-row-dense grid-cols-3 gap-3">
             {selectPost?.categories &&
               selectPost?.categories.map((category) => (
-                <div className="bg-gray-700 text-white px-3 py-[0.1rem] rounded-xl">
+                <div
+                  key={category._id}
+                  className="bg-gray-700 text-white px-3 py-[0.1rem] rounded-xl"
+                >
                   <p className="font-medium">{category?.title}</p>
                 </div>
               ))}
