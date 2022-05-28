@@ -61,7 +61,7 @@ function AddImagetoPost({ selectPost, setPhase }) {
       <div>
         <h1>Title:{selectPost?.title}</h1>
         <p>id:{selectPost?._id}</p>
-        <form method="post" action="/api/upload" enctype="multipart/form-data">
+        <form method="post" action="/api/upload" encType="multipart/form-data">
           <input name="image" type="file" />
           <input name="id" type="text" value={selectPost?._id} hidden />
           <button
