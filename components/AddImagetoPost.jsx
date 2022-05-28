@@ -5,9 +5,10 @@ import {
   AiOutlineCamera,
 } from "react-icons/ai";
 import toast from "react-hot-toast";
-
+import { useRouter } from "next/router";
 function AddImagetoPost({ selectPost, setPhase }) {
   const [file, setFile] = useState(null);
+  const router = useRouter();
 
   const imgPickerRef = useRef(null);
   const [imgToPost, setImgtoPost] = useState(null);
@@ -17,6 +18,7 @@ function AddImagetoPost({ selectPost, setPhase }) {
     selectPost._id
   );
   console.log(imagefileName);
+
   const addImgtoPost = (e) => {
     const reader = new FileReader();
     if (e.target.files[0]) {
@@ -34,41 +36,45 @@ function AddImagetoPost({ selectPost, setPhase }) {
 
   const uploadImage = async () => {
     const formData = new FormData();
-    formData.append("_id", "dtdO4o3cRLPwh3vnwtdHGE");
-    // formData.append("file", file);
+    const newid = selectPost?._id.toString();
+    console.log("newid", newid);
+    formData.append("id", `${newid}`);
+    formData.append("title", `${selectPost?.title}`);
+    formData.append("file", file);
     const requestOptions = {
       method: "POST",
       body: formData,
     };
+
     try {
-      await fetch("/api/addImagetopost", requestOptions).then((_res) => {
-        console.log(_res);
+      await fetch("/api/upload").then((_res) => {
+        console.log("upload", _res);
+        router.push("/admin");
       });
     } catch (err) {
       console.log(err);
     }
   };
 
-  const upload3 = async () => {
-    const data = new FormData();
-    data.append("file", file);
-    const imageInfo = {
-      _id: "dtdO4o3cRLPwh3vnwtdHGE",
-    };
-
-    await fetch("/api/uploadimage", {
-      body: JSON.stringify(imageInfo),
-      method: "POST",
-    });
-  };
-  function uploadFile(e) {
-    setFile(e.target.files[0]);
-  }
   return (
     <div>
+      <div>
+        <h1>Title:{selectPost?.title}</h1>
+        <p>id:{selectPost?._id}</p>
+        <form method="post" action="/api/upload" enctype="multipart/form-data">
+          <input name="image" type="file" />
+          <input name="id" type="text" value={selectPost?._id} hidden />
+          <button
+            className={`bg-red-400 border-none cursor-pointer w-1/4 text-white rounded-lg hover:bg-opacity-70 font-medium p-1`}
+            onClick={uploadImage}
+          >
+            Create
+          </button>
+        </form>
+      </div>
+      <hr className="my-10" />
       <div className={`flex flex-col mb-3`}>
         <label className={`mb-1 font-medium`}>Choose an image</label>
-        <input type="file" accept="image/*" onChange={uploadFile} />
       </div>
       <div className="flex flex-row items-center space-x-2">
         <h2 className="text-xl font-medium">Title:</h2>
@@ -91,17 +97,11 @@ function AddImagetoPost({ selectPost, setPhase }) {
       </div>{" "}
       <button
         className={`bg-red-400 border-none cursor-pointer w-1/4 text-white rounded-lg hover:bg-opacity-70 font-medium p-1`}
-        onClick={uploadImage}
+        // onClick={uploadImage}
       >
         Create
       </button>
       <hr />
-      <button
-        onClick={upload3}
-        className="mt-10 bg-red-400 border-none cursor-pointer w-1/4 text-white rounded-lg hover:bg-opacity-70 font-medium p-1"
-      >
-        upload3
-      </button>
     </div>
   );
 }
