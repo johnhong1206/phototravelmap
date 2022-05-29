@@ -103,7 +103,7 @@ function AddLocationModal() {
           <h2 className="text-xl font-bold text-center text-white">
             Search Result
           </h2>
-          <div className="grid grid-flow-row-dense md:grid-cols-2 ">
+          <div className="grid grid-flow-row-dense md:grid-cols-2">
             {searchResult &&
               searchResult?.map((result, idx) => (
                 <div
@@ -112,7 +112,7 @@ function AddLocationModal() {
                     setActiveSelectResult(idx);
                   }}
                   key={idx}
-                  className={` bg-white m-12 p-4 lg:p-10 shadow-md cursor-pointer ${
+                  className={` bg-white m-1 lg:m-12 p-1 lg:p-10 shadow-md cursor-pointer ${
                     activeSelectResult === idx && "shadow-xl shadow-pink-500/50"
                   }`}
                 >
@@ -168,7 +168,7 @@ function AddLocationModal() {
           </div>
         </div>
         {selectResult && (
-          <div className="bg-white m-12 p-4 lg:p-10 shadow-md cursor-pointer">
+          <div className="bg-white m-1 lg:m-12 p-1 shadow-md cursor-pointer">
             <h2 className="text-xl font-bold text-center ">
               Select Location Info
             </h2>
@@ -205,7 +205,7 @@ function AddLocationModal() {
               <input
                 placeholder="description"
                 type="text"
-                className=" outline-none"
+                className=" bg-transparent outline-none"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
               />

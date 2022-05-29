@@ -12,11 +12,11 @@ function AdminPostList({ posts, setSelectPost, selectPost }) {
 
   return (
     <div className="flex flex-col lg:flex-row">
-      <div className="p-4 w-full lg:w-[50vw] h-[15vh] lg:h-[75vh] space-y-4 overflow-y-auto">
+      <div className="p-4 w-full lg:w-[50vw] h-[20vh] lg:h-[75vh] space-y-4 overflow-y-auto">
         {posts?.map((post) => (
           <div
             key={post._id}
-            className={`p-4 m-8 cursor-pointer bg-white shadow-md rounded-xl  ${
+            className={`p-2 m-4  lg:p-4 lg:m-8 cursor-pointer bg-white shadow-md rounded-xl  ${
               selectPost?._id === post?._id && "bg-slate-200 sha"
             }`}
             onClick={() => setSelectPost(post)}
@@ -29,15 +29,17 @@ function AdminPostList({ posts, setSelectPost, selectPost }) {
         <div>
           <h1 className="text-xl text-center font-bold">Post Info</h1>
         </div>
+        <div className="flex flex-col space-y-4">
+          <div className="flex flex-row items-center space-x-2 w-full">
+            <h2 className="text-xl font-medium">Title:</h2>
+            <p className="font-light">{selectPost?.title}</p>
+          </div>
+          <div className="hidden lg:flex flex-row items-center space-x-2">
+            <h2 className="text-xl font-medium">Id:</h2>
+            <p className="font-light ">{selectPost?._id}</p>
+          </div>
+        </div>
 
-        <div className="flex flex-row items-center space-x-2">
-          <h2 className="text-xl font-medium">Title:</h2>
-          <p className="font-light">{selectPost?.title}</p>
-        </div>
-        <div className="flex flex-row items-center space-x-2">
-          <h2 className="text-xl font-medium">Id:</h2>
-          <p className="font-light">{selectPost?._id}</p>
-        </div>
         <div className="flex flex-row items-center space-x-2">
           <h2 className="text-xl font-medium">Post Date:</h2>
           <p className="font-light">{selectPost?.publishedAt}</p>

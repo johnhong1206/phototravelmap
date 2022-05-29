@@ -22,30 +22,52 @@ function AddPost({ location, categories, fetchsome }) {
   const categoryModalisOpen = useSelector(selectCategoryModalIsOpen);
 
   const [title, setTitle] = useState("");
-  const inputRef = useRef(null);
-  const imgPickerRef = useRef(null);
-  const [image, setImage] = useState("");
-  const [imgToPost, setImgtoPost] = useState(null);
 
   const [selectlocation, setSelectLocation] = useState(null);
   const [selectCategory, setSelectCategory] = useState(null);
   const [activeLocation, setActiveLocation] = useState(selectlocation);
   const [activeCategory, setActiveCategory] = useState(selectCategory);
   const [author, setAuthor] = useState("5eecd9d7-38e3-4b5b-ab16-6489274dea76");
+  const [searchLocation, setSearchLocation] = useState("");
+  const [searchLocationResult, setSearchLocationResult] = useState([]);
+  const [showResults, setShowResults] = useState(false);
+  const excludeColumns = [];
+  const [currentpage, setCurrentPage] = useState(1);
+  const [postsPerPage] = useState(4);
+  const indexOfLastPost = currentpage * postsPerPage;
+  const indexOfFirstPost = indexOfLastPost - postsPerPage;
+  const currentLocation = location?.slice(indexOfFirstPost, indexOfLastPost);
+  const paginate = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+  const pageNumber = [];
+  for (let i = 1; i <= Math.ceil(location?.length / postsPerPage); i++) {
+    pageNumber.push(i);
+  }
 
-  const addImgtoPost = (e) => {
-    const reader = new FileReader();
-    if (e.target.files[0]) {
-      reader.readAsDataURL(e.target.files[0]);
+  const handleChange = (value) => {
+    setSearchLocation(value);
+    filterData(value);
+  };
+
+  const filterData = (value) => {
+    const Value = value.toLocaleUpperCase().trim();
+    if (Value === "") {
+      setSearchLocationResult(location);
+      setShowResults(false);
+    } else {
+      setShowResults(true);
+      const filteredData = location.filter((item) => {
+        return Object.keys(item).some((key) =>
+          excludeColumns.includes(key)
+            ? false
+            : item[key]?.toString().toLocaleUpperCase().includes(Value)
+        );
+      });
+      setSearchLocationResult(filteredData);
     }
+  };
 
-    reader.onload = (readerEvent) => {
-      setImgtoPost(readerEvent.target.result);
-    };
-  };
-  const removeImg = () => {
-    setImgtoPost(null);
-  };
   const post = async () => {
     const notification = toast.loading("Creating location...");
 
@@ -114,13 +136,11 @@ function AddPost({ location, categories, fetchsome }) {
     <div className="flex flex-col lg:flex-row  bg-red-100 h-full">
       <div className="w-full lg:w-[35vw] bg-white p-4 hover:shadow-md cursor-pointer">
         <h1 className="font-bold text-3xl text-center">Posting Preview</h1>
-        <button onClick={() => fetchsome()}>fetchNewPost</button>
         <div className="flex flex-row items-center space-x-2">
           <h2 className="font-bold text-2xl">Title:</h2>
           <p>{title}</p>
         </div>
 
-        {image && <image src={image} alt="" />}
         <div className="mt-4">
           <h2 className="font-bold text-2xl">Location</h2>
           {selectlocation && (
@@ -164,45 +184,92 @@ function AddPost({ location, categories, fetchsome }) {
       </div>
 
       <div className="hover:shadow-md bg-white flex-1">
-        <div className="  w-full flex-1 rounded-lg px-10">
+        <div className="w-full flex-1 rounded-lg">
+          <h2 className="text-lg font-semibold px-5">Title:</h2>
           <input
             placeholder="title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="flex-1 w-full bg-transparent outline-none px-1 py-2 font-bold"
+            className="font-bold tracking-widest  text-gray-800  p-2 px-5 h-full w-full flex-grow rounded flex-shrink rounded-l-md focus:outline-none focus:shadow-2xl focus:bg-gray-100"
           />
         </div>
         <div>
-          <div className="flex items-center space-x-2 mt-3 mx-2">
-            <h2 className="text-lg font-semibold">Location</h2>
-            {locationModalisOpen ? (
-              <AiOutlineClose
-                onClick={openlocationModal}
-                className="w-4 lg:w-5 h-4 lg:h-5 text-red-500"
-              />
-            ) : (
-              <AiOutlinePlusCircle
-                onClick={openlocationModal}
-                className="w-4 lg:w-5 h-4 lg:h-5 text-blue-400"
-              />
-            )}
+          <div className="flex flex-col items-center mt-3 mx-2">
+            <div className="flex items-center space-x-4 w-full">
+              <h2 className="text-lg font-semibold">Location</h2>
+              {locationModalisOpen ? (
+                <AiOutlineClose
+                  onClick={openlocationModal}
+                  className="w-4 lg:w-5 h-4 lg:h-5 text-red-500  cursor-pointer"
+                />
+              ) : (
+                <AiOutlinePlusCircle
+                  onClick={openlocationModal}
+                  className="w-4 lg:w-5 h-4 lg:h-5 text-blue-400 cursor-pointer"
+                />
+              )}
+            </div>
+            <input
+              value={searchLocation}
+              onChange={(e) => handleChange(e.target.value)}
+              placeholder="Search anything you need... (Live Search by Filter)"
+              className={` font-bold tracking-widest bg-gradient-to-l text-gray-800 p-2 px-5 h-full w-full flex-grow rounded flex-shrink rounded-l-md focus:outline-none
+          `}
+              type="text"
+            />
           </div>
 
-          <div className="grid grid-flow-row-dense md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-10 ">
-            {location?.map((location) => (
+          <div className="grid grid-flow-row-dense grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-10 ">
+            {showResults &&
+              searchLocationResult?.map((location) => (
+                <div
+                  key={location._id}
+                  value={location._id}
+                  onClick={() => {
+                    setSelectLocation(location);
+                    setActiveLocation(location._id);
+                  }}
+                  className={`transition-all duration-500  ease-in-out flex items-center justify-center h-12 min-h-12 max-h-24 px-2 w-auto text-center cursor-pointer rounded-xl ${
+                    activeLocation === location._id &&
+                    "bg-gray-200 font-semibold shadow-md scale-110"
+                  }`}
+                >
+                  {location.title}
+                </div>
+              ))}
+            {!showResults &&
+              currentLocation?.map((location) => (
+                <div
+                  key={location._id}
+                  value={location._id}
+                  onClick={() => {
+                    setSelectLocation(location);
+                    setActiveLocation(location._id);
+                  }}
+                  className={`transition-all duration-500  ease-in-out flex items-center justify-center h-12 min-h-12 max-h-24 px-2 w-auto text-center cursor-pointer rounded-xl ${
+                    activeLocation === location._id &&
+                    "bg-gray-200 font-semibold shadow-md scale-110"
+                  }`}
+                >
+                  {location.title}
+                </div>
+              ))}
+          </div>
+
+          <div className="flex flex-row items-center justify-center space-x-2">
+            {pageNumber.map((number) => (
               <div
-                key={location._id}
-                value={location._id}
-                onClick={() => {
-                  setSelectLocation(location);
-                  setActiveLocation(location._id);
-                }}
-                className={`transition-all duration-500  ease-in-out flex items-center justify-center h-12 min-h-12 max-h-24 px-2 w-auto text-center cursor-pointer rounded-xl ${
-                  activeLocation === location._id &&
-                  "bg-gray-200 font-semibold shadow-md scale-110"
+                key={number}
+                className={`flex items-center justify-center cursor-pointer hover:animate-pulse w-6 h-6 leading-6 bg-gray-500 text-white rounded-full ${
+                  currentpage == number && "bg-gray-900"
                 }`}
               >
-                {location.title}
+                <a
+                  onClick={() => paginate(number)}
+                  className="tracking-widest text-sm "
+                >
+                  {number}
+                </a>
               </div>
             ))}
           </div>
@@ -223,7 +290,7 @@ function AddPost({ location, categories, fetchsome }) {
             )}
           </div>
 
-          <div className="grid grid-flow-row-dense md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-10 ">
+          <div className="grid grid-flow-row-dense grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-10 ">
             {categories?.map((category) => (
               <div
                 className={`transition-all duration-500 ease-in-out flex items-center justify-center h-12 min-h-12 max-h-24 px-2 w-auto text-center cursor-pointer rounded-xl ${

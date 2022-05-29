@@ -59,7 +59,12 @@ function AddPostCategories({ selectPost, categories, setPhase }) {
           </div>
         ))}
       </div>
-      <button onClick={addCategory}>Add</button>
+      <button
+        className=" bg-pink-400 w-full px-1 py-2 rounded-lg mt-10 shadow-lg hover:shadow-xl font-bold hover:text-white"
+        onClick={addCategory}
+      >
+        Add
+      </button>
     </div>
   );
 }

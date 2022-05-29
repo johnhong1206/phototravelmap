@@ -6,6 +6,7 @@ import Map, { Marker } from "react-map-gl";
 import { useRouter } from "next/router";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { IoChevronUpOutline } from "react-icons/io5";
+import Footer from "../../components/Footer";
 
 function PostDetails({ slug, post }) {
   const topRef = useRef(null);
@@ -125,6 +126,7 @@ function PostDetails({ slug, post }) {
           </div>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

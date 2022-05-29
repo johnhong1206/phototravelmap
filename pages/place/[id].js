@@ -9,6 +9,7 @@ import { getCenter } from "geolib";
 import "mapbox-gl/dist/mapbox-gl.css";
 import Map, { Marker, Popup } from "react-map-gl";
 import { IoChevronUpOutline } from "react-icons/io5";
+import Footer from "../../components/Footer";
 
 const PostFeeds = dynamic(() => import("../../components/PostFeeds"));
 
@@ -130,6 +131,7 @@ function PlaceDetail({ posts, location }) {
           </div>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

@@ -114,24 +114,35 @@ function AddImagetoPost({ selectPost, setPhase }) {
     setFile(null);
   };
   return (
-    <div>
-      <div>
-        <h1>Title:{selectPost?.title}</h1>
-        <p>id:{selectPost?._id}</p>
-        <img
-          src={file ? URL.createObjectURL(file) : null}
-          className="w-24 h-24"
-        />
-        <form
-          method="post"
-          action="/api/addImagetopost"
-          encType="multipart/form-data"
-        >
-          <input name="image" type="file" onChange={uploadFile} />
-        </form>
-        <hr className="my-12" />
-        <button onClick={makePost}>upload2</button>
+    <div className="flex-1 flex flex-col px-10 py-2 shadow-lg">
+      <div className="flex items-center justify-center space-x-5">
+        <h1 className="font-bold text-xl my-5">Title:{selectPost?.title}</h1>
+        <p className="font-light hidden lg:inline-flex">id:{selectPost?._id}</p>
       </div>
+      <div className="flex items-center justify-center w-full">
+        {file && (
+          <img
+            src={file ? URL.createObjectURL(file) : null}
+            className="w-[55%] h-[55%] lg:w-[30%] lg:h-[30%] object-contain"
+            alt="image to upload"
+          />
+        )}
+      </div>
+
+      <form
+        method="post"
+        action="/api/addImagetopost"
+        encType="multipart/form-data"
+        className="flex items-center justify-center my-4 w-full"
+      >
+        <input name="image" type="file" onChange={uploadFile} />
+      </form>
+      <button
+        onClick={makePost}
+        className=" bg-pink-400 w-full px-1 py-2 rounded-lg mt-10 shadow-lg hover:shadow-xl font-bold hover:text-white"
+      >
+        Upload
+      </button>
     </div>
   );
 }

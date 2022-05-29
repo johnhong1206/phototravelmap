@@ -9,6 +9,7 @@ import { sanityClient, urlFor } from "../sanity";
 import { getCenter } from "geolib";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { IoChevronUpOutline } from "react-icons/io5";
+import Footer from "../components/Footer";
 // components
 const PostFeeds = dynamic(() => import("../components/PostFeeds"));
 
@@ -136,6 +137,7 @@ export default function Home({ posts }) {
           </div>
         </div>
       </main>
+      <Footer />
     </div>
   );
 }
