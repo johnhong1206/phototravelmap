@@ -45,16 +45,15 @@ handler.post(async (req, res) => {
       })
       .then((response) => {
         console.log("success");
-        res.status(200).json({ message: "upload" });
       })
       .catch((err) => {
         console.error(err);
-        return res
-          .status(500)
-          .json({ message: `Couldn't submit comment`, err });
+
+        return res.status(500).json({ message: `Couldn't submit`, err });
       });
   } catch (err) {
     console.error(err);
+    return res.status(500).json({ message: `Couldn't submit`, err });
   }
 });
 

@@ -119,25 +119,7 @@ function AddPost({ location, categories, fetchsome }) {
           <h2 className="font-bold text-2xl">Title:</h2>
           <p>{title}</p>
         </div>
-        {imgToPost && (
-          <div
-            onClick={removeImg}
-            className="flex flex-col filter hover:brightness-110 transition duration-150 transform hover:scale-105 cursor-pointer"
-          >
-            <img className="h-10 object-contain" src={imgToPost} alt="" />
-            <p className="text-xs text-red-500 text-center">Remove</p>
-          </div>
-        )}
-        <div className="inputIcon" onClick={() => imgPickerRef.current.click()}>
-          <AiOutlineCamera className="h-7 text-green-500" />
-          <p className="text-xs sm:text-sm lg:text-base">Photo/Video</p>
-          <input
-            ref={imgPickerRef}
-            type="file"
-            hidden
-            onChange={addImgtoPost}
-          />
-        </div>
+
         {image && <image src={image} alt="" />}
         <div className="mt-4">
           <h2 className="font-bold text-2xl">Location</h2>

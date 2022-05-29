@@ -7,6 +7,8 @@ import {
 import toast from "react-hot-toast";
 import { useRouter } from "next/router";
 function AddImagetoPost({ selectPost, setPhase }) {
+  const title = selectPost?.title;
+  const id = selectPost?._id;
   const [file, setFile] = useState(null);
   const router = useRouter();
 
@@ -33,6 +35,7 @@ function AddImagetoPost({ selectPost, setPhase }) {
   const removeImg = () => {
     setImgtoPost(null);
   };
+  console.log("file", file);
 
   const uploadImage = async () => {
     const formData = new FormData();
@@ -41,13 +44,16 @@ function AddImagetoPost({ selectPost, setPhase }) {
     formData.append("id", `${newid}`);
     formData.append("title", `${selectPost?.title}`);
     formData.append("file", file);
+    formData.append("path");
+
     const requestOptions = {
       method: "POST",
       body: formData,
     };
 
+    console.log(requestOptions);
     try {
-      await fetch("/api/upload").then((_res) => {
+      await fetch("/api/upload", requestOptions).then((_res) => {
         console.log("upload", _res);
         router.push("/admin");
       });
@@ -56,52 +62,76 @@ function AddImagetoPost({ selectPost, setPhase }) {
     }
   };
 
+  const upload2 = async () => {
+    const formData = new FormData();
+    const newid = selectPost?._id.toString();
+    formData.append("id", `${newid}`);
+    const requestOptions = {
+      method: "POST",
+      body: formData,
+    };
+
+    console.log(requestOptions);
+
+    // try {
+    //   await fetch("/api/addImagetopost");
+    // } catch (err) {
+    //   console.error("err", err);
+    // }
+  };
+
+  function uploadFile(e) {
+    setFile(e.target.files[0]);
+  }
+
+  const makePost = async () => {
+    if (!file) false;
+    const notification = toast.loading("Uploading Image...");
+
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("id", id);
+    formData.append("image", file);
+    const requestOptions = {
+      method: "POST",
+      body: formData,
+    };
+    await fetch("/api/addImagetopost", requestOptions)
+      .then((result) =>
+        toast.success("Image Upload Success !!!", {
+          id: notification,
+        })
+      )
+      .finally(() => {
+        setPhase("Post");
+      })
+      .catch((error) => {
+        console.error(error);
+        toast.error("Error creating post", {
+          id: notification,
+        });
+      });
+    setFile(null);
+  };
   return (
     <div>
       <div>
         <h1>Title:{selectPost?.title}</h1>
         <p>id:{selectPost?._id}</p>
-        <form method="post" action="/api/upload" encType="multipart/form-data">
-          <input name="image" type="file" />
-          <input name="id" type="text" value={selectPost?._id} hidden />
-          <button
-            className={`bg-red-400 border-none cursor-pointer w-1/4 text-white rounded-lg hover:bg-opacity-70 font-medium p-1`}
-            onClick={uploadImage}
-          >
-            Create
-          </button>
-        </form>
-      </div>
-      <hr className="my-10" />
-      <div className={`flex flex-col mb-3`}>
-        <label className={`mb-1 font-medium`}>Choose an image</label>
-      </div>
-      <div className="flex flex-row items-center space-x-2">
-        <h2 className="text-xl font-medium">Title:</h2>
-        <p className="font-light">{selectPost?.title}</p>
-        <p className="font-light">{selectPost?._id}</p>
-      </div>
-      {imgToPost && (
-        <div
-          onClick={removeImg}
-          className="flex flex-col filter hover:brightness-110 transition duration-150 transform hover:scale-105 cursor-pointer"
+        <img
+          src={file ? URL.createObjectURL(file) : null}
+          className="w-24 h-24"
+        />
+        <form
+          method="post"
+          action="/api/addImagetopost"
+          encType="multipart/form-data"
         >
-          <img className="h-10 object-contain" src={imgToPost} alt="" />
-          <p className="text-xs text-red-500 text-center">Remove</p>
-        </div>
-      )}
-      <div className="inputIcon" onClick={() => imgPickerRef.current.click()}>
-        <AiOutlineCamera className="h-7 text-green-500" />
-        <p className="text-xs sm:text-sm lg:text-base">Photo/Video</p>
-        <input ref={imgPickerRef} type="file" hidden onChange={addImgtoPost} />
-      </div>{" "}
-      <button
-        className={`bg-red-400 border-none cursor-pointer w-1/4 text-white rounded-lg hover:bg-opacity-70 font-medium p-1`}
-        // onClick={uploadImage}
-      >
-        Create
-      </button>
-      <hr />
+          <input name="image" type="file" onChange={uploadFile} />
+        </form>
+        <hr className="my-12" />
+        <button onClick={makePost}>upload2</button>
+      </div>
     </div>
   );
 }
