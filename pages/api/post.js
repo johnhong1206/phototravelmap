@@ -9,7 +9,7 @@ const config = {
 const client = sanityClient(config);
 
 export default async function handler(req, res) {
-  const { title, publishedAt, category, author, location } = JSON.parse(
+  const { title, publishedAt, category, author, location, slug } = JSON.parse(
     req.body
   );
 
@@ -25,7 +25,7 @@ export default async function handler(req, res) {
         publishedAt,
         slug: {
           _type: "slug",
-          current: title,
+          current: slug,
         },
         location: {
           _type: "reference",
@@ -33,10 +33,9 @@ export default async function handler(req, res) {
         },
       })
       .then((res) => {
-        console.log("res._id", res._id);
-        client
+        return client
           .patch(res._id)
-          .setIfMissing({ categories: [] })
+          .set({ categories: [] })
           .insert("after", "categories[-1]", [
             {
               _ref: category,

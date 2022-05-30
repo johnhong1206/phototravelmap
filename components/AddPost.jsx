@@ -14,14 +14,21 @@ import {
   AiOutlineCamera,
 } from "react-icons/ai";
 import toast from "react-hot-toast";
+import PostFeeds from "./PostFeeds";
 
-function AddPost({ location, categories, fetchsome }) {
+function AddPost({ location, categories, setPhase, handleRefresh }) {
   const dispatch = useDispatch();
 
   const locationModalisOpen = useSelector(selectLocationModalIsOpen);
   const categoryModalisOpen = useSelector(selectCategoryModalIsOpen);
 
   const [title, setTitle] = useState("");
+  const slug = title.concat(
+    "-",
+    new Date().toLocaleDateString(),
+    "-",
+    new Date().toLocaleTimeString()
+  );
 
   const [selectlocation, setSelectLocation] = useState(null);
   const [selectCategory, setSelectCategory] = useState(null);
@@ -69,7 +76,7 @@ function AddPost({ location, categories, fetchsome }) {
   };
 
   const post = async () => {
-    const notification = toast.loading("Creating location...");
+    const notification = toast.loading("Posting...");
 
     if (!title) {
       toast.error("Error creating post", {
@@ -93,8 +100,9 @@ function AddPost({ location, categories, fetchsome }) {
     const postInfo = {
       title: title,
       author: author,
+      slug: slug,
       //   mainImage: "",
-      publishedAt: new Date(),
+      publishedAt: new Date().toISOString(),
       location: selectlocation?._id,
       category: selectCategory?._id,
     };
@@ -109,12 +117,13 @@ function AddPost({ location, categories, fetchsome }) {
         id: notification,
       });
     });
-
+    handleRefresh();
     setTitle("");
     setActiveLocation(null);
     setSelectLocation(null);
     setActiveCategory(null);
     setSelectCategory(null);
+    setPhase("Post");
   };
 
   const openlocationModal = () => {
@@ -131,58 +140,37 @@ function AddPost({ location, categories, fetchsome }) {
       dispatch(closeCategoryModal());
     }
   };
+  console.log("location", selectlocation);
 
   return (
-    <div className="flex flex-col lg:flex-row  bg-red-100 h-full">
-      <div className="w-full lg:w-[35vw] bg-white p-4 hover:shadow-md cursor-pointer">
-        <h1 className="font-bold text-3xl text-center">Posting Preview</h1>
-        <div className="flex flex-row items-center space-x-2">
-          <h2 className="font-bold text-2xl">Title:</h2>
-          <p>{title}</p>
-        </div>
-
-        <div className="mt-4">
-          <h2 className="font-bold text-2xl">Location</h2>
-          {selectlocation && (
-            <div className="space-y-6">
-              <div className="flex flex-row items-center space-x-2">
-                <h2 className="text-xl font-medium">Title:</h2>
-                <p className="font-light">{selectlocation?.title}</p>
-              </div>
-              <div className="flex flex-row items-center space-x-2">
-                <h2 className="text-xl font-medium">State: </h2>
-                <p className="font-light">{selectlocation?.state}</p>
-              </div>
-              <div className="flex flex-row items-center space-x-2">
-                <h2 className="text-xl font-medium">GPS: </h2>
-                <p className="font-light">
-                  <span>{selectlocation?.longitude}</span>
-                  <span>,</span>
+    <div className="flex flex-col lg:flex-row h-screen bg-slate-200">
+      <div className="w-full h-[50vh] lg:w-[35vw]  p-4">
+        <div className="bg-white text-black cursor-pointer px-2 py-4 hover:shadow-md w-full h-full">
+          <div className="w-full border-b border-gray-100">
+            <div className="flex flex-row items-center h-16">
+              <h2 className="flex-1 font-bold truncate">{title}</h2>
+            </div>
+            {selectlocation && (
+              <div className="flex flex-col">
+                <p className="font-bold">{selectlocation?.title}</p>
+                <p className="text-sm font-medium text-gray-400">
+                  <span className="mr-1">GPS:</span>
+                  {selectlocation?.longitude}
+                  <span className="mx-1">{","}</span>
                   <span>{selectlocation?.latitude}</span>
                 </p>
               </div>
-              <div className="flex flex-row items-center space-x-2">
-                <h2 className="text-xl font-medium">Address: </h2>
-                <p className="font-light">{selectlocation?.address}</p>
+            )}
+            {selectCategory && (
+              <div className="flex flex-col bg-gray-900 w-1/6 mt-4 items-center px-4 py-1 rounded-full">
+                <p className="text-sm font-medium text-gray-200">
+                  {selectCategory?.title}
+                </p>
               </div>
-              <div className="flex flex-row items-center space-x-2">
-                <h2 className="text-xl font-medium">Description: </h2>
-                <p className="font-light">{selectlocation?.description}</p>
-              </div>
-            </div>
-          )}
-        </div>
-        <div className="mt-4">
-          <h2 className="font-bold text-2xl">Categories</h2>
-          {selectCategory && (
-            <div className="flex flex-row items-center space-x-2 mt-1">
-              <h2 className="text-xl font-medium">Title: </h2>
-              <p className="font-light">{selectCategory?.title}</p>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
-
       <div className="hover:shadow-md bg-white flex-1">
         <div className="w-full flex-1 rounded-lg">
           <h2 className="text-lg font-semibold px-5">Title:</h2>
@@ -193,6 +181,7 @@ function AddPost({ location, categories, fetchsome }) {
             className="font-bold tracking-widest  text-gray-800  p-2 px-5 h-full w-full flex-grow rounded flex-shrink rounded-l-md focus:outline-none focus:shadow-2xl focus:bg-gray-100"
           />
         </div>
+
         <div>
           <div className="flex flex-col items-center mt-3 mx-2">
             <div className="flex items-center space-x-4 w-full">

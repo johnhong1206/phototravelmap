@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@badrap/bar-of-progress": "^0.2.1",
     "@reduxjs/toolkit": "^1.8.2",
     "@sanity/image-url": "^1.0.1",
     "add": "^2.0.6",

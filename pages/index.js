@@ -46,7 +46,7 @@ export default function Home({ posts }) {
       <main className="max-w-screen mx-auto">
         <div
           id="#post"
-          className="grid grid-flow-row-dense grid-cols-1 gap-3 p-2 sm:grid-cols-2 md:gap-6 md:p-6 lg:grid-cols-3 xl:grid-cols-4"
+          className="p-2 lg:p-10 grid grid-flow-row-dense md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3"
         >
           {posts?.map((post) => (
             <>
@@ -103,7 +103,7 @@ export default function Home({ posts }) {
                     )}
                   </div>
                 </Marker>
-                {selectedLocation === post.location.longitude ? (
+                {selectedLocation === post?.location?.longitude ? (
                   <div>
                     <Popup
                       closeOnClick={false}
@@ -144,22 +144,18 @@ export default function Home({ posts }) {
 
 export const getServerSideProps = async (context) => {
   const query = `*[_type == "post"]{
-    _id,
-    title,
+    ...,
     author->{
       _id,
       ...,
     },
-    slug,
     publishedAt,
-    categories[0]->{
-      _id,
+    categories[0]->{   
       ...,
     },
     mainImage,
     location->{
-      _id,
-      ...,
+          ...,
     },
   }| order(_createdAt desc)`;
   const posts = await sanityClient.fetch(query);

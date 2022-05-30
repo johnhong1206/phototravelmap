@@ -1,13 +1,19 @@
 import React, { useState, useEffect, useRef } from "react";
 import toast from "react-hot-toast";
 
-function AddPostCategories({ selectPost, categories, setPhase }) {
+function AddPostCategories({
+  handleRefresh,
+  selectPost,
+  categories,
+  setPhase,
+  setSelectPost,
+}) {
   const [selectCategory, setSelectCategory] = useState(null);
   const [activeCategory, setActiveCategory] = useState(selectCategory);
 
   const addCategory = async () => {
     if (!selectPost?._id) false;
-    const notification = toast.loading("Creating location...");
+    const notification = toast.loading("Update Categories...");
     const categoryInfo = {
       _id: selectPost?._id,
       category: selectCategory?._id,
@@ -21,9 +27,11 @@ function AddPostCategories({ selectPost, categories, setPhase }) {
         id: notification,
       });
     });
-    setPhase("Post");
+    handleRefresh();
     setSelectCategory("");
     setActiveCategory("");
+    setSelectPost(null);
+    setPhase("Post");
   };
 
   return (
