@@ -29,6 +29,20 @@ export default function Home({ posts }) {
     width: "100%",
     height: "100%",
   });
+  const [currentpage, setCurrentPage] = useState(1);
+  const [postsPerPage] = useState(4);
+  const [activeNumber, setActiveNumber] = useState("");
+  const indexOfLastPost = currentpage * postsPerPage;
+  const indexOfFirstPost = indexOfLastPost - postsPerPage;
+  const currentPost = posts?.slice(indexOfFirstPost, indexOfLastPost);
+  const paginate = (pageNumber) => {
+    console.log(pageNumber);
+    setCurrentPage(pageNumber);
+  };
+  const pageNumber = [];
+  for (let i = 1; i <= Math.ceil(posts?.length / postsPerPage); i++) {
+    pageNumber.push(i);
+  }
 
   const scrollToTop = () => {
     topRef.current.scrollIntoView({
@@ -46,25 +60,42 @@ export default function Home({ posts }) {
       <main className="max-w-screen mx-auto">
         <div
           id="#post"
-          className="p-2 lg:p-10 grid grid-flow-row-dense md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3"
+          className="p-2 lg:p-4 grid grid-flow-row-dense md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3"
         >
-          {posts?.map((post) => (
+          {currentPost?.map((post) => (
             <>
               {post?.mainImage && (
                 <PostFeeds
-                  id={post._id}
-                  key={post._id}
-                  title={post.title}
-                  author={post.author}
-                  slug={post.slug}
-                  mainImage={post.mainImage}
-                  categories={post.categories}
-                  publishedAt={post.publishedAt}
-                  location={post.location}
-                  body={post.body}
+                  id={post?._id}
+                  key={post?._id}
+                  title={post?.title}
+                  author={post?.author}
+                  slug={post?.slug}
+                  mainImage={post?.mainImage}
+                  categories={post?.categories}
+                  publishedAt={post?.publishedAt}
+                  location={post?.location}
+                  body={post?.body}
                 />
               )}
             </>
+          ))}
+        </div>
+
+        <div className="flex flex-row items-center justify-center space-x-10 my-2">
+          {pageNumber?.map((number) => (
+            <div
+              onClick={() => {
+                paginate(number);
+                setActiveNumber(number);
+              }}
+              key={number}
+              className={`grid place-items-center transition-all duration-500 ease-in-out cursor-pointer hover:animate-pulse bg-gray-900 bg-opacity-50 w-6 h-6 leading-6  text-white rounded-full 
+              ${activeNumber == number && " bg-opacity-100 scale-125"}
+           `}
+            >
+              <a className="tracking-widest text-sm">{number}</a>
+            </div>
           ))}
         </div>
         <div className="my-4">

@@ -30,6 +30,20 @@ function Category({ posts, category }) {
     width: "100%",
     height: "100%",
   });
+  const [currentpage, setCurrentPage] = useState(1);
+  const [postsPerPage] = useState(4);
+  const [activeNumber, setActiveNumber] = useState("");
+  const indexOfLastPost = currentpage * postsPerPage;
+  const indexOfFirstPost = indexOfLastPost - postsPerPage;
+  const currentPost = posts?.slice(indexOfFirstPost, indexOfLastPost);
+  const paginate = (pageNumber) => {
+    console.log(pageNumber);
+    setCurrentPage(pageNumber);
+  };
+  const pageNumber = [];
+  for (let i = 1; i <= Math.ceil(posts?.length / postsPerPage); i++) {
+    pageNumber.push(i);
+  }
 
   const scrollToTop = () => {
     topRef.current.scrollIntoView({
@@ -51,7 +65,7 @@ function Category({ posts, category }) {
       </h1>
       <main className="max-w-screen mx-auto">
         <div className="grid grid-flow-row-dense grid-cols-1 gap-3 p-2 sm:grid-cols-2 md:gap-6 md:p-6 lg:grid-cols-3 xl:grid-cols-4">
-          {posts?.map((post) => (
+          {currentPost?.map((post) => (
             <PostFeeds
               key={post._id}
               title={post.title}
@@ -63,6 +77,22 @@ function Category({ posts, category }) {
               location={post.location}
               body={post.body}
             />
+          ))}
+        </div>
+        <div className="flex flex-row items-center justify-center space-x-10 my-2">
+          {pageNumber?.map((number) => (
+            <div
+              onClick={() => {
+                paginate(number);
+                setActiveNumber(number);
+              }}
+              key={number}
+              className={`grid place-items-center transition-all duration-500 ease-in-out cursor-pointer hover:animate-pulse bg-gray-900 bg-opacity-50 w-6 h-6 leading-6  text-white rounded-full 
+              ${activeNumber == number && " bg-opacity-100 scale-125"}
+           `}
+            >
+              <a className="tracking-widest text-sm">{number}</a>
+            </div>
           ))}
         </div>
         <div className="my-4">
