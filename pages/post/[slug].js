@@ -26,7 +26,7 @@ function PostDetails({ slug, post }) {
   const [rating, setRating] = useState([]);
   const [postRating, setPostRating] = useState(null);
 
-  const [rate, setRate] = useState(Number(0));
+  const [rate, setRate] = useState(null);
   const [comment, setComment] = useState("");
   const [refetchpost, setRefetchPost] = useState(post);
   const id = post?._id;
