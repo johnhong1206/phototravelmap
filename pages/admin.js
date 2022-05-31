@@ -48,6 +48,7 @@ function Admin({ location, categories, posts }) {
             isActive ? "bg-blue-600" : "bg-gray-400"
           }`}
         />
+        {new Date().toDateString()}
       </div>
     );
   };
@@ -89,8 +90,8 @@ function Admin({ location, categories, posts }) {
         />
         <Phase
           setPhase={setPhase}
-          name="AddPost"
-          isActive={phase == "AddPost" ? true : false}
+          name="Add Post"
+          isActive={phase == "Add Post" ? true : false}
         />
         <Phase
           setPhase={setPhase}
@@ -118,16 +119,14 @@ function Admin({ location, categories, posts }) {
             selectPost={selectPost}
           />
         )}
-        {phase == "AddPost" && (
+        {phase == "Add Post" && (
           <AddPost
+            posts={refetchpost}
             location={location}
             categories={categories}
             handleRefresh={handleRefresh}
             setPhase={setPhase}
           />
-        )}
-        {phase == "Add" && (
-          <AddPost location={location} categories={categories} />
         )}
         {phase == "Add Image" && (
           <AddImagetoPost

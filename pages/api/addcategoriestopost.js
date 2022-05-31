@@ -10,7 +10,6 @@ export default async function handler(req, res) {
   const { _id, category } = JSON.parse(req.body);
   console.log(category);
   try {
-    console.log("category>>>", category);
     await client
       .patch(_id)
       .setIfMissing({ categories: [] })
@@ -26,7 +25,7 @@ export default async function handler(req, res) {
       });
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: `Couldn't submit comment`, err });
+    return res.status(500).json({ message: `Couldn't submit`, err });
   }
 
   res.status(200).json({ message: "Categoty Update" });

@@ -16,19 +16,14 @@ import {
 import toast from "react-hot-toast";
 import PostFeeds from "./PostFeeds";
 
-function AddPost({ location, categories, setPhase, handleRefresh }) {
+function AddPost({ posts, location, categories, setPhase, handleRefresh }) {
   const dispatch = useDispatch();
 
   const locationModalisOpen = useSelector(selectLocationModalIsOpen);
   const categoryModalisOpen = useSelector(selectCategoryModalIsOpen);
 
   const [title, setTitle] = useState("");
-  const slug = title.concat(
-    "-",
-    new Date().toLocaleDateString(),
-    "-",
-    new Date().toLocaleTimeString()
-  );
+  const slug = title.concat("-", "Zong-Hong");
 
   const [selectlocation, setSelectLocation] = useState(null);
   const [selectCategory, setSelectCategory] = useState(null);
@@ -75,7 +70,13 @@ function AddPost({ location, categories, setPhase, handleRefresh }) {
     }
   };
 
-  const post = async () => {
+  const postTitleExist = posts?.find(
+    (post) => post?.title.toLocaleLowerCase() === title.toLocaleLowerCase()
+  );
+  console.log("!!postTitleExist", !!postTitleExist, postTitleExist);
+
+  const post = async (e) => {
+    e.preventDefault();
     const notification = toast.loading("Posting...");
 
     if (!title) {
@@ -106,24 +107,40 @@ function AddPost({ location, categories, setPhase, handleRefresh }) {
       location: selectlocation?._id,
       category: selectCategory?._id,
     };
-    console.log("post info: ", postInfo);
 
-    await fetch("/api/post", {
-      body: JSON.stringify(postInfo),
-      method: "POST",
-    }).then((res) => {
-      console.log("res", res.body, res.json());
-      toast.success("Post Success", {
+    const postTitleExist = posts?.find((post) => post?.title === title);
+
+    if (!!postTitleExist == true) {
+      toast.error("Title already exists Please Choose a new title", {
         id: notification,
       });
-    });
-    handleRefresh();
+    }
+
+    if (!!postTitleExist == false) {
+      try {
+        await fetch("/api/post", {
+          body: JSON.stringify(postInfo),
+          method: "POST",
+        }).then((res) => {
+          console.log("res", res.body, res.json());
+          toast.success("Post Success", {
+            id: notification,
+          });
+        });
+      } catch (err) {
+        toast.error("Something went wrong", {
+          id: notification,
+        });
+      }
+    }
+
     setTitle("");
     setActiveLocation(null);
     setSelectLocation(null);
     setActiveCategory(null);
     setSelectCategory(null);
     setPhase("Post");
+    handleRefresh();
   };
 
   const openlocationModal = () => {
