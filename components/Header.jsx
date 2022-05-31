@@ -1,6 +1,6 @@
 import React from "react";
 import Link from "next/link";
-
+import { IoRestaurantOutline, IoCameraOutline } from "react-icons/io5";
 function Header() {
   return (
     <header className="bg-white z-50 px-4 py-3 sticky top-0 flex item-center justify-between">
@@ -15,6 +15,14 @@ function Header() {
           </h2>
         </div>
       </Link>
+      <div className="flex items-center space-x-4">
+        <Link href="/">
+          <IoRestaurantOutline className="w-6 h-6 hover:text-green-400 text-gray-400 cursor-pointer" />
+        </Link>
+        <Link href="/">
+          <IoCameraOutline className="w-6 h-6 hover:text-purple-400 text-gray-400 cursor-pointer" />
+        </Link>
+      </div>
     </header>
   );
 }

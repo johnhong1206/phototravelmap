@@ -12,29 +12,89 @@ import toast from "react-hot-toast";
 
 function PostDetails({ slug, post }) {
   const topRef = useRef(null);
-  const [author, setAuthor] = useState("5eecd9d7-38e3-4b5b-ab16-6489274dea76");
+  const user = {
+    name: "Zong Hong",
+    id: "5eecd9d7-38e3-4b5b-ab16-6489274dea76",
+    email: "jackyjohn1206@gmail.com",
+  };
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [author, setAuthor] = useState(user);
+
   const router = useRouter();
   const [selectedLocation, setSelectedLocation] = useState({});
-  const [rating, setRating] = useState(null);
-  const [rate, setRate] = useState(null);
+  const [rating, setRating] = useState([]);
+  const [postRating, setPostRating] = useState(null);
+
+  const [rate, setRate] = useState(Number(0));
   const [comment, setComment] = useState("");
   const [refetchpost, setRefetchPost] = useState(post);
+  const id = post?._id;
+
+  const fetchRating = async () => {
+    const query = `*[_type == "rating" && ratedPostId == $id]{
+    ...
+  }`;
+    const rating = await sanityClient.fetch(query, {
+      id: id,
+    });
+    setRating(rating);
+  };
+
+  useEffect(() => {
+    if (id) {
+      fetchRating();
+    }
+  }, [id]);
 
   const calcTotalRating = () => {
-    const totalUserRate = refetchpost?.rating?.length;
+    const totalUserRate = rating?.length;
 
     let totalRating = 0;
-    refetchpost?.rating.forEach((item) => {
+    rating?.forEach((item) => {
       totalRating = totalRating + item.rating;
     });
 
-    setRating(Number(totalRating / totalUserRate).toFixed(2));
+    setPostRating(Number(totalRating / totalUserRate).toFixed(2));
   };
+
+  const updatePostRating = async () => {
+    const notification = toast.loading("Rate the post...");
+    let totalRating = 0;
+    rating?.forEach((item) => {
+      totalRating = totalRating + item.rating;
+    });
+    const currentRating = Number(totalRating);
+    const inputRating = Number(rate);
+    const totalUserRate = Number(rating?.length) + Number(1);
+    const finalRating = (currentRating + inputRating) / totalUserRate;
+
+    const rateInfo = {
+      _id: post?._id,
+      rating: Number(finalRating),
+    };
+
+    try {
+      await fetch(`/api/updatepostrating`, {
+        body: JSON.stringify(rateInfo),
+        method: "POST",
+      }).then(() => {
+        toast.success("Post Update Rate Success", {
+          id: notification,
+        });
+      });
+    } catch (error) {
+      toast.error("You Already Rate This Post", {
+        id: notification,
+      });
+    }
+  };
+
   useEffect(() => {
-    if (refetchpost?.rating) {
+    if (rating) {
       calcTotalRating();
     }
-  }, [refetchpost]);
+  }, [rating]);
 
   const coordinates = {
     longitude: Number(refetchpost.location.longitude),
@@ -61,84 +121,62 @@ function PostDetails({ slug, post }) {
 
   const rateThePost = async (e) => {
     e.preventDefault();
+    if (!email) false;
     const notification = toast.loading("Rate the post...");
-    if (!author) false;
-
-    const findRateExist = refetchpost?.rating?.find(
-      (rating) => rating.ratedUserId === author
+    const ratingTitle = refetchpost?.title.concat(
+      "+",
+      rate,
+      "+",
+      username ? username : email
     );
-    const ratingTitle = refetchpost?.title.concat("+", rate, "+", author);
 
     const rateInfo = {
       _id: refetchpost?._id,
-      author: author,
+      ratedUserName: author?.name,
+      ratedUserEmail: email || author?.email,
+      ratedUserId: author?.id,
       rating: rate,
       ratingTitle: ratingTitle,
       comment: comment,
     };
 
-    if (!!findRateExist == false) {
-      if (rate == null) {
-        false;
-        toast.error("Rate must be filled", {
+    if (rate > Number(5)) {
+      toast.error("Maximum rating is 5", { id: notification });
+      setRate(Number(5));
+    }
+    const userRatedThePost = rating?.find(
+      (rating) => rating?.ratedUserEmail == email
+    );
+
+    if (!!userRatedThePost == false) {
+      try {
+        await fetch("/api/ratethepost", {
+          body: JSON.stringify(rateInfo),
+          method: "POST",
+        }).then((res) => {
+          toast.success("Rate Success", {
+            id: notification,
+          });
+          fetchRating();
+          updatePostRating();
+        });
+      } catch (error) {
+        toast.error("Something Error", {
           id: notification,
         });
       }
-      if (rate != null) {
-        try {
-          await fetch("/api/ratethepost", {
-            body: JSON.stringify(rateInfo),
-            method: "POST",
-          }).then((res) => {
-            toast.success("Rate Success", {
-              id: notification,
-            });
-          });
-        } catch (error) {
-          toast.error("Something Error", {
-            id: notification,
-          });
-        }
-      }
-    } else {
-      toast.error("The Post is Rated by you", {
+    }
+    if (!!userRatedThePost == true) {
+      toast.error("You Already Rate This Post", {
         id: notification,
       });
     }
 
-    setRating(null);
+    setUsername("");
+    setEmail("");
     setComment("");
-    handleRefresh();
-  };
-
-  const handleRefresh = async () => {
-    const postSlug = router.query.slug;
-    const refresnToast = toast.loading("Refreshing Post...");
-    const query = `*[_type == "post" && slug.current == $slug][0]{
-      _id,
-      title,
-      author->{
-        name,
-        image
-      },
-        description,
-        mainImage,
-        slug,
-        categories[]->{
-          ...
-        },
-        rating[]->{
-          ...
-        },
-        location->{
-       ...
-        }  
-      }`;
-    const posts = await sanityClient.fetch(query, {
-      slug: postSlug,
-    });
-    setRefetchPost(posts);
-    toast.success("Feeds Updated", { id: refresnToast });
+    setRate(Number(0));
+    fetchRating();
   };
 
   return (
@@ -148,6 +186,7 @@ function PostDetails({ slug, post }) {
         <meta name="description" content="Generated by create next app" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
+      {/* <button onClick={updatePostRating}>update Post</button> */}
       <main className="max-w-screen mx-auto">
         <div className="flex flex-col">
           <div className="w-full mb-4 flex flex-col items-center justify-center">
@@ -186,9 +225,9 @@ function PostDetails({ slug, post }) {
                 {refetchpost.location.title}
               </p>
               <p>{refetchpost.location.address}</p>
-              {rating > 0 ? (
+              {postRating > 0 ? (
                 <div className="flex items-center space-x-1">
-                  <p>{rating}</p>
+                  <p>{postRating}</p>
                   <AiTwotoneFire className=" w-4 h-4 text-red-500/80" />
                 </div>
               ) : (
@@ -201,6 +240,26 @@ function PostDetails({ slug, post }) {
         </div>
         <form className="flex flex-col mt-4 p-4 bg-white focus-within:shadow-2xl">
           <h2 className="text-3xl font-bold text-center">Rate Me</h2>
+          <div className="flex flex-row items-center space-x-2">
+            <h2 className="font-medium text-lg">Username:</h2>
+            <input
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder={"Username"}
+              className="flex-1 bg-transparent px-2 py-2 rounded-xl outline-none font-bold"
+              type="email"
+            />
+          </div>
+          <div className="flex flex-row items-center space-x-2">
+            <h2 className="font-medium text-lg">Email:</h2>
+            <input
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder={"Email"}
+              className="flex-1 bg-transparent px-2 py-2 rounded-xl outline-none font-bold"
+              type="email"
+            />
+          </div>
           <div className="flex flex-row items-center space-x-2">
             <h2 className="font-medium text-lg">Rate:</h2>
             <input

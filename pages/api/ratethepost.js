@@ -7,33 +7,27 @@ const config = {
 };
 const client = sanityClient(config);
 export default async function handler(req, res) {
-  const { _id, author, rating, ratingTitle, comment } = JSON.parse(req.body);
-  console.log(ratingTitle.toString());
+  const {
+    _id,
+    ratedUserName,
+    ratedUserEmail,
+    ratedUserId,
+    rating,
+    ratingTitle,
+    comment,
+  } = JSON.parse(req.body);
+
   try {
-    await client
-      .create({
-        _type: "rating",
-        ratedPostTitle: ratingTitle,
-        ratedUserId: author,
-        rating: Number(rating),
-        ratedPostID: _id,
-        comment: comment,
-      })
-      .then((rating) => {
-        client
-          .patch(_id)
-          .setIfMissing({ rating: [] })
-          .insert("after", "rating[-1]", [
-            {
-              _ref: rating?._id,
-            },
-          ])
-          .commit({
-            // Adds a `_key` attribute to array items, unique within the array, to
-            // ensure it can be addressed uniquely in a real-time collaboration context
-            autoGenerateArrayKeys: true,
-          });
-      });
+    await client.create({
+      _type: "rating",
+      ratedPostTitle: ratingTitle,
+      ratedUserName: ratedUserName,
+      ratedUserEmail: ratedUserEmail,
+      ratedUserId: ratedUserId,
+      rating: Number(rating),
+      ratedPostId: _id,
+      comment: comment,
+    });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: `Couldn't submit rating`, err });

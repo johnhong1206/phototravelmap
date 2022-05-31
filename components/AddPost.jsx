@@ -101,6 +101,7 @@ function AddPost({ posts, location, categories, setPhase, handleRefresh }) {
     const postInfo = {
       title: title,
       author: author,
+      rating: Number(0),
       slug: slug,
       //   mainImage: "",
       publishedAt: new Date().toISOString(),

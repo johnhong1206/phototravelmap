@@ -9,15 +9,15 @@ const config = {
 const client = sanityClient(config);
 
 export default async function handler(req, res) {
-  const { title, publishedAt, category, author, location, slug } = JSON.parse(
-    req.body
-  );
+  const { title, publishedAt, category, author, location, slug, rating } =
+    JSON.parse(req.body);
 
   try {
     await client
       .create({
         _type: "post",
         title: title,
+        rating: rating,
         author: {
           _type: "reference",
           _ref: author,

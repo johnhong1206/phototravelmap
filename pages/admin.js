@@ -48,7 +48,6 @@ function Admin({ location, categories, posts }) {
             isActive ? "bg-blue-600" : "bg-gray-400"
           }`}
         />
-        {new Date().toDateString()}
       </div>
     );
   };

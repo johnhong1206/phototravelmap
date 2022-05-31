@@ -2,6 +2,7 @@ import React from "react";
 import { urlFor } from "../sanity";
 import { useRouter } from "next/router";
 import Image from "next/image";
+import { AiTwotoneFire } from "react-icons/ai";
 
 function AdminPostList({ posts, setSelectPost, selectPost }) {
   const router = useRouter();
@@ -9,7 +10,7 @@ function AdminPostList({ posts, setSelectPost, selectPost }) {
   const navDetails = () => {
     router.push(`/post/${selectPost?.slug.current}`);
   };
-
+  console.log(selectPost?.rating);
   return (
     <div className="flex flex-col lg:flex-row">
       <div className="p-4 w-full lg:w-[50vw] h-[20vh] lg:h-[75vh] space-y-4 overflow-y-auto">
@@ -33,6 +34,13 @@ function AdminPostList({ posts, setSelectPost, selectPost }) {
           <div className="flex flex-row items-center space-x-2 w-full">
             <h2 className="text-xl font-medium">Title:</h2>
             <p className="font-light">{selectPost?.title}</p>
+          </div>
+          <div className="flex flex-row items-center space-x-2 w-full">
+            <h2 className="text-xl font-medium">Rating:</h2>
+            <div className="flex items-center space-x-1">
+              <p className="font-light ">{selectPost?.rating}</p>
+              <AiTwotoneFire className=" w-4 h-4 text-red-500/80" />
+            </div>
           </div>
           <div className="hidden lg:flex flex-row items-center space-x-2">
             <h2 className="text-xl font-medium">Id:</h2>
