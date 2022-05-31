@@ -120,9 +120,12 @@ function PostDetails({ slug, post }) {
   };
 
   const rateThePost = async (e) => {
-    e.preventDefault();
-    if (!email) false;
     const notification = toast.loading("Rate the post...");
+
+    e.preventDefault();
+    if (!email) {
+      const notification = toast.error("Email Must Include...");
+    }
     const ratingTitle = refetchpost?.title.concat(
       "+",
       rate,
@@ -279,6 +282,7 @@ function PostDetails({ slug, post }) {
             placeholder="Please Comment (optional)"
           />
           <button
+            disabled={rate == null || !email}
             onClick={rateThePost}
             className="bg-red-300 text-white font-bold px-2 py-1 rounded-xl"
           >
