@@ -4,8 +4,6 @@ import { login } from "../features/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/router";
 import Head from "next/head";
-import { signupuser } from "../utils/signupuser";
-import { signinuser } from "../utils/signinuser";
 
 function Signup() {
   const router = useRouter();
@@ -19,6 +17,27 @@ function Signup() {
   const isInvalid = username === "" || password === "" || email === "";
   const navSignIn = () => {
     router.push(`/signin`);
+  };
+  const signupuser = async (signUpInfo) => {
+    console.log("signUpInfo", signUpInfo);
+
+    const res = await fetch(`/api/signup`, {
+      body: JSON.stringify(signUpInfo),
+      method: "POST",
+    });
+    const data = await res.json();
+    return data;
+  };
+
+  const signinuser = async (signInInfo) => {
+    console.log("signInInfo", signInInfo);
+
+    const res = await fetch(`/api/signin`, {
+      body: JSON.stringify(signInInfo),
+      method: "POST",
+    });
+    const data = await res.json();
+    return data;
   };
 
   const signUp = async () => {

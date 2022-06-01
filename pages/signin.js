@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import toast from "react-hot-toast";
-import { signinuser } from "../utils/signinuser";
 import { login } from "../features/userSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/router";
@@ -18,6 +17,17 @@ function Signin() {
   const isInvalid = password === "" || email === "";
   const navSIgnUp = () => {
     router.push(`/signup`);
+  };
+
+  const signinuser = async (signInInfo) => {
+    console.log("signInInfo", signInInfo);
+
+    const res = await fetch(`/api/signin`, {
+      body: JSON.stringify(signInInfo),
+      method: "POST",
+    });
+    const data = await res.json();
+    return data;
   };
 
   const signIn = async () => {
