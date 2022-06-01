@@ -7,7 +7,7 @@ import Head from "next/head";
 import { signupuser } from "../utils/signupuser";
 import { signinuser } from "../utils/signinuser";
 
-function signup() {
+function Signup() {
   const router = useRouter();
   const dispatch = useDispatch();
   const [username, setUsername] = useState("");
@@ -115,4 +115,4 @@ function signup() {
   );
 }
 
-export default signup;
+export default Signup;

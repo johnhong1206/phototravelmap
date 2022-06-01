@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/router";
 import Head from "next/head";
 
-function signin() {
+function Signin() {
   const router = useRouter();
   const dispatch = useDispatch();
 
@@ -115,4 +115,4 @@ function signin() {
   );
 }
 
-export default signin;
+export default Signin;
