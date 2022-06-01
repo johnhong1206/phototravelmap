@@ -41,7 +41,7 @@ function PostFeeds({
                 height={35}
                 layout="fixed"
                 objectFit="cover"
-                src={urlFor(author.image).url()}
+                src={urlFor(author?.image).url()}
                 alt="author"
                 className="h-10 w-10 rounded-full"
               />

@@ -10,6 +10,7 @@ import { getCenter } from "geolib";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { IoChevronUpOutline } from "react-icons/io5";
 import Footer from "../components/Footer";
+
 // components
 const PostFeeds = dynamic(() => import("../components/PostFeeds"));
 

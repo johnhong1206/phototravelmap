@@ -3,9 +3,11 @@ import { combineReducers } from "redux";
 import { persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import modalReducer from "./modalSlice";
+import userReducer from "./userSlice";
 
 const reducers = combineReducers({
   modal: modalReducer,
+  user: userReducer,
 });
 
 const persistConfig = {
