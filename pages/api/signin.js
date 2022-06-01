@@ -10,7 +10,7 @@ const config = {
 const client = sanityClient(config);
 export default async function handler(req, res) {
   const serverRuntimeConfig = process.env.TOKEN;
-  const { username, email, password } = JSON.parse(req.body);
+  const { email, password } = JSON.parse(req.body);
   const userquery = `*[_type == "author" && email == $email]{
     ...
 }`;

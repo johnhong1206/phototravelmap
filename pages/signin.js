@@ -6,16 +6,9 @@ import { useRouter } from "next/router";
 import Head from "next/head";
 
 function Signin() {
-  const url =
-    process.env.NODE_ENV === "production"
-      ? "https://zhphototravelmap.netlify.app/"
-      : "localhost:3000";
-
-  console.log("url", url);
   const router = useRouter();
   const dispatch = useDispatch();
 
-  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [emailError, setEmailError] = useState(null);
@@ -32,8 +25,6 @@ function Signin() {
       body: JSON.stringify(signInInfo),
       method: "POST",
     });
-    console.log(res);
-
     const data = await res.json();
     return data;
   };
@@ -41,7 +32,6 @@ function Signin() {
   const signIn = async () => {
     const notification = toast.loading("Sign In...");
     const signInInfo = {
-      username: username,
       email: email,
       password: password,
     };
