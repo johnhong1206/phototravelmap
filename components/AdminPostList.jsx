@@ -3,23 +3,28 @@ import { urlFor } from "../sanity";
 import { useRouter } from "next/router";
 import Image from "next/image";
 import { AiTwotoneFire } from "react-icons/ai";
+import { selectDarkmode } from "../features/darkmodeSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 function AdminPostList({ posts, setSelectPost, selectPost }) {
   const router = useRouter();
+  const darkMode = useSelector(selectDarkmode);
 
   const navDetails = () => {
     router.push(`/post/${selectPost?.slug.current}`);
   };
   console.log(selectPost?.rating);
   return (
-    <div className="flex flex-col lg:flex-row">
+    <div className={`flex flex-col lg:flex-row`}>
       <div className="p-4 w-full lg:w-[50vw] h-[20vh] lg:h-[75vh] space-y-4 overflow-y-auto">
         {posts?.map((post) => (
           <div
             key={post._id}
-            className={`p-2 m-4  lg:p-4 lg:m-8 cursor-pointer bg-white shadow-md rounded-xl  ${
-              selectPost?._id === post?._id && "bg-slate-200 sha"
-            }`}
+            className={`transition-all duration-500  ease-in-out p-2 m-4  lg:p-4 lg:m-8 cursor-pointer bg-gray-100 backdrop-filter backdrop-blur-3xl bg-opacity-10  shadow-md rounded-xl 
+                  ${
+                    selectPost?._id === post?._id &&
+                    " shadow-2xl shadow-cyan-500 scale-105"
+                  }`}
             onClick={() => setSelectPost(post)}
           >
             {post.title}

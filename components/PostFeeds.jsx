@@ -2,6 +2,8 @@ import React from "react";
 import { urlFor } from "../sanity";
 import Image from "next/image";
 import { useRouter } from "next/router";
+import { useDispatch, useSelector } from "react-redux";
+import { selectDarkmode } from "../features/darkmodeSlice";
 
 function PostFeeds({
   key,
@@ -17,6 +19,7 @@ function PostFeeds({
   publishedAt,
 }) {
   const router = useRouter();
+  const darkMode = useSelector(selectDarkmode);
 
   const navDetails = () => {
     router.push(`/post/${slug.current}`);
@@ -26,9 +29,13 @@ function PostFeeds({
     <div
       key={key}
       onClick={navDetails}
-      className="bg-white text-black cursor-pointer px-2 py-4 hover:shadow-md w-full h-full"
+      className={`${
+        darkMode
+          ? "bg-gray-100 text-white hover:shadow-cyan-500/40 hover:shadow-lg"
+          : " bg-white text-black hover:shadow-2xl"
+      }  bg-opacity-10 shadow-md  rounded-md backdrop-filter backdrop-blur-3xl cursor-pointer px-2 py-4 hover:shadow-md w-full h-full`}
     >
-      <div className="w-full border-b border-gray-100">
+      <div className="w-full">
         <div className="flex flex-row items-center h-16">
           <div className="flex flex-col items-start flex-1">
             <h2 className="flex-1 font-bold line-clamp-6">{title}</h2>
@@ -45,7 +52,10 @@ function PostFeeds({
                 alt="author"
                 className="h-10 w-10 rounded-full"
               />
-              <div className="ml-1 flex flex-col">
+              <div
+                className="ml-1 
+            flex flex-col"
+              >
                 <p className="text-sm font-bold">@{author.name}</p>
                 <p className="text-xs font-light text-gray-400">
                   {new Date(publishedAt).toDateString()}

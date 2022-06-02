@@ -15,9 +15,11 @@ import {
 } from "react-icons/ai";
 import toast from "react-hot-toast";
 import PostFeeds from "./PostFeeds";
+import { selectDarkmode } from "../features/darkmodeSlice";
 
 function AddPost({ posts, location, categories, setPhase, handleRefresh }) {
   const dispatch = useDispatch();
+  const darkMode = useSelector(selectDarkmode);
 
   const locationModalisOpen = useSelector(selectLocationModalIsOpen);
   const categoryModalisOpen = useSelector(selectCategoryModalIsOpen);
@@ -161,7 +163,11 @@ function AddPost({ posts, location, categories, setPhase, handleRefresh }) {
   console.log("location", selectlocation);
 
   return (
-    <div className="flex flex-col lg:flex-row h-screen bg-slate-200">
+    <div
+      className={`flex flex-col lg:flex-row min-h-screen ${
+        darkMode ? "page-bg-dark" : "bg-slate-200"
+      }`}
+    >
       <div className="w-full h-[50vh] lg:w-[35vw]  p-4">
         <div className="bg-white text-black cursor-pointer px-2 py-4 hover:shadow-md w-full h-full">
           <div className="w-full border-b border-gray-100">
@@ -189,14 +195,16 @@ function AddPost({ posts, location, categories, setPhase, handleRefresh }) {
           </div>
         </div>
       </div>
-      <div className="hover:shadow-md bg-white flex-1">
+      <div
+        className={`bg-gray-100 bg-opacity-10 shadow-md  rounded-md backdrop-filter backdrop-blur-3xl cursor-pointer flex-1`}
+      >
         <div className="w-full flex-1 rounded-lg">
           <h2 className="text-lg font-semibold px-5">Title:</h2>
           <input
             placeholder="title"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="font-bold tracking-widest  text-gray-800  p-2 px-5 h-full w-full flex-grow rounded flex-shrink rounded-l-md focus:outline-none focus:shadow-2xl focus:bg-gray-100"
+            className="bg-transparent  font-bold tracking-widest p-2 px-5 h-full w-full flex-grow rounded flex-shrink rounded-l-md focus:outline-none focus:shadow-2xl "
           />
         </div>
 
@@ -220,7 +228,7 @@ function AddPost({ posts, location, categories, setPhase, handleRefresh }) {
               value={searchLocation}
               onChange={(e) => handleChange(e.target.value)}
               placeholder="Search anything you need... (Live Search by Filter)"
-              className={` font-bold tracking-widest bg-gradient-to-l text-gray-800 p-2 px-5 h-full w-full flex-grow rounded flex-shrink rounded-l-md focus:outline-none
+              className={`bg-transparent font-bold tracking-widest bg-gradient-to-l  p-2 px-5 h-full w-full flex-grow rounded flex-shrink rounded-l-md focus:outline-none
           `}
               type="text"
             />
@@ -253,9 +261,9 @@ function AddPost({ posts, location, categories, setPhase, handleRefresh }) {
                     setSelectLocation(location);
                     setActiveLocation(location._id);
                   }}
-                  className={`transition-all duration-500  ease-in-out flex items-center justify-center h-12 min-h-12 max-h-24 px-2 w-auto text-center cursor-pointer rounded-xl ${
+                  className={`bg-std text-black transition-all duration-500  ease-in-out flex items-center justify-center h-12 min-h-12 max-h-24 px-2 w-auto text-center cursor-pointer rounded-xl ${
                     activeLocation === location._id &&
-                    "bg-gray-200 font-semibold shadow-md scale-110"
+                    "bg-gray-200 font-semibold shadow-2xl scale-110 shadow-cyan-500"
                   }`}
                 >
                   {location.title}
@@ -267,9 +275,10 @@ function AddPost({ posts, location, categories, setPhase, handleRefresh }) {
             {pageNumber.map((number) => (
               <div
                 key={number}
-                className={`flex items-center justify-center cursor-pointer hover:animate-pulse w-6 h-6 leading-6 bg-gray-500 text-white rounded-full ${
-                  currentpage == number && "bg-gray-900"
-                }`}
+                className={`grid place-items-center transition-all duration-500 ease-in-out cursor-pointer hover:animate-pulse  bg-opacity-50 w-6 h-6 leading-6  text-white rounded-full 
+                ${darkMode ? "bg-gray-300 text-blue-700" : "bg-gray-900"}
+                ${currentpage == number && "bg-opacity-100 scale-125"}
+             `}
               >
                 <a
                   onClick={() => paginate(number)}
@@ -300,9 +309,9 @@ function AddPost({ posts, location, categories, setPhase, handleRefresh }) {
           <div className="grid grid-flow-row-dense grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-10 ">
             {categories?.map((category) => (
               <div
-                className={`transition-all duration-500 ease-in-out flex items-center justify-center h-12 min-h-12 max-h-24 px-2 w-auto text-center cursor-pointer rounded-xl ${
+                className={`bg-std text-black transition-all duration-500  ease-in-out flex items-center justify-center h-12 min-h-12 max-h-24 px-2 w-auto text-center cursor-pointer rounded-xl ${
                   activeCategory === category._id &&
-                  "bg-gray-200 font-semibold shadow-md scale-110"
+                  "bg-gray-200 font-semibold shadow-2xl scale-110 shadow-pink-500"
                 }`}
                 key={category._id}
                 value={category._id}

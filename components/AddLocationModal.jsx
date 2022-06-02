@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { AiOutlineSearch, AiOutlineClose } from "react-icons/ai";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { closeLocationModal } from "../features/modalSlice";
 import toast from "react-hot-toast";
+import { selectDarkmode } from "../features/darkmodeSlice";
 
 function AddLocationModal() {
   const dispatch = useDispatch();
+  const darkMode = useSelector(selectDarkmode);
 
   const [searchInput, setSearchInput] = useState("");
   const [searchResult, setSearchResult] = useState([]);
@@ -74,7 +76,7 @@ function AddLocationModal() {
   };
 
   return (
-    <div className=" fixed z-50 inset-1  bg-black bg-opacity-75 overflow-y-scroll ">
+    <div className=" fixed z-50 inset-1   bg-black bg-opacity-80 overflow-y-scroll scrollbar-hide ">
       <div className="w-full h-full min-h-screen relative">
         <AiOutlineClose
           onClick={() => dispatch(closeLocationModal(true))}
@@ -87,7 +89,7 @@ function AddLocationModal() {
         <div className="p-10">
           <form className="w-full bg-pink-300  shadow-2xl rounded-full flex flex-row items-center">
             <input
-              className="placeholder:text-gray-300  rounded-full lg:text-2xl font-medium py-2 px-1 w-full bg-slate-50 outline-none text-lg focus:shadow-2xl focus:shadow-pink-500"
+              className="placeholder:text-gray-300 text-black rounded-full lg:text-2xl font-medium py-2 px-1 w-full bg-slate-50 outline-none text-lg focus:shadow-2xl focus:shadow-pink-500"
               placeholder="Search..."
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
@@ -100,10 +102,14 @@ function AddLocationModal() {
           </form>
         </div>
         <div className="">
-          <h2 className="text-xl font-bold text-center text-white">
+          <h2
+            className={`text-xl font-bold text-center ${
+              darkMode ? "text-white" : "text-black"
+            }`}
+          >
             Search Result
           </h2>
-          <div className="grid grid-flow-row-dense md:grid-cols-2">
+          <div className="grid grid-flow-row-dense md:grid-cols-2 gap-3 p-4">
             {searchResult &&
               searchResult?.map((result, idx) => (
                 <div
@@ -112,9 +118,13 @@ function AddLocationModal() {
                     setActiveSelectResult(idx);
                   }}
                   key={idx}
-                  className={` bg-white m-1 lg:m-12 p-1 lg:p-10 shadow-md cursor-pointer ${
-                    activeSelectResult === idx && "shadow-xl shadow-pink-500/50"
-                  }`}
+                  className={`${
+                    darkMode
+                      ? "bg-gray-100 text-white hover:shadow-cyan-500/40 hover:shadow-lg"
+                      : " bg-white text-black hover:shadow-2xl"
+                  }  bg-opacity-10 shadow-md  rounded-md backdrop-filter backdrop-blur-3xl cursor-pointer px-2 py-4 hover:shadow-md w-full h-full
+                  ${activeSelectResult === idx && "shadow-cyan-500"}
+                  `}
                 >
                   <h1 className="font-bold text-xl">Result {idx + 1}</h1>
                   <div>
@@ -167,57 +177,68 @@ function AddLocationModal() {
               ))}
           </div>
         </div>
-        {selectResult && (
-          <div className="bg-white m-1 lg:m-12 p-1 shadow-md cursor-pointer">
-            <h2 className="text-xl font-bold text-center ">
-              Select Location Info
-            </h2>
-            <div className="mt-4 flex flex-row items-center space-x-2">
-              <h2 className="font-semibold">Name:</h2>
-              <p className="font-light space-x-2">
-                {selectResult?.properties.name}
-              </p>
-            </div>
-            <div className="mt-4 flex flex-row items-center space-x-2">
-              <h2 className="font-semibold">State:</h2>
-              <p className="font-light space-x-2">
-                {selectResult?.properties.state}
-              </p>
-            </div>
-            <div className="mt-4 flex flex-row items-center space-x-2">
-              <h2 className="font-semibold">Longitude:</h2>
-              <p className="font-light space-x-2">
-                {selectResult?.properties.lon}
-              </p>
-            </div>
-            <div className="mt-4 flex flex-row items-center space-x-2">
-              <h2 className="font-semibold">Latitude:</h2>
-              <p className="font-light space-x-2">
-                {selectResult?.properties.lat}
-              </p>
-            </div>
-            <div className="mt-4 flex flex-row items-center space-x-2">
-              <h2 className="font-semibold">Address:</h2>
-              <p className="font-light space-x-2">{selectAddress}</p>
-            </div>
-            <div className="mt-4 flex flex-row items-center space-x-2">
-              <h2 className="font-semibold">Description:</h2>
-              <input
-                placeholder="description"
-                type="text"
-                className=" bg-transparent outline-none"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-              />
-            </div>
+        <div className="p-4">
+          {selectResult && (
             <div
-              onClick={addLocation}
-              className="bg-blue-300 px-1 py-3 font-bold text-lg rounded-full text-center mt-4 hover:text-white "
+              className={`${
+                darkMode
+                  ? "bg-gray-100 text-white hover:shadow-cyan-500/40 hover:shadow-lg"
+                  : " bg-white text-black hover:shadow-2xl"
+              }  bg-opacity-10 shadow-md  rounded-md backdrop-filter backdrop-blur-3xl cursor-pointer px-2 py-4 hover:shadow-md w-full h-full
+        
+          `}
             >
-              Submit
+              <h2 className="text-xl font-bold text-center ">
+                Select Location Info
+              </h2>
+              <div className="mt-4 flex flex-row items-center space-x-2">
+                <h2 className="font-semibold">Name:</h2>
+                <p className="font-light space-x-2">
+                  {selectResult?.properties.name}
+                </p>
+              </div>
+              <div className="mt-4 flex flex-row items-center space-x-2">
+                <h2 className="font-semibold">State:</h2>
+                <p className="font-light space-x-2">
+                  {selectResult?.properties.state}
+                </p>
+              </div>
+              <div className="mt-4 flex flex-row items-center space-x-2">
+                <h2 className="font-semibold">Longitude:</h2>
+                <p className="font-light space-x-2">
+                  {selectResult?.properties.lon}
+                </p>
+              </div>
+              <div className="mt-4 flex flex-row items-center space-x-2">
+                <h2 className="font-semibold">Latitude:</h2>
+                <p className="font-light space-x-2">
+                  {selectResult?.properties.lat}
+                </p>
+              </div>
+              <div className="mt-4 flex flex-row items-center space-x-2">
+                <h2 className="font-semibold">Address:</h2>
+                <p className="font-light space-x-2">{selectAddress}</p>
+              </div>
+              <div className="mt-4 flex flex-row items-center space-x-2">
+                <h2 className="font-semibold">Description:</h2>
+                <input
+                  placeholder="description"
+                  type="text"
+                  className=" bg-transparent outline-none"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                />
+              </div>
+              <div
+                onClick={addLocation}
+                className="bg-blue-300 px-1 py-3 font-bold text-lg rounded-full text-center mt-4 hover:text-white "
+              >
+                Submit
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
+
         <div className="pb-10" />
       </div>
     </div>
