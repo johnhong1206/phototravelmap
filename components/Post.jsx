@@ -5,7 +5,7 @@ import { sanityClient, urlFor } from "../sanity";
 import Image from "next/image";
 import { useRouter } from "next/router";
 
-function Post({ post }) {
+function Post({ post, key }) {
   const router = useRouter();
   const navDetails = () => {
     router.push(`/post/${post?.slug?.current}`);
@@ -15,7 +15,7 @@ function Post({ post }) {
   return (
     <div
       onClick={navDetails}
-      key={post?._id}
+      key={key}
       className={`${
         darkMode
           ? "bg-gray-100 text-white hover:shadow-cyan-500/40 hover:shadow-lg"
