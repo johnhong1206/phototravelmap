@@ -204,6 +204,7 @@ export const getServerSideProps = async (context) => {
         ...,
       },
     }| order(_createdAt desc)`;
+
   const posts = await sanityClient.fetch(query, { id: id });
   const category = await sanityClient.fetch(categoryquery, { id: id });
 

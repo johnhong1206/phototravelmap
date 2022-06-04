@@ -18,7 +18,7 @@ function AddPostCategories({
       _id: selectPost?._id,
       category: selectCategory?._id,
     };
-    console.log(categoryInfo);
+
     await fetch("/api/addcategoriestopost", {
       body: JSON.stringify(categoryInfo),
       method: "POST",

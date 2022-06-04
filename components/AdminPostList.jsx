@@ -7,6 +7,7 @@ import { selectDarkmode } from "../features/darkmodeSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 function AdminPostList({ posts, setSelectPost, selectPost }) {
+  console.log(selectPost);
   const router = useRouter();
   const darkMode = useSelector(selectDarkmode);
 
@@ -39,6 +40,12 @@ function AdminPostList({ posts, setSelectPost, selectPost }) {
           <div className="flex flex-row items-center space-x-2 w-full">
             <h2 className="text-xl font-medium">Title:</h2>
             <p className="font-light">{selectPost?.title}</p>
+          </div>
+          <div className="flex flex-row items-center space-x-2 w-full">
+            <h2 className="text-xl font-medium">Post Type:</h2>
+            <div className="bg-gray-900 flex items-center justify-center leading-5 px-[1rem] py-[2px] rounded-full text-sm font-light italic">
+              <p>{selectPost?.postType}</p>
+            </div>
           </div>
           <div className="flex flex-row items-center space-x-2 w-full">
             <h2 className="text-xl font-medium">Rating:</h2>
@@ -97,6 +104,20 @@ function AdminPostList({ posts, setSelectPost, selectPost }) {
                   className="bg-gray-700 text-white px-3 py-[0.1rem] rounded-xl"
                 >
                   <p className="font-medium">{category?.title}</p>
+                </div>
+              ))}
+          </div>
+        </div>
+        <div className="flex flex-row items-center space-x-2 mt-2">
+          <h2 className="text-xl font-medium">Tags:</h2>
+          <div className="grid grid-flow-row-dense grid-cols-3 gap-3">
+            {selectPost?.categoryTags &&
+              selectPost?.categoryTags?.map((categoryTag, idx) => (
+                <div
+                  key={idx}
+                  className="bg-gray-700 text-white px-3 py-[0.1rem] rounded-xl"
+                >
+                  <p className="font-medium">{categoryTag}</p>
                 </div>
               ))}
           </div>

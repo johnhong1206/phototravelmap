@@ -22,6 +22,7 @@ import AddImagetoPost from "../components/AddImagetoPost";
 import { BiRefresh } from "react-icons/bi";
 import toast from "react-hot-toast";
 import { selectDarkmode } from "../features/darkmodeSlice";
+import AddPostCategoriesTypes from "../components/AddPostCategoriesTypes";
 
 function Admin({ location, categories, posts }) {
   const darkMode = useSelector(selectDarkmode);
@@ -76,7 +77,7 @@ function Admin({ location, categories, posts }) {
 
   return (
     <div
-      className={`flex flex-col h-screen max-h-screen ${
+      className={`flex flex-col  ${
         darkMode ? "page-bg-dark text-white" : "bg-std text-black"
       }`}
     >
@@ -105,6 +106,11 @@ function Admin({ location, categories, posts }) {
           setPhase={setPhase}
           name="Add Category"
           isActive={phase == "Add Category" ? true : false}
+        />
+        <Phase
+          setPhase={setPhase}
+          name="Add Category Types"
+          isActive={phase == "Add Category Types" ? true : false}
         />
         <div className="flex flex-col items-center justify-center cursor-pointer">
           <h1 className={`font-bold hover:text-blue-300`}>Refresh</h1>
@@ -146,6 +152,17 @@ function Admin({ location, categories, posts }) {
             categories={categories}
             handleRefresh={handleRefresh}
             setSelectPost={setSelectPost}
+            posts={refetchpost}
+          />
+        )}
+        {phase == "Add Category Types" && (
+          <AddPostCategoriesTypes
+            setPhase={setPhase}
+            selectPost={selectPost}
+            categories={categories}
+            handleRefresh={handleRefresh}
+            setSelectPost={setSelectPost}
+            posts={refetchpost}
           />
         )}
       </main>
@@ -163,6 +180,7 @@ export const getServerSideProps = async (context) => {
       ...,
     },
     mainImage,
+    categoryTags,
     location->{
       ...,
     },

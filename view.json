@@ -1,0 +1,152 @@
+[
+  {
+    "_createdAt": "2022-06-01T01:40:14Z",
+    "_id": "EHTma5b38YKWafIXOh5hqV",
+    "_rev": "EHTma5b38YKWafIXOo2BsF",
+    "_type": "post",
+    "_updatedAt": "2022-06-03T07:13:21Z",
+    "author": {
+      "_ref": "5eecd9d7-38e3-4b5b-ab16-6489274dea76",
+      "_type": "reference"
+    },
+
+    "categoryTypes": [
+      {
+        "_createdAt": "2022-06-03T07:11:09Z",
+        "_id": "20d14d71-2a46-46a8-ae65-35217b4e5cd0",
+        "_rev": "K78EC4d26COuDZYy7prCPm",
+        "_type": "categoryTypes",
+        "_updatedAt": "2022-06-03T07:11:09Z",
+        "referenceCategory": {
+          "_ref": "0e950703-16ad-4a91-b625-b9ec5cdd9c33",
+          "_type": "reference"
+        },
+        "slug": {
+          "_type": "slug",
+          "current": "dessert"
+        },
+        "title": "dessert"
+      },
+      {
+        "_createdAt": "2022-06-03T07:12:52Z",
+        "_id": "4b90e154-2c5d-41dc-b5fb-51d2d4024528",
+        "_rev": "K78EC4d26COuDZYy7prLgg",
+        "_type": "categoryTypes",
+        "_updatedAt": "2022-06-03T07:12:52Z",
+        "referenceCategory": {
+          "_ref": "0e950703-16ad-4a91-b625-b9ec5cdd9c33",
+          "_type": "reference"
+        },
+        "slug": {
+          "_type": "slug",
+          "current": "ice"
+        },
+        "title": "ice"
+      }
+    ],
+    "location": {
+      "_createdAt": "2022-05-29T11:58:37Z",
+      "_id": "dtdO4o3cRLPwh3vnx2Fu6E",
+      "_rev": "dtdO4o3cRLPwh3vnx2Fu5E",
+      "_type": "location",
+      "_updatedAt": "2022-05-29T11:58:37Z",
+      "address": "Sekinchan , 45400 Sekinchan, Selangor, Malaysia",
+      "description": "",
+      "latitude": "3.5002934",
+      "longitude": "101.10623",
+      "slug": {
+        "_type": "slug",
+        "current": "Sekinchan"
+      },
+      "state": "Selangor",
+      "title": "Sekinchan"
+    },
+    "mainImage": {
+      "_type": "image",
+      "asset": {
+        "_ref": "image-211279f93994aed66b6fab5c9d7dd0f42cc4ddbd-3024x4032-jpg",
+        "_type": "reference"
+      }
+    },
+    "postType": "public",
+    "publishedAt": "2022-06-01T01:40:13.673Z",
+    "rating": 5,
+    "slug": {
+      "_type": "slug",
+      "current": "Mango Shake -Zong-Hong"
+    },
+    "title": "Mango Shake "
+  },
+  {
+    "_createdAt": "2022-05-18T08:11:13Z",
+    "_id": "1e545e69-d115-4408-9837-5899ad0354c0",
+    "_rev": "K78EC4d26COuDZYy7pq142",
+    "_type": "post",
+    "_updatedAt": "2022-06-03T06:59:20Z",
+    "author": {
+      "_ref": "5eecd9d7-38e3-4b5b-ab16-6489274dea76",
+      "_type": "reference"
+    },
+    "categories": [
+      {
+        "_key": "9cd2e2c83615",
+        "_ref": "e6904c47-e56f-4963-84fa-7de358de6a08",
+        "_type": "reference"
+      },
+      {
+        "_key": "4e255fe7b5db",
+        "_ref": "0e950703-16ad-4a91-b625-b9ec5cdd9c33",
+        "_type": "reference"
+      }
+    ],
+    "categoryTypes": [
+      {
+        "_createdAt": "2022-06-03T06:55:11Z",
+        "_id": "4c4560d1-633f-4f39-b8e2-2ac7d3f77ef2",
+        "_rev": "pzFJH1VbFArGXXsMmAGehH",
+        "_type": "categoryTypes",
+        "_updatedAt": "2022-06-03T06:55:11Z",
+        "referenceCategory": {
+          "_ref": "0e950703-16ad-4a91-b625-b9ec5cdd9c33",
+          "_type": "reference"
+        },
+        "slug": {
+          "_type": "slug",
+          "current": "steamboat"
+        },
+        "title": "steamboat"
+      }
+    ],
+    "location": {
+      "_createdAt": "2022-06-03T06:51:36Z",
+      "_id": "657137ff-e949-4774-b654-758d10d10caa",
+      "_rev": "pzFJH1VbFArGXXsMmAGpqF",
+      "_type": "location",
+      "_updatedAt": "2022-06-03T07:09:03Z",
+      "address": "8, Main Road, 39100 Brinchang, Pahang",
+      "latitude": "4.559657057032449",
+      "longitude": "101.38197747308593",
+      "slug": {
+        "_type": "slug",
+        "current": "kwan-kee-steamboat-restaurant-cameron-highlands"
+      },
+      "state": "pahang",
+      "title": "Kwan Kee Steamboat Restaurant Cameron Highlands"
+    },
+    "mainImage": {
+      "_type": "image",
+      "asset": {
+        "_ref": "image-69ebe20e7bd8f0a4ad0673907e90309e5556184e-6000x4000-jpg",
+        "_type": "reference"
+      }
+    },
+    "postType": "public",
+    "publishedAt": "2022-05-18T08:10:53.155Z",
+    "rating": 0,
+    "slug": {
+      "_type": "slug",
+      "current": "steam-boat-in-cameron"
+    },
+    "title": "Steam boat in Cameron"
+  }
+]

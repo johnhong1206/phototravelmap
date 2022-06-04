@@ -50,14 +50,14 @@ function Header() {
         </div>
       </Link>
       <div className="flex items-center space-x-4">
-        <Link href="/">
+        <Link href="/food">
           <IoRestaurantOutline
             className={`w-6 h-6 hover:text-green-400  cursor-pointer ${
               darkMode ? "text-white" : "text-gray-500/90"
             }`}
           />
         </Link>
-        <Link href="/">
+        <Link href="/travel">
           <IoCameraOutline
             className={`w-6 h-6 hover:text-purple-400  cursor-pointer ${
               darkMode ? "text-white" : "text-gray-500/90"

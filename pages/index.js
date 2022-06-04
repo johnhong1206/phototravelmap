@@ -12,18 +12,35 @@ import { IoChevronUpOutline } from "react-icons/io5";
 import Footer from "../components/Footer";
 import { selectDarkmode } from "../features/darkmodeSlice";
 import { useDispatch, useSelector } from "react-redux";
+import { MdChevronRight, MdChevronLeft } from "react-icons/md";
 
 // components
 const PostFeeds = dynamic(() => import("../components/PostFeeds"));
 
 export default function Home({ posts }) {
-  const darkMode = useSelector(selectDarkmode);
   const topRef = useRef(null);
   const router = useRouter();
+  const darkMode = useSelector(selectDarkmode);
+  const [showAll, setShowAll] = useState(false);
+  const [currentpage, setCurrentPage] = useState(1);
+  const [postsPerPage] = useState(4);
+  const [activeNumber, setActiveNumber] = useState("");
+  const indexOfLastPost = currentpage * postsPerPage;
+  const indexOfFirstPost = indexOfLastPost - postsPerPage;
+  const currentPost = posts?.slice(indexOfFirstPost, indexOfLastPost);
+  const mapImgPost = showAll ? posts : currentPost;
+  const paginate = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+  const pageNumber = [];
+  for (let i = 1; i <= Math.ceil(posts?.length / postsPerPage); i++) {
+    pageNumber.push(i);
+  }
   const coordinates = posts.map((result) => ({
     longitude: result?.location?.longitude,
     latitude: result?.location?.latitude,
   }));
+
   const [selectedLocation, setSelectedLocation] = useState({});
   const center = getCenter(coordinates);
   const [viewport, setViewport] = useState({
@@ -33,20 +50,6 @@ export default function Home({ posts }) {
     width: "100%",
     height: "100%",
   });
-  const [currentpage, setCurrentPage] = useState(1);
-  const [postsPerPage] = useState(4);
-  const [activeNumber, setActiveNumber] = useState("");
-  const indexOfLastPost = currentpage * postsPerPage;
-  const indexOfFirstPost = indexOfLastPost - postsPerPage;
-  const currentPost = posts?.slice(indexOfFirstPost, indexOfLastPost);
-  const paginate = (pageNumber) => {
-    console.log(pageNumber);
-    setCurrentPage(pageNumber);
-  };
-  const pageNumber = [];
-  for (let i = 1; i <= Math.ceil(posts?.length / postsPerPage); i++) {
-    pageNumber.push(i);
-  }
 
   const scrollToTop = () => {
     topRef.current.scrollIntoView({
@@ -112,6 +115,53 @@ export default function Home({ posts }) {
           <h2 className="text-3xl font-bold text-center">My Map</h2>
         </div>
         <div id="#map" className="relative flex items-center justify-center">
+          <div className=" transition-all duration-700 ease-in-out z-50 absolute top-5 right-5 flex flex-row items-center justify-center space-x-2 my-2">
+            {!showAll &&
+              pageNumber?.map((number) => (
+                <div
+                  onClick={() => {
+                    paginate(number);
+                    setActiveNumber(number);
+                  }}
+                  key={number}
+                  className={`grid place-items-center transition-all duration-500 ease-in-out cursor-pointer hover:animate-pulse  bg-opacity-50 w-6 h-6 leading-6  text-white rounded-full 
+              ${darkMode ? "bg-gray-700 text-blue-400" : "bg-gray-900"}
+              ${activeNumber == number && "bg-opacity-100 scale-125"}
+           `}
+                >
+                  <a className="tracking-widest text-sm">{number}</a>
+                </div>
+              ))}
+            {showAll ? (
+              <>
+                <div
+                  className={`flex items-center justify-center transition-all duration-700 ease-in-out cursor-pointer hover:animate-pulse  bg-opacity-50 w-6 h-6 leading-6  text-white rounded-full 
+              ${darkMode ? "bg-gray-700 text-blue-400" : "bg-gray-900"}
+              
+           `}
+                >
+                  <MdChevronLeft
+                    onClick={() => setShowAll(!showAll)}
+                    className="w-6 h-6"
+                  />
+                </div>
+              </>
+            ) : (
+              <>
+                <div
+                  className={`flex items-center justify-center transition-all duration-700 ease-in-out cursor-pointer hover:animate-pulse  bg-opacity-50 w-6 h-6 leading-6  text-white rounded-full 
+              ${darkMode ? "bg-gray-700 text-blue-400" : "bg-gray-900"}
+              
+           `}
+                >
+                  <MdChevronRight
+                    onClick={() => setShowAll(!showAll)}
+                    className="w-6 h-6"
+                  />
+                </div>
+              </>
+            )}
+          </div>
           <Map
             {...viewport}
             onMove={(evt) => setViewport(evt.viewport)}
@@ -119,7 +169,7 @@ export default function Home({ posts }) {
             mapStyle="mapbox://styles/zonghong/cks1a85to4kqf18p6zuj5zdx6"
             mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_KEY}
           >
-            {posts?.map((post) => (
+            {mapImgPost?.map((post) => (
               <div key={post._id}>
                 <Marker
                   longitude={Number(post.location.longitude)}

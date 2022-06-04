@@ -9,8 +9,16 @@ const config = {
 const client = sanityClient(config);
 
 export default async function handler(req, res) {
-  const { title, publishedAt, category, author, location, slug, rating } =
-    JSON.parse(req.body);
+  const {
+    title,
+    postType,
+    publishedAt,
+    category,
+    author,
+    location,
+    slug,
+    rating,
+  } = JSON.parse(req.body);
 
   try {
     await client
@@ -18,6 +26,7 @@ export default async function handler(req, res) {
         _type: "post",
         title: title,
         rating: rating,
+        postType: postType.toString(),
         author: {
           _type: "reference",
           _ref: author,

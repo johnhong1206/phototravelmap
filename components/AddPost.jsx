@@ -26,7 +26,7 @@ function AddPost({ posts, location, categories, setPhase, handleRefresh }) {
 
   const [title, setTitle] = useState("");
   const slug = title.concat("-", "Zong-Hong");
-
+  const [postType, setPostType] = useState("public");
   const [selectlocation, setSelectLocation] = useState(null);
   const [selectCategory, setSelectCategory] = useState(null);
   const [activeLocation, setActiveLocation] = useState(selectlocation);
@@ -102,6 +102,7 @@ function AddPost({ posts, location, categories, setPhase, handleRefresh }) {
 
     const postInfo = {
       title: title,
+      postType: postType,
       author: author,
       rating: Number(0),
       slug: slug,
@@ -207,7 +208,28 @@ function AddPost({ posts, location, categories, setPhase, handleRefresh }) {
             className="bg-transparent  font-bold tracking-widest p-2 px-5 h-full w-full flex-grow rounded flex-shrink rounded-l-md focus:outline-none focus:shadow-2xl "
           />
         </div>
-
+        <div className="w-full flex-1 rounded-lg">
+          <h2 className="text-lg font-semibold px-5">Post Type:</h2>
+          <select
+            name="question1"
+            className="text-black h-10 cursor-pointer flex-grow w-full outline-none focus:shadow-md focus:shadow-blue-500/50 rounded-2xl"
+            value={postType}
+            onChange={(e) => setPostType(e.target.value)}
+          >
+            <option
+              value={"public"}
+              onChange={(e) => setPostType(e.target.value)}
+            >
+              Public
+            </option>
+            <option
+              value={"private"}
+              onChange={(e) => setPostType(e.target.value)}
+            >
+              Private
+            </option>
+          </select>
+        </div>
         <div>
           <div className="flex flex-col items-center mt-3 mx-2">
             <div className="flex items-center space-x-4 w-full">
