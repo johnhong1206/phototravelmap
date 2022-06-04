@@ -54,7 +54,10 @@ function Post({ post, key }) {
       </div>
       <div className="grid grid-flow-row-dense grid-cols-2 gap-2 mt-2 mb-1">
         {post?.categoryTags?.map((value) => (
-          <div className="bg-gray-800 text-white flex items-center justify-center rounded-full w-full h-6 text-sm">
+          <div
+            key={value}
+            className="bg-gray-800 text-white flex items-center justify-center rounded-full w-full h-6 text-sm"
+          >
             {value}
           </div>
         ))}
