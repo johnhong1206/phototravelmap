@@ -208,8 +208,8 @@ function AddPost({ posts, location, categories, setPhase, handleRefresh }) {
             className="bg-transparent  font-bold tracking-widest p-2 px-5 h-full w-full flex-grow rounded flex-shrink rounded-l-md focus:outline-none focus:shadow-2xl "
           />
         </div>
-        <div className="w-full flex-1 rounded-lg">
-          <h2 className="text-lg font-semibold px-5">Post Type:</h2>
+        <div className="w-full flex-1 rounded-lg p-5">
+          <h2 className="text-lg font-semibold px-5 mb-4">Post Type:</h2>
           <select
             name="question1"
             className="text-black h-10 cursor-pointer flex-grow w-full outline-none focus:shadow-md focus:shadow-blue-500/50 rounded-2xl"

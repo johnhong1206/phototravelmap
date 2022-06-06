@@ -27,7 +27,7 @@ function Header() {
   return (
     <header
       className={`z-50 px-5 py-3 sticky top-0 flex item-center justify-between ${
-        darkMode ? "head-bg-dark" : "bg-bg-std"
+        darkMode ? "head-bg-dark" : "bg-std"
       } `}
     >
       <Link href="/">

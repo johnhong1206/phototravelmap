@@ -44,7 +44,7 @@ function AdminPostList({ posts, setSelectPost, selectPost }) {
           <div className="flex flex-row items-center space-x-2 w-full">
             <h2 className="text-xl font-medium">Post Type:</h2>
             <div className="bg-gray-900 flex items-center justify-center leading-5 px-[1rem] py-[2px] rounded-full text-sm font-light italic">
-              <p>{selectPost?.postType}</p>
+              <p>{selectPost?.postType && selectPost?.postType}</p>
             </div>
           </div>
           <div className="flex flex-row items-center space-x-2 w-full">

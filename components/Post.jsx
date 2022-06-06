@@ -52,8 +52,8 @@ function Post({ post, key }) {
           )}
         </div>
       </div>
-      <div className="grid grid-flow-row-dense grid-cols-2 gap-2 mt-2 mb-1">
-        {post?.categoryTags?.map((value) => (
+      <div className="grid grid-flow-row-dense grid-cols-4 gap-2 mt-2 mb-1">
+        {post?.categoryTags?.slice(0, 4).map((value) => (
           <div
             key={value}
             className="bg-gray-800 text-white flex items-center justify-center rounded-full w-full h-6 text-sm"

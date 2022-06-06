@@ -234,6 +234,17 @@ function PostDetails({ slug, post }) {
                 {refetchpost.location.title}
               </p>
               <p>{refetchpost.location.address}</p>
+              <div className="flex items-center space-x-2  mt-3 mb-2">
+                {refetchpost?.categoryTags &&
+                  refetchpost?.categoryTags?.map((tag, idx) => (
+                    <div key={idx}>
+                      <p className="italic text-sm font-light hover:text-teal-400 text-sky-400  cursor-pointer hover:underline">
+                        <span>{"#"}</span>
+                        <span>{tag}</span>
+                      </p>
+                    </div>
+                  ))}
+              </div>
               {postRating > 0 ? (
                 <div className="flex items-center space-x-1">
                   <p>{postRating}</p>
@@ -382,19 +393,20 @@ export const getStaticProps = async ({ params }) => {
       name,
       image
     },
-      description,
-      mainImage,
-      slug,
-      categories[]->{
-        ...
-      },
-      rating[]->{
-        ...
-      },
-      location->{
-     ...
-      }  
-    }`;
+    description,
+    mainImage,
+    slug,
+    categories[]->{
+      ...
+    },
+    rating[]->{
+      ...
+    },
+    location->{
+      ...
+    },
+    categoryTags  
+  }`;
 
   const post = await sanityClient.fetch(query, {
     slug: params?.slug,
