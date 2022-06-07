@@ -31,7 +31,7 @@ function AddPost({ posts, location, categories, setPhase, handleRefresh }) {
   const [selectCategory, setSelectCategory] = useState(null);
   const [activeLocation, setActiveLocation] = useState(selectlocation);
   const [activeCategory, setActiveCategory] = useState(selectCategory);
-  const [author, setAuthor] = useState("5eecd9d7-38e3-4b5b-ab16-6489274dea76");
+  const [author, setAuthor] = useState(null);
   const [searchLocation, setSearchLocation] = useState("");
   const [searchLocationResult, setSearchLocationResult] = useState([]);
   const [showResults, setShowResults] = useState(false);
@@ -266,7 +266,7 @@ function AddPost({ posts, location, categories, setPhase, handleRefresh }) {
                     setSelectLocation(location);
                     setActiveLocation(location._id);
                   }}
-                  className={`transition-all duration-500  ease-in-out flex items-center justify-center h-12 min-h-12 max-h-24 px-2 w-auto text-center cursor-pointer rounded-xl ${
+                  className={`transition-all duration-500  ease-in-out flex items-center justify-center h-12 min-h-12 max-h-12 truncate mx-1 px-2 w-auto text-center cursor-pointer rounded-xl ${
                     activeLocation === location._id &&
                     "bg-gray-200 font-semibold shadow-md scale-110"
                   }`}
@@ -283,7 +283,7 @@ function AddPost({ posts, location, categories, setPhase, handleRefresh }) {
                     setSelectLocation(location);
                     setActiveLocation(location._id);
                   }}
-                  className={`bg-std text-black transition-all duration-500  ease-in-out flex items-center justify-center h-12 min-h-12 max-h-24 px-2 w-auto text-center cursor-pointer rounded-xl ${
+                  className={`bg-std text-black transition-all duration-500  ease-in-out flex items-center justify-center h-12 min-h-12 max-h-12 truncate mx-1 px-2 w-auto text-center cursor-pointer rounded-xl ${
                     activeLocation === location._id &&
                     "bg-gray-200 font-semibold shadow-2xl scale-110 shadow-cyan-500"
                   }`}

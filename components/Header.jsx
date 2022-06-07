@@ -7,6 +7,7 @@ import {
   IoLogOutOutline,
   IoSunnyOutline,
   IoMoon,
+  IoClipboardOutline,
 } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
 import { selectUser, logout } from "../features/userSlice";
@@ -64,6 +65,16 @@ function Header() {
             }`}
           />
         </Link>
+        {user && (
+          <Link href={`/tripplans/${user?.email}`}>
+            <IoClipboardOutline
+              className={`w-6 h-6 hover:text-teal-400  cursor-pointer ${
+                darkMode ? "text-white" : "text-gray-500/90"
+              }`}
+            />
+          </Link>
+        )}
+
         {user ? (
           <IoLogInOutline
             onClick={userLogout}

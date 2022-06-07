@@ -14,7 +14,7 @@ function AdminPostList({ posts, setSelectPost, selectPost }) {
   const navDetails = () => {
     router.push(`/post/${selectPost?.slug.current}`);
   };
-  console.log(selectPost?.rating);
+
   return (
     <div className={`flex flex-col lg:flex-row`}>
       <div className="p-4 w-full lg:w-[50vw] h-[20vh] lg:h-[75vh] space-y-4 overflow-y-auto">

@@ -77,7 +77,8 @@ function PostDetails({ slug, post }) {
       await fetch(`/api/updatepostrating`, {
         body: JSON.stringify(rateInfo),
         method: "POST",
-      }).then(() => {
+      }).then((res) => {
+        console.log(res);
         toast.success("Post Update Rate Success", {
           id: notification,
         });
