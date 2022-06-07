@@ -92,7 +92,8 @@ function Plandetails({ plan, location, params }) {
   const addPlan = async (e) => {
     const notification = toast.loading("Updating Plan...");
     const planInfo = {
-      title: title.concat("+", user?.email),
+      title: title,
+      email: user?.email,
       referenceTripPlan: plans?._id,
       date: new Date().toISOString(),
       time: time?.toString(),
