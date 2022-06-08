@@ -16,10 +16,7 @@ export default async function handler(req, res) {
       .create({
         _type: "tripDetails",
         title: title,
-        referenceTripPlan: {
-          _type: "reference",
-          _ref: referenceTripPlan,
-        },
+        referenceTripPlan: referenceTripPlan,
         email: email,
         date: date,
         time: time,

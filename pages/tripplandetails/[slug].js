@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { selectDarkmode } from "../../features/darkmodeSlice";
 import {
   closeLocationModal,
@@ -12,8 +12,11 @@ import { AiOutlinePlusCircle, AiOutlineClose } from "react-icons/ai";
 import toast from "react-hot-toast";
 import { BiRefresh } from "react-icons/bi";
 import Head from "next/head";
+import TripDetailsMap from "../../components/TripDetailsMap";
+import AddLocationModal from "../../components/AddLocationModal";
 
 function Plandetails({ plan, location, params }) {
+  const dispatch = useDispatch();
   const darkMode = useSelector(selectDarkmode);
   const user = useSelector(selectUser);
   const [title, setTitle] = useState("");
@@ -31,6 +34,7 @@ function Plandetails({ plan, location, params }) {
   const indexOfLastPost = currentpage * postsPerPage;
   const indexOfFirstPost = indexOfLastPost - postsPerPage;
   const [plans, setPlans] = useState(plan);
+
   const currentLocation = location?.slice(indexOfFirstPost, indexOfLastPost);
   const paginate = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -101,6 +105,18 @@ function Plandetails({ plan, location, params }) {
       location: selectlocation?._id,
       thingstodo: thingstodo,
     };
+    if (!title) {
+      toast.error("Please provide a title"), { id: notification };
+      return false;
+    }
+    if (!time) {
+      toast.error("Please provide a time"), { id: notification };
+      return false;
+    }
+    if (!selectlocation?._id) {
+      toast.error("Please provide a location"), { id: notification };
+      return false;
+    }
     try {
       await fetch(`/api/addtripplan`, {
         body: JSON.stringify(planInfo),
@@ -115,6 +131,7 @@ function Plandetails({ plan, location, params }) {
         setTime("");
         setSelectLocation(null);
         setThingstodo("");
+        setActiveLocation("");
       });
     } catch (error) {
       toast.error("Something Error", {
@@ -167,9 +184,10 @@ function Plandetails({ plan, location, params }) {
                     <div>
                       <h2>{tripDetail?.title}</h2>
                     </div>
-                    <div className="flex">
+                    <div className="flex space-x-3">
                       <p>{tripDetail?.location?.title}</p>
                     </div>
+
                     <div>
                       <p>{tripDetail?.thingstodo}</p>
                     </div>
@@ -330,6 +348,7 @@ function Plandetails({ plan, location, params }) {
             </div>
           </form>
           <button
+            disabled={!user || !selectlocation || !time}
             onClick={addPlan}
             className="bg-teal-400 px-1 py-2 w-full rounded-xl mt-2 font-bold text-lg hover:shadow-lg hover:shadow-fuchsia-300/50"
           >
@@ -337,7 +356,10 @@ function Plandetails({ plan, location, params }) {
           </button>
         </div>
       </main>
+      {plans?.tripDetails && <TripDetailsMap location={plans?.tripDetails} />}
+
       <div className="pb-1" />
+      {locationModalisOpen && <AddLocationModal />}
     </div>
   );
 }
