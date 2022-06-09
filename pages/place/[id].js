@@ -171,12 +171,6 @@ function PlaceDetail({ posts, location }) {
         <h1 className="text-center text-3xl lg:text-5xl uppercase">
           {location[0]?.title}
         </h1>
-        <div className="flex flex-col items-center justify-center cursor-pointer group">
-          <BiRefresh
-            onClick={getInfo}
-            className=" text-blue-500 h-6 w-6 cursor-pointer text-twitterBlue transition-all duration-500 ease-out hover:rotate-180 active:scale-125"
-          />
-        </div>
       </div>
 
       <main className="max-w-screen mx-auto">
@@ -253,7 +247,7 @@ function PlaceDetail({ posts, location }) {
           ) : (
             false
           )}
-          <div className="absolute z-50 top-2 right-4 flex items-center justify-center space-x-4">
+          <div className="absolute z-50 top-10 right-4 flex items-center justify-center space-x-4">
             <IoRestaurantOutline
               className="w-5 h-5 cursor-pointer text-yellow-400"
               onClick={() => handleChange("catering")}
@@ -293,7 +287,7 @@ function PlaceDetail({ posts, location }) {
           <Map
             {...viewport}
             onMove={(evt) => setViewport(evt.viewport)}
-            style={{ width: "100vw", height: "100vh" }}
+            style={{ width: "100vw", height: "90vh" }}
             mapStyle="mapbox://styles/zonghong/cks1a85to4kqf18p6zuj5zdx6"
             mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_KEY}
           >
