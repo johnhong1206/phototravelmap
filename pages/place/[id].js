@@ -304,8 +304,11 @@ function PlaceDetail({ posts, location }) {
                       <div className="flex flex-row items-center justify-center space-x-1 px-2 py-1 bg-gray-800 w-full rounded-full">
                         <h2>{result?.properties?.name}</h2>
                         <div className="grid grid-flow-row-dense grid-cols-2">
-                          {result?.properties?.categories.map((item) => (
-                            <div className="flex items-center justify-center">
+                          {result?.properties?.categories.map((item, idx) => (
+                            <div
+                              key={idx}
+                              className="flex items-center justify-center"
+                            >
                               {item == "catering" && (
                                 <IoRestaurantOutline
                                   className="w-4 h-4 text-yellow-400"
@@ -388,8 +391,11 @@ function PlaceDetail({ posts, location }) {
                       <div className="flex flex-row items-center justify-center space-x-1 px-2 py-1 bg-gray-800 w-full rounded-full">
                         <h2>{result?.properties?.name}</h2>
                         <div className="grid grid-flow-row-dense grid-cols-2">
-                          {result?.properties?.categories.map((item) => (
-                            <div className="flex items-center justify-center">
+                          {result?.properties?.categories.map((item, idx) => (
+                            <div
+                              key={idx}
+                              className="flex items-center justify-center"
+                            >
                               {item == "catering" && (
                                 <IoRestaurantOutline
                                   className="w-4 h-4 text-yellow-400"
