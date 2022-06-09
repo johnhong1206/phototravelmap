@@ -123,20 +123,24 @@ function Category({ posts, category }) {
                   color="red"
                   onClick={() => setSelectedLocation(post)}
                 >
-                  <div
-                    onClick={() => setSelectedLocation(post.location.longitude)}
-                    className="w-12 text-center  text-white  cursor-pointer"
-                  >
-                    <Image
-                      layout="fixed"
-                      width={60}
-                      height={60}
-                      src={urlFor(post.mainImage).url()}
-                      alt="img"
-                      objectFit="contain"
-                      className=""
-                    />
-                  </div>
+                  {post.mainImage && (
+                    <div
+                      onClick={() =>
+                        setSelectedLocation(post.location.longitude)
+                      }
+                      className="w-12 text-center  text-white  cursor-pointer"
+                    >
+                      <Image
+                        layout="fixed"
+                        width={60}
+                        height={60}
+                        src={urlFor(post.mainImage).url()}
+                        alt="img"
+                        objectFit="contain"
+                        className=""
+                      />
+                    </div>
+                  )}
                 </Marker>
                 {selectedLocation === post.location.longitude ? (
                   <div>

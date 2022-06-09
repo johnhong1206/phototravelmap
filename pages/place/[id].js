@@ -4,6 +4,7 @@ import { IoRestaurantOutline } from "react-icons/io5";
 import { RiHotelLine } from "react-icons/ri";
 import { MdOutlineTour, MdChevronLeft, MdChevronRight } from "react-icons/md";
 import { FaRegGem, FaRegGrinBeam } from "react-icons/fa";
+import { BiRefresh } from "react-icons/bi";
 
 import { sanityClient, urlFor } from "../../sanity";
 import Image from "next/image";
@@ -17,11 +18,19 @@ import Footer from "../../components/Footer";
 import { useDispatch, useSelector } from "react-redux";
 import { selectDarkmode } from "../../features/darkmodeSlice";
 import { getUniqueValues } from "../../utils/helper";
+import {
+  selectPlaceInfo,
+  getAreaInfo,
+  removeInfo,
+} from "../../features/placeinfoSlice";
+import toast from "react-hot-toast";
 
 const PostFeeds = dynamic(() => import("../../components/PostFeeds"));
 
 function PlaceDetail({ posts, location }) {
+  const dispatch = useDispatch();
   const darkMode = useSelector(selectDarkmode);
+  const placeInfo = useSelector(selectPlaceInfo);
 
   const topRef = useRef(null);
   const [areaInfo, setAreaInfo] = useState([]);
@@ -41,7 +50,7 @@ function PlaceDetail({ posts, location }) {
   const [viewport, setViewport] = useState({
     longitude: center?.longitude,
     latitude: center?.latitude,
-    zoom: 17,
+    zoom: 14,
     width: "100%",
     height: "100%",
   });
@@ -52,7 +61,6 @@ function PlaceDetail({ posts, location }) {
   const indexOfFirstPost = indexOfLastPost - postsPerPage;
   const currentPost = posts?.slice(indexOfFirstPost, indexOfLastPost);
   const paginate = (pageNumber) => {
-    console.log(pageNumber);
     setCurrentPage(pageNumber);
   };
   const pageNumber = [];
@@ -67,21 +75,65 @@ function PlaceDetail({ posts, location }) {
   };
 
   const getInfo = async () => {
+    const refresnToast = toast.loading(
+      `Getting ${location[0]?.title} area info`
+    );
+
+    const checkValue = location[0]?.city.toLocaleUpperCase();
+    console.log("checkValue: ", checkValue);
+    const infoExist = placeInfo?.features?.find((item) =>
+      item?.properties.city?.toLocaleUpperCase().includes(checkValue)
+    );
+    console.log("infoExist: ", !!infoExist);
+
+    // if (!!infoExist == true) {
+    //   toast.error(`You already have  ${location[0]?.title} area info`, {
+    //     id: refresnToast,
+    //   });
+    //   return false;
+    // }
+
+    // if (!!infoExist == false) {
+    //   var requestOptions = {
+    //     method: "GET",
+    //   };
+    //   const url = `https://api.geoapify.com/v2/places?categories=catering,tourism,heritage,accommodation,entertainment&filter=circle:${location[0].longitude},${location[0].latitude},10000&bias=proximity:${location[0].longitude},${location[0].latitude}&limit=30&apiKey=${process.env.NEXT_PUBLIC_GEOAPIFY_KEY}`;
+    //   await fetch(url, requestOptions)
+    //     .then((response) => response.json())
+    //     .then((responseData) => {
+    //       setAreaInfo(responseData);
+    //       dispatch(getAreaInfo(responseData));
+    //       toast.success(
+    //         `${location[0]?.title} area info updated successfully`,
+    //         {
+    //           id: refresnToast,
+    //         }
+    //       );
+    //     })
+    //     .catch((error) => console.log("error", error));
+    // }
+
     var requestOptions = {
       method: "GET",
     };
-    const url = `https://api.geoapify.com/v2/places?categories=catering,entertainment,leisure,tourism,heritage,accommodation&filter=circle:${location[0].longitude},${location[0].latitude},10000&bias=proximity:${location[0].longitude},${location[0].latitude}&limit=50&apiKey=${process.env.NEXT_PUBLIC_GEOAPIFY_KEY}`;
+    const url = `https://api.geoapify.com/v2/places?categories=catering,tourism,heritage,accommodation,entertainment&filter=circle:${location[0].longitude},${location[0].latitude},10000&bias=proximity:${location[0].longitude},${location[0].latitude}&limit=30&apiKey=${process.env.NEXT_PUBLIC_GEOAPIFY_KEY}`;
     await fetch(url, requestOptions)
       .then((response) => response.json())
-      .then((responseData) => setAreaInfo(responseData))
+      .then((responseData) => {
+        setAreaInfo(responseData);
+        dispatch(getAreaInfo(responseData));
+        toast.success(`${location[0]?.title} area info updated successfully`, {
+          id: refresnToast,
+        });
+      })
       .catch((error) => console.log("error", error));
   };
 
-  useEffect(() => {
-    if (location) {
-      getInfo();
-    }
-  }, [location]);
+  // useEffect(() => {
+  //   if (location) {
+  //     getInfo();
+  //   }
+  // }, [location]);
 
   const handleChange = (value) => {
     setSearchLocation(value);
@@ -90,11 +142,11 @@ function PlaceDetail({ posts, location }) {
   const filterData = (value) => {
     const Value = value.toLocaleUpperCase().trim();
     if (Value === "") {
-      setSearchLocationResult(areaInfo);
+      setSearchLocationResult(placeInfo);
       setShowResults(false);
     } else {
       setShowResults(true);
-      const newFilter = areaInfo?.features?.filter((item) =>
+      const newFilter = placeInfo?.features?.filter((item) =>
         item?.properties?.categories.includes(value)
       );
       setSearchLocationResult(newFilter);
@@ -115,9 +167,18 @@ function PlaceDetail({ posts, location }) {
         <meta name="description" content="Generated by create next app" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <h1 className="text-center text-3xl lg:text-5xl uppercase">
-        {location[0]?.title}
-      </h1>
+      <div className="flex items-center justify-center space-x-2">
+        <h1 className="text-center text-3xl lg:text-5xl uppercase">
+          {location[0]?.title}
+        </h1>
+        <div className="flex flex-col items-center justify-center cursor-pointer group">
+          <BiRefresh
+            onClick={getInfo}
+            className=" text-blue-500 h-6 w-6 cursor-pointer text-twitterBlue transition-all duration-500 ease-out hover:rotate-180 active:scale-125"
+          />
+        </div>
+      </div>
+
       <main className="max-w-screen mx-auto">
         <div className="grid grid-flow-row-dense grid-cols-1 gap-3 p-2 sm:grid-cols-2 md:gap-6 md:p-6 lg:grid-cols-3 xl:grid-cols-4">
           {currentPost?.map((post) => (
@@ -205,10 +266,6 @@ function PlaceDetail({ posts, location }) {
               className="w-4 h-4 text-fuchsia-400"
               onClick={() => handleChange("tourism")}
             />
-            <MdOutlineTour
-              className="w-4 h-4 text-fuchsia-400"
-              onClick={() => handleChange("leisure")}
-            />
             <FaRegGem
               className="w-4 h-4 text-red-400"
               onClick={() => handleChange("heritage")}
@@ -216,6 +273,10 @@ function PlaceDetail({ posts, location }) {
             <FaRegGrinBeam
               className="w-4 h-4 text-purple-400"
               onClick={() => handleChange("entertainment")}
+            />
+            <BiRefresh
+              onClick={getInfo}
+              className=" text-blue-500 h-6 w-6 cursor-pointer text-twitterBlue transition-all duration-500 ease-out hover:rotate-180 active:scale-125"
             />
             {showResults ? (
               <MdChevronLeft
@@ -378,7 +439,7 @@ function PlaceDetail({ posts, location }) {
               </>
             ) : (
               <>
-                {areaInfo?.features?.map((result, idx) => (
+                {placeInfo?.features?.map((result, idx) => (
                   <div key={idx} className="">
                     <Marker
                       longitude={Number(result?.properties?.lon)}

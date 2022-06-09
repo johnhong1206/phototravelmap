@@ -9,13 +9,25 @@ const config = {
 const client = sanityClient(config);
 
 export default async function handler(req, res) {
-  const { title, state, longitude, latitude, address, description } =
-    JSON.parse(req.body);
+  const {
+    title,
+    city,
+    state,
+    district,
+    country,
+    longitude,
+    latitude,
+    address,
+    description,
+  } = JSON.parse(req.body);
   console.log("req.body", req.body);
   try {
     await client.create({
       _type: "location",
       title: title,
+      city: city,
+      district: district,
+      country: country,
       state: state,
       longitude: longitude,
       latitude: latitude,

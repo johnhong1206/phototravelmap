@@ -38,14 +38,15 @@ function AddLocationModal() {
     }
   }, [selectResult]);
 
-  const fetchLocation = () => {};
-
   const addLocation = async () => {
     const notification = toast.loading("Creating location...");
 
     const locationInfo = {
       title: selectResult?.properties.name,
+      city: selectResult?.properties.city,
       state: selectResult?.properties.state,
+      district: selectResult?.properties.district,
+      country: selectResult?.properties.country,
       latitude: selectResult?.properties.lat.toString(),
       longitude: selectResult?.properties.lon.toString(),
       address: selectAddress,
