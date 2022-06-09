@@ -1,5 +1,9 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Head from "next/head";
+import { IoRestaurantOutline } from "react-icons/io5";
+import { RiHotelLine } from "react-icons/ri";
+import { MdOutlineTour, MdChevronLeft, MdChevronRight } from "react-icons/md";
+import { FaRegGem, FaRegGrinBeam } from "react-icons/fa";
 
 import { sanityClient, urlFor } from "../../sanity";
 import Image from "next/image";
@@ -12,14 +16,19 @@ import { IoChevronUpOutline } from "react-icons/io5";
 import Footer from "../../components/Footer";
 import { useDispatch, useSelector } from "react-redux";
 import { selectDarkmode } from "../../features/darkmodeSlice";
+import { getUniqueValues } from "../../utils/helper";
 
 const PostFeeds = dynamic(() => import("../../components/PostFeeds"));
 
 function PlaceDetail({ posts, location }) {
   const darkMode = useSelector(selectDarkmode);
 
-  console.log("location.title", location[0]?.title);
   const topRef = useRef(null);
+  const [areaInfo, setAreaInfo] = useState([]);
+  const [searchLocation, setSearchLocation] = useState("");
+  const [searchLocationResult, setSearchLocationResult] = useState([]);
+  const [showResults, setShowResults] = useState(false);
+  const excludeColumns = [];
 
   const router = useRouter();
   const coordinates = posts.map((result) => ({
@@ -27,11 +36,12 @@ function PlaceDetail({ posts, location }) {
     latitude: result?.location?.latitude,
   }));
   const [selectedLocation, setSelectedLocation] = useState({});
+  const [locationDetails, setLocationDetails] = useState({});
   const center = getCenter(coordinates);
   const [viewport, setViewport] = useState({
     longitude: center?.longitude,
     latitude: center?.latitude,
-    zoom: 3.5,
+    zoom: 17,
     width: "100%",
     height: "100%",
   });
@@ -55,6 +65,43 @@ function PlaceDetail({ posts, location }) {
       behavior: "smooth",
     });
   };
+
+  const getInfo = async () => {
+    var requestOptions = {
+      method: "GET",
+    };
+    const url = `https://api.geoapify.com/v2/places?categories=catering,entertainment,leisure,tourism,heritage,accommodation&filter=circle:${location[0].longitude},${location[0].latitude},10000&bias=proximity:${location[0].longitude},${location[0].latitude}&limit=50&apiKey=${process.env.NEXT_PUBLIC_GEOAPIFY_KEY}`;
+    await fetch(url, requestOptions)
+      .then((response) => response.json())
+      .then((responseData) => setAreaInfo(responseData))
+      .catch((error) => console.log("error", error));
+  };
+
+  useEffect(() => {
+    if (location) {
+      getInfo();
+    }
+  }, [location]);
+
+  const handleChange = (value) => {
+    setSearchLocation(value);
+    filterData(value);
+  };
+  const filterData = (value) => {
+    const Value = value.toLocaleUpperCase().trim();
+    if (Value === "") {
+      setSearchLocationResult(areaInfo);
+      setShowResults(false);
+    } else {
+      setShowResults(true);
+      const newFilter = areaInfo?.features?.filter((item) =>
+        item?.properties?.categories.includes(value)
+      );
+      setSearchLocationResult(newFilter);
+    }
+  };
+
+  console.log(searchLocation, searchLocationResult);
 
   return (
     <div
@@ -107,6 +154,81 @@ function PlaceDetail({ posts, location }) {
           <h2 className="text-3xl font-bold text-center">My Map</h2>
         </div>
         <div id="#map" className="relative flex items-center justify-center">
+          {locationDetails?.name?.length > 0 ? (
+            <div
+              className={`${
+                locationDetails ? "flex flex-col" : "hidden"
+              } rounded-lg absolute p-4 top-2 left-2 z-50  lg:top-10 lg:left-10 bg-white shadow-md w-3/4 lg:w-1/4 h-fit  text-black`}
+            >
+              <h1 className="text-center font-bold mb-2 text-xl">
+                {locationDetails?.name}
+              </h1>
+              <div className="grid grid-flow-row-dense  md:grid-cols-2 gap-2">
+                {locationDetails?.categories?.map((item, idx) => (
+                  <div key={idx} className="">
+                    <p>{item}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-2">
+                <p className="font-light">
+                  Distance: {locationDetails?.distance / 1000}
+                  <span className="font-bold ml-1">KM</span>
+                </p>
+              </div>
+              <div className="mt-2">
+                <h2 className="text-center font-semibold mb-2 text-lg">
+                  Address
+                </h2>
+                <p>{locationDetails?.formatted}</p>
+              </div>
+              <button
+                onClick={() => setLocationDetails({})}
+                className="bg-cyan-800 text-white font-bold px-3 py-1 w-full mt-2 rounded-xl hover:shadow-xl hover:shadow-cyan-500/20"
+              >
+                Close
+              </button>
+            </div>
+          ) : (
+            false
+          )}
+          <div className="absolute z-50 top-2 right-4 flex items-center justify-center space-x-4">
+            <IoRestaurantOutline
+              className="w-5 h-5 cursor-pointer text-yellow-400"
+              onClick={() => handleChange("catering")}
+            />
+            <RiHotelLine
+              className="w-4 h-4 text-cyan-400"
+              onClick={() => handleChange("accommodation")}
+            />
+            <MdOutlineTour
+              className="w-4 h-4 text-fuchsia-400"
+              onClick={() => handleChange("tourism")}
+            />
+            <MdOutlineTour
+              className="w-4 h-4 text-fuchsia-400"
+              onClick={() => handleChange("leisure")}
+            />
+            <FaRegGem
+              className="w-4 h-4 text-red-400"
+              onClick={() => handleChange("heritage")}
+            />
+            <FaRegGrinBeam
+              className="w-4 h-4 text-purple-400"
+              onClick={() => handleChange("entertainment")}
+            />
+            {showResults ? (
+              <MdChevronLeft
+                onClick={() => setShowResults(!showResults)}
+                className="w-6 h-6"
+              />
+            ) : (
+              <MdChevronRight
+                onClick={() => setShowResults(!showResults)}
+                className="w-6 h-6"
+              />
+            )}
+          </div>
           <Map
             {...viewport}
             onMove={(evt) => setViewport(evt.viewport)}
@@ -116,27 +238,32 @@ function PlaceDetail({ posts, location }) {
           >
             {posts.map((post) => (
               <div key={post._id}>
-                <Marker
-                  longitude={Number(post.location.longitude)}
-                  latitude={Number(post.location.latitude)}
-                  color="red"
-                  onClick={() => setSelectedLocation(post)}
-                >
-                  <div
-                    onClick={() => setSelectedLocation(post.location.longitude)}
-                    className="w-12 text-center  text-white  cursor-pointer"
+                {post?.mainImage && (
+                  <Marker
+                    longitude={Number(post.location.longitude)}
+                    latitude={Number(post.location.latitude)}
+                    color="red"
+                    onClick={() => setSelectedLocation(post)}
                   >
-                    <Image
-                      layout="fixed"
-                      width={60}
-                      height={60}
-                      src={urlFor(post.mainImage).url()}
-                      alt="img"
-                      objectFit="contain"
-                      className=""
-                    />
-                  </div>
-                </Marker>
+                    <div
+                      onClick={() =>
+                        setSelectedLocation(post.location.longitude)
+                      }
+                      className="w-12 text-center  text-white  cursor-pointer"
+                    >
+                      <Image
+                        layout="fixed"
+                        width={60}
+                        height={60}
+                        src={urlFor(post.mainImage).url()}
+                        alt="img"
+                        objectFit="contain"
+                        className=""
+                      />
+                    </div>
+                  </Marker>
+                )}
+
                 {selectedLocation === post.location.longitude ? (
                   <div>
                     <Popup
@@ -162,6 +289,175 @@ function PlaceDetail({ posts, location }) {
                 )}
               </div>
             ))}
+            {showResults ? (
+              <>
+                {searchLocationResult?.map((result, idx) => (
+                  <div key={idx} className="">
+                    <Marker
+                      longitude={Number(result?.properties?.lon)}
+                      latitude={Number(result?.properties?.lat)}
+                      color="red"
+                      onClick={() =>
+                        setSelectedLocation(result?.properties?.lon)
+                      }
+                    >
+                      <div className="flex flex-row items-center justify-center space-x-1 px-2 py-1 bg-gray-800 w-full rounded-full">
+                        <h2>{result?.properties?.name}</h2>
+                        <div className="grid grid-flow-row-dense grid-cols-2">
+                          {result?.properties?.categories.map((item) => (
+                            <div className="flex items-center justify-center">
+                              {item == "catering" && (
+                                <IoRestaurantOutline
+                                  className="w-4 h-4 text-yellow-400"
+                                  onClick={() => setSelectedLocation(result)}
+                                />
+                              )}
+                              {item == "accommodation" && (
+                                <RiHotelLine
+                                  className="w-4 h-4 text-cyan-400"
+                                  onClick={() => setSelectedLocation(result)}
+                                />
+                              )}
+                              {item == "tourism" && (
+                                <MdOutlineTour
+                                  className="w-4 h-4 text-fuchsia-400"
+                                  onClick={() => setSelectedLocation(result)}
+                                />
+                              )}
+                              {item == "leisure" && (
+                                <MdOutlineTour
+                                  className="w-4 h-4 text-pink-400"
+                                  onClick={() => setSelectedLocation(result)}
+                                />
+                              )}
+                              {item == "heritage" && (
+                                <FaRegGem
+                                  className="w-4 h-4 text-red-400"
+                                  onClick={() => setSelectedLocation(result)}
+                                />
+                              )}
+                              {item == "entertainment" && (
+                                <FaRegGrinBeam
+                                  className="w-4 h-4 text-purple-400"
+                                  onClick={() => setSelectedLocation(result)}
+                                />
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </Marker>
+                    {selectedLocation === result?.properties?.lon ? (
+                      <div>
+                        <Popup
+                          closeOnClick={false}
+                          onClose={() => setSelectedLocation({})}
+                          latitude={result?.properties?.lat}
+                          longitude={result?.properties?.lon}
+                        >
+                          <div
+                            onClick={() =>
+                              setLocationDetails(result?.properties)
+                            }
+                            className="cursor-pointer"
+                          >
+                            <p className="font-bold hover:underline text-black">
+                              {result?.properties?.name}
+                            </p>
+                          </div>
+                        </Popup>
+                      </div>
+                    ) : (
+                      false
+                    )}
+                  </div>
+                ))}
+              </>
+            ) : (
+              <>
+                {areaInfo?.features?.map((result, idx) => (
+                  <div key={idx} className="">
+                    <Marker
+                      longitude={Number(result?.properties?.lon)}
+                      latitude={Number(result?.properties?.lat)}
+                      color="red"
+                      onClick={() =>
+                        setSelectedLocation(result?.properties?.lon)
+                      }
+                    >
+                      <div className="flex flex-row items-center justify-center space-x-1 px-2 py-1 bg-gray-800 w-full rounded-full">
+                        <h2>{result?.properties?.name}</h2>
+                        <div className="grid grid-flow-row-dense grid-cols-2">
+                          {result?.properties?.categories.map((item) => (
+                            <div className="flex items-center justify-center">
+                              {item == "catering" && (
+                                <IoRestaurantOutline
+                                  className="w-4 h-4 text-yellow-400"
+                                  onClick={() => setSelectedLocation(result)}
+                                />
+                              )}
+                              {item == "accommodation" && (
+                                <RiHotelLine
+                                  className="w-4 h-4 text-cyan-400"
+                                  onClick={() => setSelectedLocation(result)}
+                                />
+                              )}
+                              {item == "tourism" && (
+                                <MdOutlineTour
+                                  className="w-4 h-4 text-fuchsia-400"
+                                  onClick={() => setSelectedLocation(result)}
+                                />
+                              )}
+                              {item == "leisure" && (
+                                <MdOutlineTour
+                                  className="w-4 h-4 text-fuchsia-400"
+                                  onClick={() => setSelectedLocation(result)}
+                                />
+                              )}
+                              {item == "heritage" && (
+                                <FaRegGem
+                                  className="w-4 h-4 text-red-400"
+                                  onClick={() => setSelectedLocation(result)}
+                                />
+                              )}
+                              {item == "entertainment" && (
+                                <FaRegGrinBeam
+                                  className="w-4 h-4 text-purple-400"
+                                  onClick={() => setSelectedLocation(result)}
+                                />
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </Marker>
+                    {selectedLocation === result?.properties?.lon ? (
+                      <div>
+                        <Popup
+                          closeOnClick={false}
+                          onClose={() => setSelectedLocation({})}
+                          latitude={result?.properties?.lat}
+                          longitude={result?.properties?.lon}
+                        >
+                          <div
+                            onClick={() =>
+                              setLocationDetails(result?.properties)
+                            }
+                            className="cursor-pointer"
+                          >
+                            <p className="font-bold hover:underline text-black">
+                              {result?.properties?.name}
+                            </p>
+                          </div>
+                        </Popup>
+                      </div>
+                    ) : (
+                      false
+                    )}
+                  </div>
+                ))}
+              </>
+            )}
           </Map>
           <div
             onClick={scrollToTop}
