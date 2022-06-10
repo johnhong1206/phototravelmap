@@ -18,6 +18,7 @@ import {
   selectLocationModalIsOpen,
 } from "../../features/modalSlice";
 import PlanList from "../../components/PlanList";
+import AddLocationModal from "../../components/AddLocationModal";
 
 function UserTripPlans({ location, userInfo, tripplans }) {
   const dispatch = useDispatch();
@@ -276,6 +277,7 @@ function UserTripPlans({ location, userInfo, tripplans }) {
           </button>
         </div>
       </main>
+      {locationModalisOpen && <AddLocationModal />}
     </div>
   );
 }

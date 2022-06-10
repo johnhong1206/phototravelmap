@@ -10,12 +10,19 @@ import { selectUser } from "../../features/userSlice";
 import { sanityClient } from "../../sanity";
 import { AiOutlinePlusCircle, AiOutlineClose } from "react-icons/ai";
 import toast from "react-hot-toast";
+import { BiMapPin } from "react-icons/bi";
+import { IoRestaurantOutline } from "react-icons/io5";
+import { RiHotelLine } from "react-icons/ri";
+import { MdOutlineTour, MdChevronLeft, MdChevronRight } from "react-icons/md";
+import { FaRegGem, FaRegGrinBeam } from "react-icons/fa";
 import { BiRefresh } from "react-icons/bi";
 import Head from "next/head";
 import TripDetailsMap from "../../components/TripDetailsMap";
 import AddLocationModal from "../../components/AddLocationModal";
+import { getAreaInfo } from "../../features/placeinfoSlice";
 
 function Plandetails({ plan, location, params }) {
+  console.log(plan?.title);
   const dispatch = useDispatch();
   const darkMode = useSelector(selectDarkmode);
   const user = useSelector(selectUser);
@@ -34,6 +41,7 @@ function Plandetails({ plan, location, params }) {
   const indexOfLastPost = currentpage * postsPerPage;
   const indexOfFirstPost = indexOfLastPost - postsPerPage;
   const [plans, setPlans] = useState(plan);
+  const [queryOption, setQueryOption] = useState("");
 
   const currentLocation = location?.slice(indexOfFirstPost, indexOfLastPost);
   const paginate = (pageNumber) => {
@@ -71,6 +79,7 @@ function Plandetails({ plan, location, params }) {
       dispatch(closeLocationModal());
     }
   };
+
   const refreshPlan = async () => {
     const refresnToast = toast.loading("Refreshing Plan...");
 
@@ -138,6 +147,34 @@ function Plandetails({ plan, location, params }) {
         id: notification,
       });
     }
+  };
+
+  const getInfo = async () => {
+    const refresnToast = toast.loading(`Getting ${plan?.title} area info`);
+
+    var requestOptions = {
+      method: "GET",
+    };
+    const queryOptionUrl = `https://api.geoapify.com/v2/places?categories=${queryOption.toString()}&filter=circle:${
+      plan?.location?.longitude
+    },${plan?.location?.latitude},10000&bias=proximity:${
+      plan?.location?.longitude
+    },${plan?.location?.latitude}&limit=50&apiKey=${
+      process.env.NEXT_PUBLIC_GEOAPIFY_KEY
+    }`;
+    const defaultUrl = `https://api.geoapify.com/v2/places?categories=catering,tourism,heritage,accommodation,entertainment&filter=circle:${plan?.location?.longitude},${plan?.location?.latitude},10000&bias=proximity:${plan?.location?.longitude},${plan?.location?.latitude}&limit=50&apiKey=${process.env.NEXT_PUBLIC_GEOAPIFY_KEY}`;
+
+    const url = queryOption ? queryOptionUrl : defaultUrl;
+
+    await fetch(url, requestOptions)
+      .then((response) => response.json())
+      .then((responseData) => {
+        dispatch(getAreaInfo(responseData));
+        toast.success(`${location[0]?.title} area info updated successfully`, {
+          id: refresnToast,
+        });
+      })
+      .catch((error) => console.log("error", error));
   };
 
   return (
@@ -235,7 +272,37 @@ function Plandetails({ plan, location, params }) {
           </div>
         </div>
         <div className="w-full flex flex-col p-4 items-center justify-center">
-          <h1 className="text-3xl text-center">Add Plan</h1>
+          <div className="flex flex-col items-center justify-center space-y-2">
+            <h1 className="text-3xl text-center">Add Plan</h1>
+            <div className="flex items-center justify-center space-x-4 w-full">
+              <IoRestaurantOutline
+                className={`w-5 h-5 cursor-pointer text-yellow-400 ${
+                  queryOption === "catering" && "scale-110"
+                }`}
+                onClick={() => setQueryOption("catering")}
+              />
+              <RiHotelLine
+                className="w-4 h-4 text-cyan-400"
+                onClick={() => setQueryOption("accommodation")}
+              />
+              <MdOutlineTour
+                className="w-4 h-4 text-fuchsia-400"
+                onClick={() => setQueryOption("tourism")}
+              />
+              <FaRegGem
+                className="w-4 h-4 text-red-400"
+                onClick={() => setQueryOption("heritage")}
+              />
+              <FaRegGrinBeam
+                className="w-4 h-4 text-purple-400"
+                onClick={() => setQueryOption("entertainment")}
+              />
+
+              <button onClick={getInfo} className="">
+                Get Location Info for {queryOption}
+              </button>
+            </div>
+          </div>
           <form
             className={`${
               darkMode
@@ -356,7 +423,11 @@ function Plandetails({ plan, location, params }) {
           </button>
         </div>
       </main>
-      {plans?.tripDetails && <TripDetailsMap location={plans?.tripDetails} />}
+
+      <TripDetailsMap
+        location={plans?.tripDetails}
+        currentLocation={plan?.location}
+      />
 
       <div className="pb-1" />
       {locationModalisOpen && <AddLocationModal />}

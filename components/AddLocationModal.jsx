@@ -14,6 +14,15 @@ function AddLocationModal() {
   const [selectResult, setSelectResult] = useState(null);
   const [selectAddress, setSelectAddress] = useState(null);
   const [activeSelectResult, setActiveSelectResult] = useState(null);
+
+  const [title, setTitle] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [district, setDistrict] = useState("");
+  const [country, setCountry] = useState("");
+  const [latitude, setLatitude] = useState("");
+  const [longitude, setLongitude] = useState("");
+  const [address, setAddress] = useState(selectAddress);
   const [description, setDescription] = useState("");
 
   const searchLocationInfo = async () => {
@@ -26,7 +35,6 @@ function AddLocationModal() {
       .then((result) => setSearchResult(result.features))
       .catch((error) => console.log("error", error));
   };
-  console.log(selectAddress);
 
   useEffect(() => {
     if (selectResult !== null) {
@@ -42,14 +50,14 @@ function AddLocationModal() {
     const notification = toast.loading("Creating location...");
 
     const locationInfo = {
-      title: selectResult?.properties.name,
-      city: selectResult?.properties.city,
-      state: selectResult?.properties.state,
-      district: selectResult?.properties.district,
-      country: selectResult?.properties.country,
-      latitude: selectResult?.properties.lat.toString(),
-      longitude: selectResult?.properties.lon.toString(),
-      address: selectAddress,
+      title: title,
+      city: city,
+      state: state,
+      district: district,
+      country: country,
+      latitude: latitude,
+      longitude: longitude,
+      address: address,
       description: description,
     };
     await fetch("/api/addlocation", {
@@ -73,9 +81,39 @@ function AddLocationModal() {
     setSelectResult(null);
     setSelectAddress(null);
     setActiveSelectResult(null);
+    setTitle("");
+    setCity("");
+    setState("");
+    setDistrict("");
+    setCountry("");
+    setLatitude("");
+    setLongitude("");
+    setAddress("");
     setDescription("");
   };
+  useEffect(() => {
+    if (searchResult) {
+      setTitle(selectResult?.properties?.name);
+      setCity(selectResult?.properties.city);
+      setState(selectResult?.properties.state);
+      setDistrict(selectResult?.properties.district);
+      setCountry(selectResult?.properties.country);
+      setLatitude(selectResult?.properties.lat.toString());
+      setLongitude(selectResult?.properties.lon.toString());
+      setAddress(selectAddress);
+    }
+  }, [selectResult]);
 
+  console.log(
+    title,
+    city,
+    district,
+    state,
+    country,
+    latitude,
+    longitude,
+    address
+  );
   return (
     <div className=" fixed z-50 inset-1   bg-black bg-opacity-80 overflow-y-scroll scrollbar-hide ">
       <div className="w-full h-full min-h-screen relative">
@@ -178,66 +216,109 @@ function AddLocationModal() {
               ))}
           </div>
         </div>
+
         <div className="p-4">
-          {selectResult && (
-            <div
-              className={`${
-                darkMode
-                  ? "bg-gray-100 text-white hover:shadow-cyan-500/40 hover:shadow-lg"
-                  : " bg-white text-black hover:shadow-2xl"
-              }  bg-opacity-10 shadow-md  rounded-md backdrop-filter backdrop-blur-3xl cursor-pointer px-2 py-4 hover:shadow-md w-full h-full
+          <div
+            className={`${
+              darkMode
+                ? "bg-gray-100 text-white hover:shadow-cyan-500/40 hover:shadow-lg"
+                : " bg-white text-black hover:shadow-2xl"
+            }  bg-opacity-10 shadow-md  rounded-md backdrop-filter backdrop-blur-3xl cursor-pointer px-2 py-4 hover:shadow-md w-full h-full
         
           `}
-            >
-              <h2 className="text-xl font-bold text-center ">
-                Select Location Info
-              </h2>
-              <div className="mt-4 flex flex-row items-center space-x-2">
-                <h2 className="font-semibold">Name:</h2>
-                <p className="font-light space-x-2">
-                  {selectResult?.properties.name}
-                </p>
-              </div>
-              <div className="mt-4 flex flex-row items-center space-x-2">
-                <h2 className="font-semibold">State:</h2>
-                <p className="font-light space-x-2">
-                  {selectResult?.properties.state}
-                </p>
-              </div>
-              <div className="mt-4 flex flex-row items-center space-x-2">
-                <h2 className="font-semibold">Longitude:</h2>
-                <p className="font-light space-x-2">
-                  {selectResult?.properties.lon}
-                </p>
-              </div>
-              <div className="mt-4 flex flex-row items-center space-x-2">
-                <h2 className="font-semibold">Latitude:</h2>
-                <p className="font-light space-x-2">
-                  {selectResult?.properties.lat}
-                </p>
-              </div>
-              <div className="mt-4 flex flex-row items-center space-x-2">
-                <h2 className="font-semibold">Address:</h2>
-                <p className="font-light space-x-2">{selectAddress}</p>
-              </div>
-              <div className="mt-4 flex flex-row items-center space-x-2">
-                <h2 className="font-semibold">Description:</h2>
-                <input
-                  placeholder="description"
-                  type="text"
-                  className=" bg-transparent outline-none"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                />
-              </div>
-              <div
-                onClick={addLocation}
-                className="bg-blue-300 px-1 py-3 font-bold text-lg rounded-full text-center mt-4 hover:text-white "
-              >
-                Submit
-              </div>
+          >
+            <h2 className="text-xl font-bold text-center ">
+              Select Location Info
+            </h2>
+            <div className="mt-4 flex flex-row items-center space-x-2">
+              <h2 className="font-semibold">Name:</h2>
+              <input
+                placeholder="title"
+                className=" text-blue-400 outline-none bg-transparent w-full"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+              />
             </div>
-          )}
+            <div className="mt-4 flex flex-row items-center space-x-2">
+              <h2 className="font-semibold">City:</h2>
+              <input
+                placeholder="city"
+                className=" text-blue-400 outline-none bg-transparent w-full"
+                value={city}
+                onChange={(e) => setCity(e.target.value)}
+              />
+            </div>
+            <div className="mt-4 flex flex-row items-center space-x-2">
+              <h2 className="font-semibold">District:</h2>
+              <input
+                placeholder="district"
+                className=" text-blue-400 outline-none bg-transparent w-full"
+                value={district}
+                onChange={(e) => setDistrict(e.target.value)}
+              />
+            </div>
+            <div className="mt-4 flex flex-row items-center space-x-2">
+              <h2 className="font-semibold">State:</h2>
+              <input
+                placeholder="state"
+                className=" text-blue-400 outline-none bg-transparent w-full"
+                value={state}
+                onChange={(e) => setState(e.target.value)}
+              />
+            </div>
+            <div className="mt-4 flex flex-row items-center space-x-2">
+              <h2 className="font-semibold">Country:</h2>
+              <input
+                placeholder="country"
+                className=" text-blue-400 outline-none bg-transparent w-full"
+                value={country}
+                onChange={(e) => setCountry(e.target.value)}
+              />
+            </div>
+            <div className="mt-4 flex flex-row items-center space-x-2">
+              <h2 className="font-semibold">Longitude:</h2>
+              <input
+                placeholder="longitude"
+                className=" text-blue-400 outline-none bg-transparent w-full"
+                value={longitude}
+                onChange={(e) => setLongitude(e.target.value)}
+              />
+            </div>
+            <div className="mt-4 flex flex-row items-center space-x-2">
+              <h2 className="font-semibold">Latitude:</h2>
+              <input
+                placeholder="latitude"
+                className=" text-blue-400 outline-none bg-transparent w-full"
+                value={latitude}
+                onChange={(e) => setLatitude(e.target.value)}
+              />
+            </div>
+            <div className="mt-4 flex flex-col items-center space-x-2">
+              <h2 className="font-semibold">Address:</h2>
+              <textarea
+                placeholder="address"
+                className=" text-blue-400 outline-none bg-transparent w-full"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+              />
+            </div>
+            <div className="mt-4 flex flex-col items-center space-x-2">
+              <h2 className="font-semibold">Description:</h2>
+              <textarea
+                placeholder="description"
+                type="text"
+                className=" text-blue-400 outline-none bg-transparent w-full"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+              />
+            </div>
+            <div
+              onClick={addLocation}
+              className="bg-blue-300 px-1 py-3 font-bold text-lg rounded-full text-center mt-4 hover:text-white "
+            >
+              Submit
+            </div>
+          </div>
         </div>
 
         <div className="pb-10" />
