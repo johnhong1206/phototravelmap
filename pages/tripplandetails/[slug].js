@@ -176,6 +176,7 @@ function Plandetails({ plan, location, params }) {
       })
       .catch((error) => console.log("error", error));
   };
+  console.log(queryOption);
 
   return (
     <div
@@ -272,36 +273,46 @@ function Plandetails({ plan, location, params }) {
           </div>
         </div>
         <div className="w-full flex flex-col p-4 items-center justify-center">
-          <div className="flex flex-col items-center justify-center space-y-2">
+          <div className="flex flex-col items-center justify-center space-y-3">
             <h1 className="text-3xl text-center">Add Plan</h1>
             <div className="flex items-center justify-center space-x-4 w-full">
               <IoRestaurantOutline
-                className={`w-5 h-5 cursor-pointer text-yellow-400 ${
-                  queryOption === "catering" && "scale-110"
+                className={`w-5 h-5 transition-all duration-500  ease-in-out cursor-pointer text-yellow-400 ${
+                  queryOption === "catering" && "scale-125"
                 }`}
                 onClick={() => setQueryOption("catering")}
               />
               <RiHotelLine
-                className="w-4 h-4 text-cyan-400"
+                className={`w-5 h-5 transition-all duration-500  ease-in-out cursor-pointer text-cyan-400  ${
+                  queryOption === "accommodation" && "scale-125"
+                }`}
                 onClick={() => setQueryOption("accommodation")}
               />
               <MdOutlineTour
-                className="w-4 h-4 text-fuchsia-400"
+                className={`w-5 h-5 transition-all duration-500  ease-in-out cursor-pointer text-fuchsia-400 ${
+                  queryOption === "tourism" && "scale-125"
+                }`}
                 onClick={() => setQueryOption("tourism")}
               />
               <FaRegGem
-                className="w-4 h-4 text-red-400"
+                className={`w-5 h-5 transition-all duration-500  ease-in-out cursor-pointer text-red-400 ${
+                  queryOption === "heritage" && "scale-125"
+                }`}
                 onClick={() => setQueryOption("heritage")}
               />
               <FaRegGrinBeam
-                className="w-4 h-4 text-purple-400"
+                className={`w-5 h-5 transition-all duration-500  ease-in-out cursor-pointer text-purple-400 ${
+                  queryOption === "entertainment" && "scale-125"
+                }`}
                 onClick={() => setQueryOption("entertainment")}
               />
-
-              <button onClick={getInfo} className="">
-                Get Location Info for {queryOption}
-              </button>
             </div>
+            <button
+              onClick={getInfo}
+              className="w-full bg-cyan-800 px-1 py-2 rounded-xl"
+            >
+              Click for {queryOption} Info
+            </button>
           </div>
           <form
             className={`${

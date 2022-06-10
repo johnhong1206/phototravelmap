@@ -80,11 +80,11 @@ function PlaceDetail({ posts, location }) {
     );
 
     const checkValue = location[0]?.city.toLocaleUpperCase();
-    console.log("checkValue: ", checkValue);
+    // console.log("checkValue: ", checkValue);
     const infoExist = placeInfo?.features?.find((item) =>
       item?.properties.city?.toLocaleUpperCase().includes(checkValue)
     );
-    console.log("infoExist: ", !!infoExist);
+    // console.log("infoExist: ", !!infoExist);
 
     // if (!!infoExist == true) {
     //   toast.error(`You already have  ${location[0]?.title} area info`, {
@@ -152,8 +152,6 @@ function PlaceDetail({ posts, location }) {
       setSearchLocationResult(newFilter);
     }
   };
-
-  console.log(searchLocation, searchLocationResult);
 
   return (
     <div
@@ -249,23 +247,33 @@ function PlaceDetail({ posts, location }) {
           )}
           <div className="absolute z-50 top-10 right-4 flex items-center justify-center space-x-4">
             <IoRestaurantOutline
-              className="w-5 h-5 cursor-pointer text-yellow-400"
+              className={`w-5 h-5 cursor-pointer transition-all duration-500 ease-in-out text-yellow-400 ${
+                searchLocation === "catering" && "scale-150"
+              }`}
               onClick={() => handleChange("catering")}
             />
             <RiHotelLine
-              className="w-4 h-4 text-cyan-400"
+              className={`w-5 h-5 transition-all duration-500 ease-in-out text-cyan-400 ${
+                searchLocation === "accommodation" && "scale-150"
+              }`}
               onClick={() => handleChange("accommodation")}
             />
             <MdOutlineTour
-              className="w-4 h-4 text-fuchsia-400"
+              className={`w-5 h-5 transition-all duration-500 ease-in-out text-fuchsia-400 ${
+                searchLocation === "tourism" && "scale-150"
+              }`}
               onClick={() => handleChange("tourism")}
             />
             <FaRegGem
-              className="w-4 h-4 text-red-400"
+              className={`w-5 h-5 transition-all duration-500 ease-in-out text-red-400 ${
+                searchLocation === "heritage" && "scale-150"
+              } `}
               onClick={() => handleChange("heritage")}
             />
             <FaRegGrinBeam
-              className="w-4 h-4 text-purple-400"
+              className={`w-5 h-5 transition-all duration-500 ease-in-out text-purple-400 ${
+                searchLocation === "entertainment" && "scale-150"
+              }`}
               onClick={() => handleChange("entertainment")}
             />
             <BiRefresh
@@ -366,7 +374,7 @@ function PlaceDetail({ posts, location }) {
                             >
                               {item == "catering" && (
                                 <IoRestaurantOutline
-                                  className="w-4 h-4 text-yellow-400"
+                                  className="w-4 h-4 transition-all duration-500 ease-out text-yellow-400"
                                   onClick={() => setSelectedLocation(result)}
                                 />
                               )}
