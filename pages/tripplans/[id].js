@@ -253,7 +253,7 @@ function UserTripPlans({ location, userInfo, tripplans }) {
                 value={searchLocation}
                 onChange={(e) => handleChange(e.target.value)}
               />
-              <div className="w-full h-[20vh] lg:h-[15vh] scrollbar-hide overflow-y-scroll grid grid-flow-row-dense grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-9 p-10 ">
+              <div className="w-full h-[20vh] lg:h-[15vh] scrollbar-hide overflow-y-scroll grid grid-flow-row-dense grid-cols-2 lg:grid-cols-3 gap-9 p-10 ">
                 {showResults &&
                   searchLocationResult?.map((location) => (
                     <div

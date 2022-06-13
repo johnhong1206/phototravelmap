@@ -27,22 +27,6 @@ export default async function handler(req, res) {
         thingstodo: thingstodo,
       })
       .then((res) => {
-        console.log("res", res?._id);
-        return client
-          .patch(referenceTripPlan)
-          .setIfMissing({ tripDetails: [] })
-          .insert("after", "tripDetails[-1]", [
-            {
-              _ref: res?._id,
-            },
-          ])
-          .commit({
-            // Adds a `_key` attribute to array items, unique within the array, to
-            // ensure it can be addressed uniquely in a real-time collaboration context
-            autoGenerateArrayKeys: true,
-          });
-      })
-      .then((res) => {
         console.log("res", res, "success");
       });
   } catch (err) {

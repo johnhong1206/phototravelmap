@@ -9,7 +9,7 @@ function PlanList({ plan, key }) {
 
   const darkMode = useSelector(selectDarkmode);
   const navDetails = () => {
-    router.push(`/tripplandetails/${plan?.slug.current}`);
+    router.push(`/tripplandetails/${plan?._id}`);
   };
   return (
     <div

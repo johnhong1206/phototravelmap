@@ -67,7 +67,7 @@ function AddLocationModal({ handleRefresh }) {
 
     const locationInfo = {
       title: title,
-      city: city,
+      city: city.toLowerCase(),
       state: state,
       district: district,
       country: country,

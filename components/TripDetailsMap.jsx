@@ -23,12 +23,14 @@ import {
   openLocationModal,
 } from "../features/modalSlice";
 
-function TripDetailsMap({ location, currentLocation, plans }) {
+function TripDetailsMap({
+  initalLocationState,
+  location,
+  currentLocation,
+  plans,
+}) {
   const dispatch = useDispatch();
-  const markerRef = useRef(null);
-
   const placeInfo = useSelector(selectPlaceInfo);
-  const [areaInfo, setAreaInfo] = useState([]);
   const [showResults, setShowResults] = useState(false);
   const [searchLocation, setSearchLocation] = useState("");
   const [searchLocationResult, setSearchLocationResult] = useState([]);
@@ -40,7 +42,7 @@ function TripDetailsMap({ location, currentLocation, plans }) {
   const [myLocation, setMyLocation] = useState(null);
 
   const coordinates =
-    location &&
+    initalLocationState == false &&
     location?.map((result) => ({
       longitude: result?.location?.longitude,
       latitude: result?.location?.latitude,
@@ -48,8 +50,12 @@ function TripDetailsMap({ location, currentLocation, plans }) {
 
   const center = getCenter(coordinates);
   const [viewport, setViewport] = useState({
-    longitude: location ? center?.longitude : currentLocation?.longitude,
-    latitude: location ? center?.latitude : currentLocation?.latitude,
+    longitude: initalLocationState
+      ? currentLocation?.longitude
+      : center?.longitude,
+    latitude: initalLocationState
+      ? currentLocation?.latitude
+      : center?.latitude,
     zoom: 13,
     width: "100%",
     height: "100%",
@@ -67,7 +73,6 @@ function TripDetailsMap({ location, currentLocation, plans }) {
     await fetch(url, requestOptions)
       .then((response) => response.json())
       .then((responseData) => {
-        setAreaInfo(responseData);
         dispatch(getAreaInfo(responseData));
         toast.success(
           `${currentLocation?.title} area info updated successfully`,
@@ -102,7 +107,6 @@ function TripDetailsMap({ location, currentLocation, plans }) {
         .then((response) => response.json())
         .then((responseData) => {
           console.log("responseData", responseData);
-          setAreaInfo(responseData);
           setMyLocation(selectedLocation?.title);
           dispatch(getAreaInfo(responseData));
           toast.success(
@@ -142,7 +146,6 @@ function TripDetailsMap({ location, currentLocation, plans }) {
   };
 
   const addLocationToModal = () => {
-    console.log("selectedLocation", locationDetails);
     dispatch(openLocationModal(true));
     dispatch(addInfoFromMap(true));
     dispatch(addItemFromMap(locationDetails));
@@ -205,10 +208,10 @@ function TripDetailsMap({ location, currentLocation, plans }) {
           </h1>
           <div className="grid grid-flow-row-dense  md:grid-cols-2 gap-2">
             {/* {locationDetails?.categories?.map((item, idx) => (
-              <div key={idx} className="">
-                <p>{item}</p>
-              </div>
-            ))} */}
+      <div key={idx} className="">
+        <p>{item}</p>
+      </div>
+    ))} */}
           </div>
           <div className="mt-2">
             <h2 className="text-center font-semibold mb-2 text-lg">Address</h2>
@@ -327,7 +330,26 @@ function TripDetailsMap({ location, currentLocation, plans }) {
         mapStyle="mapbox://styles/zonghong/cks1a85to4kqf18p6zuj5zdx6"
         mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_KEY}
       >
-        {plans?.tripDetails?.map((location, idx) => (
+        {initalLocationState && (
+          <Marker
+            longitude={Number(currentLocation?.longitude)}
+            latitude={Number(currentLocation?.latitude)}
+            color="red"
+            onClick={() => setSelectedLocation(location?.location)}
+          >
+            <div
+              className={`flex flex-col items-center justify-center ${
+                myLocation === location?.location?.title &&
+                "animate-pulse scale-150"
+              }`}
+            >
+              <BiMapPin className="w-6 h-6 text-red-400" />
+              <div></div>
+            </div>
+          </Marker>
+        )}
+
+        {location?.map((location, idx) => (
           <div key={idx}>
             <Marker
               longitude={Number(location?.location?.longitude)}

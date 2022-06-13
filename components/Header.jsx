@@ -13,6 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectUser, logout } from "../features/userSlice";
 import { useRouter } from "next/router";
 import { selectDarkmode, updateDarkMode } from "../features/darkmodeSlice";
+import { removeInfo } from "../features/placeinfoSlice";
 
 function Header() {
   const router = useRouter();
@@ -23,6 +24,7 @@ function Header() {
   const userLogout = () => {
     router.replace("/");
     dispatch(logout());
+    dispatch(removeInfo());
   };
 
   return (

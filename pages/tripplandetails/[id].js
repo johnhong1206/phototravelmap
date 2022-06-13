@@ -18,12 +18,15 @@ import { MdOutlineTour, MdChevronLeft, MdChevronRight } from "react-icons/md";
 import { FaRegGem, FaRegGrinBeam } from "react-icons/fa";
 import { BiRefresh } from "react-icons/bi";
 import Head from "next/head";
+import { useRouter } from "next/router";
 const TripDetailsMap = dynamic(() => import("../../components/TripDetailsMap"));
 
 import AddLocationModal from "../../components/AddLocationModal";
 import { getAreaInfo } from "../../features/placeinfoSlice";
 
-function Plandetails({ plan, location, params }) {
+function Plandetails({ plan, location, tripdetails }) {
+  const router = useRouter();
+  const id = router.query.id;
   const dispatch = useDispatch();
   const darkMode = useSelector(selectDarkmode);
   const user = useSelector(selectUser);
@@ -33,7 +36,9 @@ function Plandetails({ plan, location, params }) {
   const [thingstodo, setThingstodo] = useState("");
   const locationModalisOpen = useSelector(selectLocationModalIsOpen);
   const [refetchLocation, setRefetchLocation] = useState(location);
-
+  const [refetchTripDetails, setRefetchTripDetails] = useState(tripdetails);
+  const [initalLocationState, setInitalLocationState] = useState(true);
+  const [activeNumber, setActiveNumber] = useState("");
   const [selectlocation, setSelectLocation] = useState(null);
   const [activeLocation, setActiveLocation] = useState(selectlocation);
   const [searchLocation, setSearchLocation] = useState("");
@@ -44,7 +49,7 @@ function Plandetails({ plan, location, params }) {
   const [postsPerPage] = useState(4);
   const indexOfLastPost = currentpage * postsPerPage;
   const indexOfFirstPost = indexOfLastPost - postsPerPage;
-  const [plans, setPlans] = useState(plan);
+  const [plans, setPlans] = useState(plan[0]);
   const [queryOption, setQueryOption] = useState("");
 
   const currentLocation = refetchLocation?.slice(
@@ -91,23 +96,16 @@ function Plandetails({ plan, location, params }) {
   const refreshPlan = async () => {
     const refresnToast = toast.loading("Refreshing Plan...");
 
-    const query = `*[_type == "tripplans" && slug.current == $slug][0]{
-    ...,
-    location->{
+    const tripplandettailsquery = `*[_type == "tripDetails" && referenceTripPlan == $id]{
+      ...,
+      location->{
         ...
       },
-      tripDetails[]->{
-        ...,
-        location->{
-            ...
-          },
-      },
-    }
-    `;
-    const plan = await sanityClient.fetch(query, {
-      slug: params?.slug,
+     }| order(_createdAt asc)`;
+    const tripdetails = await sanityClient.fetch(tripplandettailsquery, {
+      id: id,
     });
-    setPlans(plan);
+    setRefetchTripDetails(tripdetails);
     toast.success("Plan Updated", { id: refresnToast });
   };
 
@@ -116,8 +114,8 @@ function Plandetails({ plan, location, params }) {
     const planInfo = {
       title: title,
       email: user?.email,
-      referenceTripPlan: plans?._id,
-      date: new Date().toISOString(),
+      referenceTripPlan: id,
+      date: date,
       time: time?.toString(),
       location: selectlocation?._id,
       thingstodo: thingstodo,
@@ -126,6 +124,7 @@ function Plandetails({ plan, location, params }) {
       toast.error("Please provide a title"), { id: notification };
       return false;
     }
+
     if (!time) {
       toast.error("Please provide a time"), { id: notification };
       return false;
@@ -157,19 +156,21 @@ function Plandetails({ plan, location, params }) {
   };
 
   const getInfo = async () => {
-    const refresnToast = toast.loading(`Getting ${plan?.title} area info`);
+    const refresnToast = toast.loading(
+      `Getting ${plans?.location?.title} area info`
+    );
 
     var requestOptions = {
       method: "GET",
     };
     const queryOptionUrl = `https://api.geoapify.com/v2/places?categories=${queryOption.toString()}&filter=circle:${
-      plan?.location?.longitude
-    },${plan?.location?.latitude},10000&bias=proximity:${
-      plan?.location?.longitude
-    },${plan?.location?.latitude}&limit=50&apiKey=${
+      plans?.location?.longitude
+    },${plans?.location?.latitude},10000&bias=proximity:${
+      plans?.location?.longitude
+    },${plans?.location?.latitude}&limit=50&apiKey=${
       process.env.NEXT_PUBLIC_GEOAPIFY_KEY
     }`;
-    const defaultUrl = `https://api.geoapify.com/v2/places?categories=catering,tourism,heritage,accommodation,entertainment&filter=circle:${plan?.location?.longitude},${plan?.location?.latitude},10000&bias=proximity:${plan?.location?.longitude},${plan?.location?.latitude}&limit=50&apiKey=${process.env.NEXT_PUBLIC_GEOAPIFY_KEY}`;
+    const defaultUrl = `https://api.geoapify.com/v2/places?categories=catering,tourism,heritage,accommodation,entertainment&filter=circle:${plans?.location?.longitude},${plans?.location?.latitude},10000&bias=proximity:${plans?.location?.longitude},${plans?.location?.latitude}&limit=50&apiKey=${process.env.NEXT_PUBLIC_GEOAPIFY_KEY}`;
 
     const url = queryOption ? queryOptionUrl : defaultUrl;
 
@@ -203,6 +204,16 @@ function Plandetails({ plan, location, params }) {
     });
   };
 
+  useEffect(() => {
+    if (refetchTripDetails.length > 0) {
+      setInitalLocationState(false);
+    } else {
+      setInitalLocationState(true);
+    }
+  }, [refetchTripDetails]);
+
+  console.log(searchLocationResult);
+
   return (
     <div
       className={`min-h-screen ${
@@ -233,14 +244,17 @@ function Plandetails({ plan, location, params }) {
 
       <main className="my-4 flex flex-col lg:flex-row mx-auto max-w-screen">
         <div className="felx flex-row flex-grow w-full overflow-y-scroll scrollbar-hide h-full lg:h-[80vh]">
-          {!!plans &&
-            plans?.tripDetails?.map((tripDetail) => (
+          {!!refetchTripDetails &&
+            refetchTripDetails?.map((tripDetail) => (
               <div key={tripDetail?._id} className="my-3">
                 <div className="flex flex-row items-baseline justify-between space-x-2 px-2">
                   <div>
                     <div className="flex flex-row items-center space-x-2">
                       <div className="bg-teal-400 h-2 w-2 rounded-full" />
-                      <p>{tripDetail?.time}</p>
+                      <div className="flex flex-col">
+                        <p>{new Date(tripDetail?.date).toDateString()}</p>
+                        <p>{tripDetail?.time}</p>
+                      </div>
                     </div>
                   </div>
                   <div className="flex flex-col items-end flex-grow">
@@ -270,8 +284,10 @@ function Plandetails({ plan, location, params }) {
                 <div>
                   <div className="flex flex-row items-center space-x-2">
                     <div className="bg-teal-400 h-2 w-2 rounded-full" />
-                    <p>{date}</p>
-                    <p>{time}</p>
+                    <div className="flex flex-col">
+                      <p>{date}</p>
+                      <p>{time}</p>
+                    </div>
                   </div>
                 </div>
                 <div className="flex flex-col items-end flex-grow">
@@ -395,7 +411,7 @@ function Plandetails({ plan, location, params }) {
                 value={searchLocation}
                 onChange={(e) => handleChange(e.target.value)}
               />
-              <div className="h-[20vh] lg:h-[15vh] scrollbar-hide overflow-y-scroll grid grid-flow-row-dense grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-10 ">
+              <div className="h-[20vh] lg:h-[15vh] scrollbar-hide overflow-y-scroll grid grid-flow-row-dense grid-cols-2 lg:grid-cols-3 gap-4 p-10 ">
                 {showResults &&
                   searchLocationResult?.map((location) => (
                     <div
@@ -405,7 +421,7 @@ function Plandetails({ plan, location, params }) {
                         setSelectLocation(location);
                         setActiveLocation(location._id);
                       }}
-                      className={`bg-std text-black transition-all duration-500  ease-in-out flex items-center justify-center min-h-12 overflow-hidden truncate px-2 w-auto text-center cursor-pointer rounded-xl ${
+                      className={`bg-std h-8 text-black transition-all duration-500  ease-in-out flex items-center justify-center min-h-12 overflow-hidden truncate px-2 w-auto text-center cursor-pointer rounded-xl ${
                         activeLocation === location._id &&
                         "bg-gray-200  scale-110 shadow-fuchsia-500 ring-1 ring-fuchsia-500"
                       }`}
@@ -422,7 +438,7 @@ function Plandetails({ plan, location, params }) {
                         setSelectLocation(location);
                         setActiveLocation(location._id);
                       }}
-                      className={`bg-std text-black transition-all duration-500  ease-in-out flex items-center justify-center min-h-12 overflow-hidden truncate px-2 w-auto text-center cursor-pointer rounded-xl ${
+                      className={`bg-std h-8 text-black transition-all duration-500  ease-in-out flex items-center justify-center min-h-12 overflow-hidden truncate px-2 w-auto text-center cursor-pointer rounded-xl ${
                         activeLocation === location._id &&
                         "bg-gray-200  scale-110 shadow-fuchsia-500 ring-1 ring-fuchsia-500"
                       }`}
@@ -431,21 +447,20 @@ function Plandetails({ plan, location, params }) {
                     </div>
                   ))}
               </div>
-              <div className="flex flex-row items-center justify-center space-x-2">
+              <div className="flex flex-row items-center justify-center space-x-2 my-2">
                 {pageNumber.map((number) => (
                   <div
+                    onClick={() => {
+                      setActiveNumber(number);
+                      paginate(number);
+                    }}
                     key={number}
-                    className={`grid place-items-center transition-all duration-500 ease-in-out cursor-pointer hover:animate-pulse  bg-opacity-50 w-6 h-6 leading-6  text-white rounded-full 
-                ${darkMode ? "bg-gray-300 text-blue-700" : "bg-gray-900"}
-                ${currentpage == number && "bg-opacity-100 scale-125"}
-             `}
+                    className={`bg-std text-black transition-all duration-500  ease-in-out flex items-center justify-center min-h-12 overflow-hidden truncate px-2 w-auto text-center cursor-pointer rounded-xl ${
+                      activeNumber == number &&
+                      "bg-gray-200  scale-110 shadow-fuchsia-500 ring-1 ring-fuchsia-500"
+                    }`}
                   >
-                    <a
-                      onClick={() => paginate(number)}
-                      className="tracking-widest text-sm "
-                    >
-                      {number}
-                    </a>
+                    <a className="tracking-widest text-sm ">{number}</a>
                   </div>
                 ))}
               </div>
@@ -471,8 +486,9 @@ function Plandetails({ plan, location, params }) {
       </main>
 
       <TripDetailsMap
-        location={plans?.tripDetails}
-        currentLocation={plan?.location}
+        initalLocationState={initalLocationState}
+        location={refetchTripDetails}
+        currentLocation={plans?.location}
         plans={plans}
       />
 
@@ -485,58 +501,94 @@ function Plandetails({ plan, location, params }) {
 }
 
 export default Plandetails;
-export const getStaticPaths = async () => {
-  const query = `*[_type == "tripplans"]{
-            _id,
-            slug {
-                current
-            } 
-          }`;
-  const plan = await sanityClient.fetch(query);
 
-  const paths = plan.map((plan) => ({
-    params: {
-      slug: plan.slug.current,
-    },
-  }));
-
-  return { paths, fallback: "blocking" };
-};
-export const getStaticProps = async ({ params }) => {
-  const query = `*[_type == "tripplans" && slug.current == $slug][0]{
-...,
-location->{
-    ...
-  },
-  tripDetails[]->{
+export const getServerSideProps = async (context) => {
+  const id = context.query.id.toString();
+  const tripplanquery = `*[_type == "tripplans" && _id == $id]{
     ...,
     location->{
-        ...
-      },
-  },
-}
-`;
+      ...
+    },
+   }| order(_createdAt desc)`;
+  const tripplandettailsquery = `*[_type == "tripDetails" && referenceTripPlan == $id]{
+    ...,
+    location->{
+      ...
+    },
+   }| order(_createdAt asc)`;
   const locationquery = `*[_type == "location"]{
-  ...
- }| order(_createdAt desc)`;
-
-  const location = await sanityClient.fetch(locationquery);
-
-  const plan = await sanityClient.fetch(query, {
-    slug: params?.slug,
+    ...
+   }| order(_createdAt desc)`;
+  const plan = await sanityClient.fetch(tripplanquery, { id: id });
+  const tripdetails = await sanityClient.fetch(tripplandettailsquery, {
+    id: id,
   });
-
-  if (!plan) {
-    return {
-      notFound: true,
-    };
-  }
+  const location = await sanityClient.fetch(locationquery);
   return {
     props: {
-      plan: plan,
-      params: params,
-      location: location,
+      plan,
+      tripdetails,
+      location,
     },
-    revalidate: 60,
   };
 };
+
+// export const getStaticProps = async ({ params }) => {
+//   const query = `*[_type == "tripplans" && slug.current == $slug][0]{
+// ...,
+// location->{
+//     ...
+//   },
+//   tripDetails[]->{
+//     ...,
+//     location->{
+//         ...
+//       },
+//   },
+// }
+// `;
+//   const locationquery = `*[_type == "location"]{
+//   ...
+//  }| order(_createdAt desc)`;
+
+//   const planDetailQuery = `*[_type == "tripDetails" && referenceTripPlan == $id]{
+//   ...,
+//   location->{
+//       ...
+//     },
+//     tripDetails[]->{
+//       ...,
+//       location->{
+//           ...
+//         },
+//     },
+//   }
+// | order(_createdAt desc)`;
+
+//   const location = await sanityClient.fetch(locationquery);
+
+//   const plan = await sanityClient.fetch(query, {
+//     slug: params?.slug,
+//   });
+//   // const planDetails = await sanityClient.fetch(planDetailQuery, {
+//   //   id: params?.id,
+//   // });
+//   const id = params?.id;
+//   console.log(params?.id);
+
+//   if (!plan) {
+//     return {
+//       notFound: true,
+//     };
+//   }
+//   return {
+//     props: {
+//       plan: plan,
+//       params: params,
+//       location: location,
+//       // planDetails: planDetails,
+//       // id: id,
+//     },
+//     revalidate: 60,
+//   };
+// };
