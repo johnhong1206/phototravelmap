@@ -26,7 +26,6 @@ function UserTripPlans({ location, userInfo, tripplans }) {
   const darkMode = useSelector(selectDarkmode);
   const locationModalisOpen = useSelector(selectLocationModalIsOpen);
   // const [userInfo, setUserInfo] = useState(null);
-  console.log(userInfo);
   const [selectlocation, setSelectLocation] = useState(null);
   const [activeLocation, setActiveLocation] = useState(selectlocation);
   const [title, setTitle] = useState("");
@@ -65,7 +64,7 @@ function UserTripPlans({ location, userInfo, tripplans }) {
 
     const tripplansquery = `*[_type == "tripplans" && email == $email ]{
     ...
-  }`;
+  }| order(_createdAt desc)`;
     const plans = await sanityClient.fetch(tripplansquery, {
       email: userInfo?.email,
     });
