@@ -28,6 +28,7 @@ function Plandetails({ plan, location, params }) {
   const darkMode = useSelector(selectDarkmode);
   const user = useSelector(selectUser);
   const [title, setTitle] = useState("");
+  const [date, setDate] = useState(new Date(plans?.tripDate).toDateString());
   const [time, setTime] = useState("");
   const [thingstodo, setThingstodo] = useState("");
   const locationModalisOpen = useSelector(selectLocationModalIsOpen);
@@ -269,6 +270,7 @@ function Plandetails({ plan, location, params }) {
                 <div>
                   <div className="flex flex-row items-center space-x-2">
                     <div className="bg-teal-400 h-2 w-2 rounded-full" />
+                    <p>{date}</p>
                     <p>{time}</p>
                   </div>
                 </div>
@@ -293,7 +295,7 @@ function Plandetails({ plan, location, params }) {
             </div>
           )}
           <div className="my-3">
-            <h2>Day End</h2>
+            <h2>Trip End</h2>
           </div>
         </div>
         <div className="w-full flex flex-col p-4 items-center justify-center">
@@ -352,6 +354,15 @@ function Plandetails({ plan, location, params }) {
                 placeholder="title"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
+              />
+            </div>
+            <div className="flex flex-col items-center space-x-2">
+              <h2 className="text-lg font-medium">time:</h2>
+              <input
+                type="date"
+                value={date}
+                className="text-base text-white placeholder:text-blue-400  w-full outline-none h-8 bg-transparent"
+                onChange={(e) => setDate(e.target.value)}
               />
             </div>
             <div className="flex flex-col items-center space-x-2">
