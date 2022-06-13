@@ -65,7 +65,7 @@ function UserTripPlans({ location, userInfo, tripplans }) {
 
     const tripplansquery = `*[_type == "tripplans" && email == $email ]{
     ...
-  }| order(_createdAt desc)`;
+  }`;
     const plans = await sanityClient.fetch(tripplansquery, {
       email: userInfo?.email,
     });
