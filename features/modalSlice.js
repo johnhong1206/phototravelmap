@@ -5,6 +5,8 @@ export const modalSlice = createSlice({
   initialState: {
     categorymodal: false,
     locationmodal: false,
+    addFromMap: false,
+    itemFromMap: null,
   },
   reducers: {
     openCategoryModal: (state) => {
@@ -19,6 +21,18 @@ export const modalSlice = createSlice({
     closeLocationModal: (state) => {
       state.locationmodal = false;
     },
+    addInfoFromMap: (state) => {
+      state.addFromMap = true;
+    },
+    resetAddInfoFromMap: (state) => {
+      state.addFromMap = false;
+    },
+    addItemFromMap: (state, action) => {
+      state.itemFromMap = action.payload;
+    },
+    removeItemFromMap: (state, action) => {
+      state.itemFromMap = null;
+    },
   },
 });
 
@@ -27,9 +41,15 @@ export const {
   closeCategoryModal,
   openLocationModal,
   closeLocationModal,
+  addInfoFromMap,
+  resetAddInfoFromMap,
+  addItemFromMap,
+  removeItemFromMap,
 } = modalSlice.actions;
 
 export const selectCategoryModalIsOpen = (state) => state.modal.categorymodal;
 export const selectLocationModalIsOpen = (state) => state.modal.locationmodal;
+export const selectAddInfoFromMap = (state) => state.modal.addFromMap;
+export const selectItemFromMap = (state) => state.modal.itemFromMap;
 
 export default modalSlice.reducer;

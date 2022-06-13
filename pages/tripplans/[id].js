@@ -33,6 +33,7 @@ function UserTripPlans({ location, userInfo, tripplans }) {
   const [tripDate, setTripDate] = useState(new Date());
   // const [destination, setDestination] = useState("");
   const [description, setDescription] = useState("");
+  const [refetchLocation, setRefetchLocation] = useState(location);
   const [searchLocation, setSearchLocation] = useState("");
   const [searchLocationResult, setSearchLocationResult] = useState([]);
   const [showResults, setShowResults] = useState(false);
@@ -41,13 +42,16 @@ function UserTripPlans({ location, userInfo, tripplans }) {
   const [postsPerPage] = useState(4);
   const indexOfLastPost = currentpage * postsPerPage;
   const indexOfFirstPost = indexOfLastPost - postsPerPage;
-  const currentLocation = location?.slice(indexOfFirstPost, indexOfLastPost);
+  const currentLocation = refetchLocation?.slice(
+    indexOfFirstPost,
+    indexOfLastPost
+  );
   const [plans, setPlans] = useState(tripplans);
   const paginate = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
   const pageNumber = [];
-  for (let i = 1; i <= Math.ceil(location?.length / postsPerPage); i++) {
+  for (let i = 1; i <= Math.ceil(refetchLocation?.length / postsPerPage); i++) {
     pageNumber.push(i);
   }
 
@@ -56,12 +60,12 @@ function UserTripPlans({ location, userInfo, tripplans }) {
     filterData(value);
   };
 
-  const handleRefresh = async () => {
+  const handleRefreshPlan = async () => {
     const refresnToast = toast.loading("Refreshing Plans...");
 
     const tripplansquery = `*[_type == "tripplans" && email == $email ]{
     ...
-  }`;
+  }| order(_createdAt desc)`;
     const plans = await sanityClient.fetch(tripplansquery, {
       email: userInfo?.email,
     });
@@ -72,11 +76,11 @@ function UserTripPlans({ location, userInfo, tripplans }) {
   const filterData = (value) => {
     const Value = value.toLocaleUpperCase().trim();
     if (Value === "") {
-      setSearchLocationResult(location);
+      setSearchLocationResult(refetchLocation);
       setShowResults(false);
     } else {
       setShowResults(true);
-      const filteredData = location.filter((item) => {
+      const filteredData = refetchLocation.filter((item) => {
         return Object.keys(item).some((key) =>
           excludeColumns.includes(key)
             ? false
@@ -86,12 +90,27 @@ function UserTripPlans({ location, userInfo, tripplans }) {
       setSearchLocationResult(filteredData);
     }
   };
+
+  const refreshAllLocation = async () => {
+    const refresnToast = toast.loading("Refreshing Location...");
+    const locationquery = `*[_type == "location"]{
+      ...
+     }| order(_createdAt desc)`;
+    const location = await sanityClient.fetch(locationquery);
+    setRefetchLocation(location);
+    toast.success("Location Updated", { id: refresnToast });
+  };
+
   const openlocationModal = () => {
     if (!locationModalisOpen) {
       dispatch(openLocationModal());
     } else {
       dispatch(closeLocationModal());
     }
+  };
+  const refeshAll = () => {
+    handleRefreshPlan();
+    refreshAllLocation();
   };
   const createPlan = async (e) => {
     e.preventDefault();
@@ -115,7 +134,7 @@ function UserTripPlans({ location, userInfo, tripplans }) {
         toast.success("Plan Create Success", {
           id: notification,
         });
-        handleRefresh();
+        refeshAll();
       });
     } catch (err) {
       toast.error("Something went wrong", {
@@ -144,7 +163,7 @@ function UserTripPlans({ location, userInfo, tripplans }) {
               Your Plan List
             </h1>
             <BiRefresh
-              onClick={handleRefresh}
+              onClick={handleRefreshPlan}
               className=" text-blue-500 h-6 w-6 cursor-pointer text-twitterBlue transition-all duration-500 ease-out hover:rotate-180 active:scale-125"
             />
           </div>
@@ -156,8 +175,37 @@ function UserTripPlans({ location, userInfo, tripplans }) {
           </div>
         </div>
         <div className="w-full lg:w-[50vw] p-4 h-full overflow-y-scroll scrollbar-hide ">
-          <h1 className="text-center my-4 text-xl lg:text-3xl">Trip Plan </h1>
-          {/* <button onClick={handleRefresh}>handleRefresh </button> */}
+          <div className="flex flex-row items-center justify-center space-x-2 w-full">
+            <h1 className="text-center my-4 text-xl lg:text-3xl">Trip Plan </h1>
+            <BiRefresh
+              onClick={refreshAllLocation}
+              className=" text-blue-500 h-6 w-6 cursor-pointer text-twitterBlue transition-all duration-500 ease-out hover:rotate-180 active:scale-125"
+            />
+          </div>
+          <div
+            className={`${
+              darkMode
+                ? "bg-gray-100 text-white hover:shadow-cyan-500/40 hover:shadow-lg"
+                : " bg-white text-black hover:shadow-2xl"
+            } space-y-4 mt-2  bg-opacity-10 shadow-md  rounded-md backdrop-filter backdrop-blur-3xl cursor-pointer px-2 py-4 hover:shadow-md w-full`}
+          >
+            <div className="flex items-center space-x-1">
+              <h2>Title:</h2>
+              <p>{title}</p>
+            </div>
+            <div className="flex items-center space-x-1">
+              <h2>Trip Date:</h2>
+              {tripDate && <p>{tripDate?.toString()}</p>}
+            </div>
+            <div className="flex items-center space-x-1">
+              <h2>Location:</h2>
+              {selectlocation && <p>{selectlocation?.title}</p>}
+            </div>
+            <div className="flex items-center space-x-1">
+              <h2>Description:</h2>
+              <p>{description}</p>
+            </div>
+          </div>
           <form
             className={`${
               darkMode
@@ -175,7 +223,9 @@ function UserTripPlans({ location, userInfo, tripplans }) {
               />
             </div>
             <div className="flex flex-col items-center space-x-2">
-              <h2 className="text-lg font-medium">Trip Date:</h2>
+              <div className="flex flex-row items-center space-x-2">
+                <h2 className="text-lg font-medium">Trip Date:</h2>
+              </div>
               <input
                 type="date"
                 value={tripDate}
@@ -204,7 +254,7 @@ function UserTripPlans({ location, userInfo, tripplans }) {
                 value={searchLocation}
                 onChange={(e) => handleChange(e.target.value)}
               />
-              <div className="h-[20vh] lg:h-[15vh] scrollbar-hide overflow-y-scroll grid grid-flow-row-dense grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-10 ">
+              <div className="w-full h-[20vh] lg:h-[15vh] scrollbar-hide overflow-y-scroll grid grid-flow-row-dense grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-9 p-10 ">
                 {showResults &&
                   searchLocationResult?.map((location) => (
                     <div
@@ -214,9 +264,9 @@ function UserTripPlans({ location, userInfo, tripplans }) {
                         setSelectLocation(location);
                         setActiveLocation(location._id);
                       }}
-                      className={`transition-all duration-500  ease-in-out flex items-center justify-center min-h-12 px-2 w-auto text-center cursor-pointer rounded-xl ${
+                      className={`bg-std h-fit text-black transition-all duration-500  ease-in-out flex items-center justify-center min-h-12 overflow-hidden truncate px-2 w-auto text-center cursor-pointer rounded-xl ${
                         activeLocation === location._id &&
-                        "bg-gray-200 font-semibold shadow-md scale-110"
+                        "bg-gray-200  scale-110 shadow-fuchsia-500 ring-1 ring-fuchsia-500"
                       }`}
                     >
                       {location.title}
@@ -231,9 +281,9 @@ function UserTripPlans({ location, userInfo, tripplans }) {
                         setSelectLocation(location);
                         setActiveLocation(location._id);
                       }}
-                      className={`bg-std text-black transition-all duration-500  ease-in-out flex items-center justify-center min-h-12 overflow-hidden truncate px-2 w-auto text-center cursor-pointer rounded-xl ${
+                      className={`bg-std h-fit text-black transition-all duration-500  ease-in-out flex items-center justify-center min-h-12 overflow-hidden truncate px-2 w-auto text-center cursor-pointer rounded-xl ${
                         activeLocation === location._id &&
-                        "bg-gray-200 font-semibold shadow-2xl scale-110 shadow-cyan-500"
+                        "bg-gray-200  shadow-2xl scale-110 shadow-fuchsia-500 ring-1 ring-fuchsia-500"
                       }`}
                     >
                       {location.title}
@@ -277,7 +327,7 @@ function UserTripPlans({ location, userInfo, tripplans }) {
           </button>
         </div>
       </main>
-      {locationModalisOpen && <AddLocationModal />}
+      {locationModalisOpen && <AddLocationModal handleRefresh={refeshAll} />}
     </div>
   );
 }
@@ -288,13 +338,13 @@ export const getServerSideProps = async (context) => {
 
   const locationquery = `*[_type == "location"]{
      ...
-    }`;
+    }| order(_createdAt desc)`;
   const userquery = `*[_type == "author" && email == $email][0]{
       ...
-  }`;
+  }| order(_createdAt desc) `;
   const tripplansquery = `*[_type == "tripplans" && email == $email ]{
     ...
-  }`;
+  }| order(_createdAt desc)`;
   const location = await sanityClient.fetch(locationquery);
   const userInfo = await sanityClient.fetch(userquery, { email: email });
   const tripplans = await sanityClient.fetch(tripplansquery, {

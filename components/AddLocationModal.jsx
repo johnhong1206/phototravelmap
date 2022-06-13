@@ -4,15 +4,25 @@ import { useDispatch, useSelector } from "react-redux";
 import { closeLocationModal } from "../features/modalSlice";
 import toast from "react-hot-toast";
 import { selectDarkmode } from "../features/darkmodeSlice";
+import {
+  selectAddInfoFromMap,
+  selectItemFromMap,
+  resetAddInfoFromMap,
+  removeItemFromMap,
+} from "../features/modalSlice";
 
-function AddLocationModal() {
+function AddLocationModal({ handleRefresh }) {
   const dispatch = useDispatch();
   const darkMode = useSelector(selectDarkmode);
+  const addFromMap = useSelector(selectAddInfoFromMap);
+  console.log("addFromMap", addFromMap);
+  const locationInfoFromMap = useSelector(selectItemFromMap);
 
   const [searchInput, setSearchInput] = useState("");
   const [searchResult, setSearchResult] = useState([]);
   const [selectResult, setSelectResult] = useState(null);
   const [selectAddress, setSelectAddress] = useState(null);
+  const newAddress = selectAddress;
   const [activeSelectResult, setActiveSelectResult] = useState(null);
 
   const [title, setTitle] = useState("");
@@ -24,6 +34,12 @@ function AddLocationModal() {
   const [longitude, setLongitude] = useState("");
   const [address, setAddress] = useState(selectAddress);
   const [description, setDescription] = useState("");
+
+  const closeTheModal = () => {
+    dispatch(closeLocationModal());
+    dispatch(resetAddInfoFromMap());
+    dispatch(removeItemFromMap());
+  };
 
   const searchLocationInfo = async () => {
     var requestOptions = {
@@ -90,6 +106,10 @@ function AddLocationModal() {
     setLongitude("");
     setAddress("");
     setDescription("");
+    handleRefresh();
+    dispatch(closeLocationModal(true));
+    dispatch(resetAddInfoFromMap());
+    dispatch(removeItemFromMap());
   };
   useEffect(() => {
     if (searchResult) {
@@ -100,25 +120,28 @@ function AddLocationModal() {
       setCountry(selectResult?.properties.country);
       setLatitude(selectResult?.properties.lat.toString());
       setLongitude(selectResult?.properties.lon.toString());
-      setAddress(selectAddress);
+      setAddress(selectResult?.properties?.formatted);
     }
   }, [selectResult]);
 
-  console.log(
-    title,
-    city,
-    district,
-    state,
-    country,
-    latitude,
-    longitude,
-    address
-  );
+  useEffect(() => {
+    if (locationInfoFromMap) {
+      setTitle(locationInfoFromMap.name);
+      setCity(locationInfoFromMap.city);
+      setState(locationInfoFromMap.state);
+      setDistrict(locationInfoFromMap.district);
+      setCountry(locationInfoFromMap.country);
+      setLatitude(locationInfoFromMap.lat.toString());
+      setLongitude(locationInfoFromMap.lon.toString());
+      setAddress(locationInfoFromMap?.formatted);
+    }
+  }, [addFromMap, locationInfoFromMap]);
+
   return (
     <div className=" fixed z-50 inset-1   bg-black bg-opacity-80 overflow-y-scroll scrollbar-hide ">
       <div className="w-full h-full min-h-screen relative">
         <AiOutlineClose
-          onClick={() => dispatch(closeLocationModal(true))}
+          onClick={closeTheModal}
           className="absolute text-red-500 h-8 w-8 top-3 right-4 cursor-pointer hover:text-white"
         />
         <h1 className="text-center text-2xl font-bold text-white">

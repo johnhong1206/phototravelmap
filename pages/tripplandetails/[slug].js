@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import dynamic from "next/dynamic";
 import { useDispatch, useSelector } from "react-redux";
 import { selectDarkmode } from "../../features/darkmodeSlice";
 import {
@@ -17,12 +18,12 @@ import { MdOutlineTour, MdChevronLeft, MdChevronRight } from "react-icons/md";
 import { FaRegGem, FaRegGrinBeam } from "react-icons/fa";
 import { BiRefresh } from "react-icons/bi";
 import Head from "next/head";
-import TripDetailsMap from "../../components/TripDetailsMap";
+const TripDetailsMap = dynamic(() => import("../../components/TripDetailsMap"));
+
 import AddLocationModal from "../../components/AddLocationModal";
 import { getAreaInfo } from "../../features/placeinfoSlice";
 
 function Plandetails({ plan, location, params }) {
-  console.log(plan?.title);
   const dispatch = useDispatch();
   const darkMode = useSelector(selectDarkmode);
   const user = useSelector(selectUser);
@@ -30,6 +31,8 @@ function Plandetails({ plan, location, params }) {
   const [time, setTime] = useState("");
   const [thingstodo, setThingstodo] = useState("");
   const locationModalisOpen = useSelector(selectLocationModalIsOpen);
+  const [refetchLocation, setRefetchLocation] = useState(location);
+
   const [selectlocation, setSelectLocation] = useState(null);
   const [activeLocation, setActiveLocation] = useState(selectlocation);
   const [searchLocation, setSearchLocation] = useState("");
@@ -43,14 +46,18 @@ function Plandetails({ plan, location, params }) {
   const [plans, setPlans] = useState(plan);
   const [queryOption, setQueryOption] = useState("");
 
-  const currentLocation = location?.slice(indexOfFirstPost, indexOfLastPost);
+  const currentLocation = refetchLocation?.slice(
+    indexOfFirstPost,
+    indexOfLastPost
+  );
   const paginate = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
   const pageNumber = [];
-  for (let i = 1; i <= Math.ceil(location?.length / postsPerPage); i++) {
+  for (let i = 1; i <= Math.ceil(refetchLocation?.length / postsPerPage); i++) {
     pageNumber.push(i);
   }
+
   const handleChange = (value) => {
     setSearchLocation(value);
     filterData(value);
@@ -58,11 +65,11 @@ function Plandetails({ plan, location, params }) {
   const filterData = (value) => {
     const Value = value.toLocaleUpperCase().trim();
     if (Value === "") {
-      setSearchLocationResult(location);
+      setSearchLocationResult(refetchLocation);
       setShowResults(false);
     } else {
       setShowResults(true);
-      const filteredData = location.filter((item) => {
+      const filteredData = refetchLocation.filter((item) => {
         return Object.keys(item).some((key) =>
           excludeColumns.includes(key)
             ? false
@@ -131,7 +138,6 @@ function Plandetails({ plan, location, params }) {
         body: JSON.stringify(planInfo),
         method: "POST",
       }).then((res) => {
-        console.log(res);
         toast.success("Update Plan Success", {
           id: notification,
         });
@@ -170,13 +176,31 @@ function Plandetails({ plan, location, params }) {
       .then((response) => response.json())
       .then((responseData) => {
         dispatch(getAreaInfo(responseData));
-        toast.success(`${location[0]?.title} area info updated successfully`, {
-          id: refresnToast,
-        });
+        toast.success(
+          `${plans?.location?.title} area info updated successfully`,
+          {
+            id: refresnToast,
+          }
+        );
       })
       .catch((error) => console.log("error", error));
   };
-  console.log(queryOption);
+
+  const refreshAllLocation = async () => {
+    const refresnToast = toast.loading("Refreshing Location...");
+    const locationquery = `*[_type == "location"]{
+      ...
+     }| order(_createdAt desc)`;
+    const location = await sanityClient.fetch(locationquery);
+    setRefetchLocation(location);
+    toast.success("Location Updated", { id: refresnToast });
+  };
+
+  const handleRefresh = () => {
+    refreshPlan().then(() => {
+      refreshAllLocation();
+    });
+  };
 
   return (
     <div
@@ -193,7 +217,7 @@ function Plandetails({ plan, location, params }) {
         <div className="flex flex-row items-center space-x-2">
           <h1 className="text-3xl text-center">{plans?.title}</h1>
           <BiRefresh
-            onClick={refreshPlan}
+            onClick={handleRefresh}
             className=" text-blue-500 h-6 w-6 cursor-pointer text-twitterBlue transition-all duration-500 ease-out hover:rotate-180 active:scale-125"
           />
         </div>
@@ -370,9 +394,9 @@ function Plandetails({ plan, location, params }) {
                         setSelectLocation(location);
                         setActiveLocation(location._id);
                       }}
-                      className={`transition-all duration-500  ease-in-out flex items-center justify-center min-h-12 px-2 w-auto text-center cursor-pointer rounded-xl ${
+                      className={`bg-std text-black transition-all duration-500  ease-in-out flex items-center justify-center min-h-12 overflow-hidden truncate px-2 w-auto text-center cursor-pointer rounded-xl ${
                         activeLocation === location._id &&
-                        "bg-gray-200 font-semibold shadow-md scale-110"
+                        "bg-gray-200  scale-110 shadow-fuchsia-500 ring-1 ring-fuchsia-500"
                       }`}
                     >
                       {location.title}
@@ -389,7 +413,7 @@ function Plandetails({ plan, location, params }) {
                       }}
                       className={`bg-std text-black transition-all duration-500  ease-in-out flex items-center justify-center min-h-12 overflow-hidden truncate px-2 w-auto text-center cursor-pointer rounded-xl ${
                         activeLocation === location._id &&
-                        "bg-gray-200 font-semibold shadow-2xl scale-110 shadow-cyan-500"
+                        "bg-gray-200  scale-110 shadow-fuchsia-500 ring-1 ring-fuchsia-500"
                       }`}
                     >
                       {location.title}
@@ -438,10 +462,13 @@ function Plandetails({ plan, location, params }) {
       <TripDetailsMap
         location={plans?.tripDetails}
         currentLocation={plan?.location}
+        plans={plans}
       />
 
       <div className="pb-1" />
-      {locationModalisOpen && <AddLocationModal />}
+      {locationModalisOpen && (
+        <AddLocationModal handleRefresh={handleRefresh} />
+      )}
     </div>
   );
 }
@@ -479,8 +506,9 @@ location->{
 }
 `;
   const locationquery = `*[_type == "location"]{
-    ...
-   }`;
+  ...
+ }| order(_createdAt desc)`;
+
   const location = await sanityClient.fetch(locationquery);
 
   const plan = await sanityClient.fetch(query, {

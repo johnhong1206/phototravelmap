@@ -26,11 +26,11 @@ import AddPostCategoriesTypes from "../components/AddPostCategoriesTypes";
 
 function Admin({ location, categories, posts }) {
   const darkMode = useSelector(selectDarkmode);
-
   const dispatch = useDispatch();
   const [phase, setPhase] = useState("Post");
   const [selectPost, setSelectPost] = useState(null);
   const [refetchpost, setRefetchPost] = useState(posts);
+  const [refetchLocation, setRefetchLocation] = useState(location);
   const locationModalisOpen = useSelector(selectLocationModalIsOpen);
   const categoryModalisOpen = useSelector(selectCategoryModalIsOpen);
 
@@ -73,6 +73,21 @@ function Admin({ location, categories, posts }) {
     const posts = await sanityClient.fetch(query);
     setRefetchPost(posts);
     toast.success("Feeds Updated", { id: refresnToast });
+  };
+
+  const refreshAllLocation = async () => {
+    const refresnToast = toast.loading("Refreshing Location...");
+    const locationquery = `*[_type == "location"]{
+      ...
+     }| order(_createdAt desc)`;
+    const location = await sanityClient.fetch(locationquery);
+    setRefetchLocation(location);
+    toast.success("Location Updated", { id: refresnToast });
+  };
+
+  const refeshAll = () => {
+    handleRefresh();
+    refreshAllLocation();
   };
 
   return (
@@ -131,9 +146,9 @@ function Admin({ location, categories, posts }) {
         {phase == "Add Post" && (
           <AddPost
             posts={refetchpost}
-            location={location}
+            location={refetchLocation}
             categories={categories}
-            handleRefresh={handleRefresh}
+            handleRefresh={refeshAll}
             setPhase={setPhase}
           />
         )}
@@ -141,7 +156,7 @@ function Admin({ location, categories, posts }) {
           <AddImagetoPost
             selectPost={selectPost}
             setPhase={setPhase}
-            handleRefresh={handleRefresh}
+            handleRefresh={refeshAll}
             setSelectPost={setSelectPost}
           />
         )}
@@ -150,7 +165,7 @@ function Admin({ location, categories, posts }) {
             setPhase={setPhase}
             selectPost={selectPost}
             categories={categories}
-            handleRefresh={handleRefresh}
+            handleRefresh={refeshAll}
             setSelectPost={setSelectPost}
             posts={refetchpost}
           />
@@ -160,14 +175,14 @@ function Admin({ location, categories, posts }) {
             setPhase={setPhase}
             selectPost={selectPost}
             categories={categories}
-            handleRefresh={handleRefresh}
+            handleRefresh={refeshAll}
             setSelectPost={setSelectPost}
             posts={refetchpost}
           />
         )}
       </main>
 
-      {locationModalisOpen && <AddLocationModal />}
+      {locationModalisOpen && <AddLocationModal handleRefresh={refeshAll} />}
       {categoryModalisOpen && <AddCategoryModal />}
     </div>
   );
@@ -188,10 +203,10 @@ export const getServerSideProps = async (context) => {
 
   const locationquery = `*[_type == "location"]{
      ...
-    }`;
+    }| order(_createdAt desc)`;
   const categoriesquery = `*[_type == "category"]{
         ...
-       }`;
+       }| order(_createdAt desc)`;
   const posts = await sanityClient.fetch(query);
   const location = await sanityClient.fetch(locationquery);
   const categories = await sanityClient.fetch(categoriesquery);
