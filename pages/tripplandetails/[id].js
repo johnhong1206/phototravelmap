@@ -1,5 +1,16 @@
 import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
+import Head from "next/head";
+import { useRouter } from "next/router";
+import { fetchlocation } from "../../utils/fetchlocation";
+import {
+  fetchlocationInfo,
+  fetchlocationQueryInfo,
+} from "../../utils/fetchareaInfo";
+import {
+  fetchtripplansById,
+  fetchtripdetailsById,
+} from "../../utils/fetchtripplans";
 import { useDispatch, useSelector } from "react-redux";
 import { selectDarkmode } from "../../features/darkmodeSlice";
 import {
@@ -8,21 +19,18 @@ import {
   selectLocationModalIsOpen,
 } from "../../features/modalSlice";
 import { selectUser } from "../../features/userSlice";
-import { sanityClient } from "../../sanity";
+import { getAreaInfo } from "../../features/placeinfoSlice";
 import { AiOutlinePlusCircle, AiOutlineClose } from "react-icons/ai";
-import toast from "react-hot-toast";
-import { BiMapPin } from "react-icons/bi";
 import { IoRestaurantOutline } from "react-icons/io5";
 import { RiHotelLine } from "react-icons/ri";
-import { MdOutlineTour, MdChevronLeft, MdChevronRight } from "react-icons/md";
+import { MdOutlineTour } from "react-icons/md";
 import { FaRegGem, FaRegGrinBeam } from "react-icons/fa";
 import { BiRefresh } from "react-icons/bi";
-import Head from "next/head";
-import { useRouter } from "next/router";
+import toast from "react-hot-toast";
 const TripDetailsMap = dynamic(() => import("../../components/TripDetailsMap"));
-
-import AddLocationModal from "../../components/AddLocationModal";
-import { getAreaInfo } from "../../features/placeinfoSlice";
+const AddLocationModal = dynamic(() =>
+  import("../../components/AddLocationModal")
+);
 
 function Plandetails({ plan, location, tripdetails }) {
   const router = useRouter();
@@ -95,17 +103,9 @@ function Plandetails({ plan, location, tripdetails }) {
 
   const refreshPlan = async () => {
     const refresnToast = toast.loading("Refreshing Plan...");
-
-    const tripplandettailsquery = `*[_type == "tripDetails" && referenceTripPlan == $id]{
-      ...,
-      location->{
-        ...
-      },
-     }| order(_createdAt asc)`;
-    const tripdetails = await sanityClient.fetch(tripplandettailsquery, {
-      id: id,
+    await fetchtripdetailsById(id).then((tripdetails) => {
+      setRefetchTripDetails(tripdetails);
     });
-    setRefetchTripDetails(tripdetails);
     toast.success("Plan Updated", { id: refresnToast });
   };
 
@@ -159,49 +159,50 @@ function Plandetails({ plan, location, tripdetails }) {
     const refresnToast = toast.loading(
       `Getting ${plans?.location?.title} area info`
     );
-
-    var requestOptions = {
-      method: "GET",
+    const locationInfo = {
+      queryOption: queryOption.toString(),
+      longitude: plans?.location?.longitude,
+      latitude: plans?.location?.latitude,
     };
-    const queryOptionUrl = `https://api.geoapify.com/v2/places?categories=${queryOption.toString()}&filter=circle:${
-      plans?.location?.longitude
-    },${plans?.location?.latitude},10000&bias=proximity:${
-      plans?.location?.longitude
-    },${plans?.location?.latitude}&limit=50&apiKey=${
-      process.env.NEXT_PUBLIC_GEOAPIFY_KEY
-    }`;
-    const defaultUrl = `https://api.geoapify.com/v2/places?categories=catering,tourism,heritage,accommodation,entertainment&filter=circle:${plans?.location?.longitude},${plans?.location?.latitude},10000&bias=proximity:${plans?.location?.longitude},${plans?.location?.latitude}&limit=50&apiKey=${process.env.NEXT_PUBLIC_GEOAPIFY_KEY}`;
 
-    const url = queryOption ? queryOptionUrl : defaultUrl;
-
-    await fetch(url, requestOptions)
-      .then((response) => response.json())
-      .then((responseData) => {
-        dispatch(getAreaInfo(responseData));
-        toast.success(
-          `${plans?.location?.title} area info updated successfully`,
-          {
-            id: refresnToast,
-          }
-        );
-      })
-      .catch((error) => console.log("error", error));
+    if (queryOption) {
+      await fetchlocationQueryInfo(locationInfo)
+        .then((responseData) => {
+          dispatch(getAreaInfo(responseData));
+          toast.success(
+            `${plans?.location?.title} area info updated successfully`,
+            {
+              id: refresnToast,
+            }
+          );
+        })
+        .catch((error) => console.log("error", error));
+    } else {
+      await fetchlocationInfo(locationInfo)
+        .then((responseData) => {
+          dispatch(getAreaInfo(responseData));
+          toast.success(
+            `${plans?.location?.title} area info updated successfully`,
+            {
+              id: refresnToast,
+            }
+          );
+        })
+        .catch((error) => console.log("error", error));
+    }
   };
 
   const refreshAllLocation = async () => {
     const refresnToast = toast.loading("Refreshing Location...");
-    const locationquery = `*[_type == "location"]{
-      ...
-     }| order(_createdAt desc)`;
-    const location = await sanityClient.fetch(locationquery);
-    setRefetchLocation(location);
+    await fetchlocation().then((location) => {
+      setRefetchLocation(location);
+    });
     toast.success("Location Updated", { id: refresnToast });
   };
 
   const handleRefresh = () => {
-    refreshPlan().then(() => {
-      refreshAllLocation();
-    });
+    refreshPlan();
+    refreshAllLocation();
   };
 
   useEffect(() => {
@@ -211,8 +212,6 @@ function Plandetails({ plan, location, tripdetails }) {
       setInitalLocationState(true);
     }
   }, [refetchTripDetails]);
-
-  console.log(searchLocationResult);
 
   return (
     <div
@@ -225,6 +224,7 @@ function Plandetails({ plan, location, tripdetails }) {
         <meta name="description" content="Generated by create next app" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
+
       <div className="flex flex-col items-center justify-center">
         <div className="flex flex-row items-center space-x-2">
           <h1 className="text-3xl text-center">{plans?.title}</h1>
@@ -504,26 +504,9 @@ export default Plandetails;
 
 export const getServerSideProps = async (context) => {
   const id = context.query.id.toString();
-  const tripplanquery = `*[_type == "tripplans" && _id == $id]{
-    ...,
-    location->{
-      ...
-    },
-   }| order(_createdAt desc)`;
-  const tripplandettailsquery = `*[_type == "tripDetails" && referenceTripPlan == $id]{
-    ...,
-    location->{
-      ...
-    },
-   }| order(_createdAt asc)`;
-  const locationquery = `*[_type == "location"]{
-    ...
-   }| order(_createdAt desc)`;
-  const plan = await sanityClient.fetch(tripplanquery, { id: id });
-  const tripdetails = await sanityClient.fetch(tripplandettailsquery, {
-    id: id,
-  });
-  const location = await sanityClient.fetch(locationquery);
+  const plan = await fetchtripplansById(id);
+  const tripdetails = await fetchtripdetailsById(id);
+  const location = await fetchlocation();
   return {
     props: {
       plan,
@@ -532,63 +515,3 @@ export const getServerSideProps = async (context) => {
     },
   };
 };
-
-// export const getStaticProps = async ({ params }) => {
-//   const query = `*[_type == "tripplans" && slug.current == $slug][0]{
-// ...,
-// location->{
-//     ...
-//   },
-//   tripDetails[]->{
-//     ...,
-//     location->{
-//         ...
-//       },
-//   },
-// }
-// `;
-//   const locationquery = `*[_type == "location"]{
-//   ...
-//  }| order(_createdAt desc)`;
-
-//   const planDetailQuery = `*[_type == "tripDetails" && referenceTripPlan == $id]{
-//   ...,
-//   location->{
-//       ...
-//     },
-//     tripDetails[]->{
-//       ...,
-//       location->{
-//           ...
-//         },
-//     },
-//   }
-// | order(_createdAt desc)`;
-
-//   const location = await sanityClient.fetch(locationquery);
-
-//   const plan = await sanityClient.fetch(query, {
-//     slug: params?.slug,
-//   });
-//   // const planDetails = await sanityClient.fetch(planDetailQuery, {
-//   //   id: params?.id,
-//   // });
-//   const id = params?.id;
-//   console.log(params?.id);
-
-//   if (!plan) {
-//     return {
-//       notFound: true,
-//     };
-//   }
-//   return {
-//     props: {
-//       plan: plan,
-//       params: params,
-//       location: location,
-//       // planDetails: planDetails,
-//       // id: id,
-//     },
-//     revalidate: 60,
-//   };
-// };

@@ -80,7 +80,7 @@ function Header() {
         {user ? (
           <IoLogInOutline
             onClick={userLogout}
-            className={`w-7 h-7 hover:text-fuchsia-400  cursor-pointe ${
+            className={`w-7 h-7 hover:text-fuchsia-400  cursor-pointer ${
               darkMode ? "text-white" : "text-gray-500/90"
             }`}
           />

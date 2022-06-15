@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import toast from "react-hot-toast";
-import { login } from "../features/userSlice";
-import { useDispatch, useSelector } from "react-redux";
-import { useRouter } from "next/router";
 import Head from "next/head";
+import { useRouter } from "next/router";
+import { signupuser, signinuser } from "../utils/fetchauth";
+import { login } from "../features/userSlice";
+import { useDispatch } from "react-redux";
+import toast from "react-hot-toast";
 
 function Signup() {
   const router = useRouter();
@@ -18,27 +19,6 @@ function Signup() {
   const navSignIn = () => {
     router.push(`/signin`);
   };
-  const signupuser = async (signUpInfo) => {
-    console.log("signUpInfo", signUpInfo);
-
-    const res = await fetch(`/api/signup`, {
-      body: JSON.stringify(signUpInfo),
-      method: "POST",
-    });
-    const data = await res.json();
-    return data;
-  };
-
-  const signinuser = async (signInInfo) => {
-    console.log("signInInfo", signInInfo);
-
-    const res = await fetch(`/api/signin`, {
-      body: JSON.stringify(signInInfo),
-      method: "POST",
-    });
-    const data = await res.json();
-    return data;
-  };
 
   const signUp = async () => {
     const notification = toast.loading("Sign Up...");
@@ -52,7 +32,6 @@ function Signup() {
       if (res.message == "Sign Up Success") {
         toast.success(`${res.email} ${res.message}`, { id: notification });
         signinuser(signUpInfo).then((res) => {
-          console.log("res", res);
           dispatch(
             login({
               username: res.name,
@@ -78,6 +57,7 @@ function Signup() {
       }
     });
   };
+
   return (
     <div className="h-screen p-4">
       <Head>

@@ -1,84 +1,52 @@
 import React, { useState, useEffect, useRef } from "react";
 import Head from "next/head";
 import Image from "next/image";
-import { sanityClient, urlFor } from "../../sanity";
-import Map, { Marker } from "react-map-gl";
 import { useRouter } from "next/router";
+import { urlFor } from "../../sanity";
+import {
+  fetchPost,
+  fetchpostdetails,
+  fetchpostrating,
+} from "../../utils/fetchposts";
+import { useSelector } from "react-redux";
+import { selectUser } from "../../features/userSlice";
+import { selectDarkmode } from "../../features/darkmodeSlice";
+import Map, { Marker } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { IoChevronUpOutline } from "react-icons/io5";
-import Footer from "../../components/Footer";
 import { AiTwotoneFire } from "react-icons/ai";
+import Footer from "../../components/Footer";
 import toast from "react-hot-toast";
-import { selectUser } from "../../features/userSlice";
-import { useSelector } from "react-redux";
-import { selectDarkmode } from "../../features/darkmodeSlice";
 
-function PostDetails({ slug, post }) {
+function PostDetails({ post }) {
+  const router = useRouter();
+  const postSlug = router.query.slug;
   const darkMode = useSelector(selectDarkmode);
   const topRef = useRef(null);
   const user = useSelector(selectUser);
-
   const [username, setUsername] = useState(user ? user?.username : "");
   const [email, setEmail] = useState(user ? user?.email : "");
-  const router = useRouter();
   const [selectedLocation, setSelectedLocation] = useState({});
-  const [rating, setRating] = useState([]);
-  const [postRating, setPostRating] = useState(null);
-
   const [rate, setRate] = useState(null);
   const [comment, setComment] = useState("");
   const [refetchpost, setRefetchPost] = useState(post);
   const id = post?._id;
 
-  const fetchRating = async () => {
-    const query = `*[_type == "rating" && ratedPostId == $id]{
-    ...
-  }`;
-    const rating = await sanityClient.fetch(query, {
-      id: id,
-    });
-    setRating(rating);
+  const fetchPost = async () => {
+    fetchpostdetails(postSlug).then((refetchpost) =>
+      setRefetchPost(refetchpost)
+    );
   };
 
-  useEffect(() => {
-    if (id) {
-      fetchRating();
-    }
-  }, [id]);
-
-  const calcTotalRating = () => {
-    const totalUserRate = rating?.length;
-
-    let totalRating = 0;
-    rating?.forEach((item) => {
-      totalRating = totalRating + item.rating;
-    });
-
-    setPostRating(Number(totalRating / totalUserRate).toFixed(2));
-  };
-
-  const updatePostRating = async () => {
+  const updatePostRating = async (updaterateInfo) => {
     const notification = toast.loading("Rate the post...");
-    let totalRating = 0;
-    rating?.forEach((item) => {
-      totalRating = totalRating + item.rating;
-    });
-    const currentRating = Number(totalRating);
-    const inputRating = Number(rate);
-    const totalUserRate = Number(rating?.length) + Number(1);
-    const finalRating = (currentRating + inputRating) / totalUserRate;
-
-    const rateInfo = {
-      _id: post?._id,
-      rating: Number(finalRating),
-    };
 
     try {
       await fetch(`/api/updatepostrating`, {
-        body: JSON.stringify(rateInfo),
+        body: JSON.stringify(updaterateInfo),
         method: "POST",
       }).then((res) => {
-        console.log(res);
+        fetchPost();
         toast.success("Post Update Rate Success", {
           id: notification,
         });
@@ -89,12 +57,6 @@ function PostDetails({ slug, post }) {
       });
     }
   };
-
-  useEffect(() => {
-    if (rating) {
-      calcTotalRating();
-    }
-  }, [rating]);
 
   const coordinates = {
     longitude: Number(refetchpost.location.longitude),
@@ -135,6 +97,15 @@ function PostDetails({ slug, post }) {
       "+",
       user ? user?.username : email
     );
+    const ratings = await fetchpostrating(id);
+    let totalRating = 0;
+    ratings?.forEach((item) => {
+      totalRating = totalRating + item.rating;
+    });
+    const currentRating = Number(totalRating);
+    const inputRating = Number(rate);
+    const totalUserRate = Number(ratings?.length) + Number(1);
+    const finalRating = (currentRating + inputRating) / totalUserRate;
 
     const rateInfo = {
       _id: refetchpost?._id,
@@ -146,11 +117,16 @@ function PostDetails({ slug, post }) {
       comment: comment,
     };
 
+    const updaterateInfo = {
+      _id: post?._id,
+      rating: Number(finalRating),
+    };
+
     if (rate > Number(5)) {
       toast.error("Maximum rating is 5", { id: notification });
       setRate(Number(5));
     }
-    const userRatedThePost = rating?.find(
+    const userRatedThePost = ratings?.find(
       (rating) => rating?.ratedUserEmail == email
     );
 
@@ -163,8 +139,7 @@ function PostDetails({ slug, post }) {
           toast.success("Rate Success", {
             id: notification,
           });
-          fetchRating();
-          updatePostRating();
+          updatePostRating(updaterateInfo);
         });
       } catch (error) {
         toast.error("Something Error", {
@@ -182,7 +157,6 @@ function PostDetails({ slug, post }) {
     setEmail("");
     setComment("");
     setRate(Number(0));
-    fetchRating();
   };
 
   return (
@@ -197,6 +171,7 @@ function PostDetails({ slug, post }) {
         <meta name="description" content="Generated by create next app" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
+
       <main className="max-w-screen mx-auto">
         <div className="flex flex-col">
           <div className="w-full mb-4 flex flex-col items-center justify-center">
@@ -246,9 +221,9 @@ function PostDetails({ slug, post }) {
                     </div>
                   ))}
               </div>
-              {postRating > 0 ? (
+              {refetchpost?.rating > 0 ? (
                 <div className="flex items-center space-x-1">
-                  <p>{postRating}</p>
+                  <p>{refetchpost?.rating}</p>
                   <AiTwotoneFire className=" w-4 h-4 text-red-500/80" />
                 </div>
               ) : (
@@ -369,13 +344,7 @@ function PostDetails({ slug, post }) {
 export default PostDetails;
 
 export const getStaticPaths = async () => {
-  const query = `*[_type == "post"]{
-          _id,
-          slug {
-              current
-          } 
-        }`;
-  const posts = await sanityClient.fetch(query);
+  const posts = await fetchPost();
 
   const paths = posts.map((post) => ({
     params: {
@@ -387,31 +356,7 @@ export const getStaticPaths = async () => {
 };
 
 export const getStaticProps = async ({ params }) => {
-  const query = `*[_type == "post" && slug.current == $slug][0]{
-    _id,
-    title,
-    author->{
-      name,
-      image
-    },
-    description,
-    mainImage,
-    slug,
-    categories[]->{
-      ...
-    },
-    rating[]->{
-      ...
-    },
-    location->{
-      ...
-    },
-    categoryTags  
-  }`;
-
-  const post = await sanityClient.fetch(query, {
-    slug: params?.slug,
-  });
+  const post = await fetchpostdetails(params?.slug);
 
   if (!post) {
     return {

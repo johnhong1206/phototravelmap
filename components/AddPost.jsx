@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { selectDarkmode } from "../features/darkmodeSlice";
 import {
   openCategoryModal,
   closeCategoryModal,
@@ -8,30 +9,23 @@ import {
   selectCategoryModalIsOpen,
   selectLocationModalIsOpen,
 } from "../features/modalSlice";
-import {
-  AiOutlinePlusCircle,
-  AiOutlineClose,
-  AiOutlineCamera,
-} from "react-icons/ai";
+import { selectUser } from "../features/userSlice";
+import { AiOutlinePlusCircle, AiOutlineClose } from "react-icons/ai";
 import toast from "react-hot-toast";
-import PostFeeds from "./PostFeeds";
-import { selectDarkmode } from "../features/darkmodeSlice";
 
 function AddPost({ posts, location, categories, setPhase, handleRefresh }) {
   const dispatch = useDispatch();
   const darkMode = useSelector(selectDarkmode);
-
+  const user = useSelector(selectUser);
   const locationModalisOpen = useSelector(selectLocationModalIsOpen);
   const categoryModalisOpen = useSelector(selectCategoryModalIsOpen);
-
   const [title, setTitle] = useState("");
-  const slug = title.concat("-", "Zong-Hong");
+  const slug = title.concat("-", user?.username);
   const [postType, setPostType] = useState("public");
   const [selectlocation, setSelectLocation] = useState(null);
   const [selectCategory, setSelectCategory] = useState(null);
   const [activeLocation, setActiveLocation] = useState(selectlocation);
   const [activeCategory, setActiveCategory] = useState(selectCategory);
-  const [author, setAuthor] = useState(null);
   const [searchLocation, setSearchLocation] = useState("");
   const [searchLocationResult, setSearchLocationResult] = useState([]);
   const [showResults, setShowResults] = useState(false);
@@ -103,7 +97,7 @@ function AddPost({ posts, location, categories, setPhase, handleRefresh }) {
     const postInfo = {
       title: title,
       postType: postType,
-      author: author,
+      author: user?.id,
       rating: Number(0),
       slug: slug,
       //   mainImage: "",
@@ -118,6 +112,7 @@ function AddPost({ posts, location, categories, setPhase, handleRefresh }) {
       toast.error("Title already exists Please Choose a new title", {
         id: notification,
       });
+      return false;
     }
 
     if (!!postTitleExist == false) {
@@ -161,7 +156,6 @@ function AddPost({ posts, location, categories, setPhase, handleRefresh }) {
       dispatch(closeCategoryModal());
     }
   };
-  console.log("location", selectlocation);
 
   return (
     <div

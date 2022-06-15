@@ -1,9 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
-import {
-  AiOutlinePlusCircle,
-  AiOutlineClose,
-  AiOutlineCamera,
-} from "react-icons/ai";
+import React, { useState } from "react";
 import toast from "react-hot-toast";
 
 function AddImagetoPost({

@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import toast from "react-hot-toast";
-import { login } from "../features/userSlice";
-import { useDispatch, useSelector } from "react-redux";
-import { useRouter } from "next/router";
 import Head from "next/head";
+import { useRouter } from "next/router";
+import { login } from "../features/userSlice";
+import { useDispatch } from "react-redux";
+import { signinuser } from "../utils/fetchauth";
+import toast from "react-hot-toast";
 
 function Signin() {
   const router = useRouter();
@@ -16,15 +17,6 @@ function Signin() {
   const isInvalid = password === "" || email === "";
   const navSIgnUp = () => {
     router.push(`/signup`);
-  };
-
-  const signinuser = async (signInInfo) => {
-    const res = await fetch(`/api/signin`, {
-      body: JSON.stringify(signInInfo),
-      method: "POST",
-    });
-    const data = await res.json();
-    return data;
   };
 
   const signIn = async () => {

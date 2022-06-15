@@ -2,7 +2,7 @@ import React from "react";
 import { urlFor } from "../sanity";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { selectDarkmode } from "../features/darkmodeSlice";
 
 function PostFeeds({
@@ -11,11 +11,7 @@ function PostFeeds({
   author,
   slug,
   mainImage,
-  categories,
-  id,
-
   location,
-  body,
   publishedAt,
 }) {
   const router = useRouter();

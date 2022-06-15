@@ -1,51 +1,42 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import Head from "next/head";
-import { IoRestaurantOutline } from "react-icons/io5";
+import Image from "next/image";
+import dynamic from "next/dynamic";
+import { useRouter } from "next/router";
+import { sanityClient, urlFor } from "../../sanity";
+import { fetchlocationInfo } from "../../utils/fetchareaInfo";
+import { useDispatch, useSelector } from "react-redux";
+import { selectDarkmode } from "../../features/darkmodeSlice";
+import { selectPlaceInfo, getAreaInfo } from "../../features/placeinfoSlice";
+import Map, { Marker, Popup } from "react-map-gl";
+import { getCenter } from "geolib";
+import "mapbox-gl/dist/mapbox-gl.css";
+import { IoRestaurantOutline, IoChevronUpOutline } from "react-icons/io5";
 import { RiHotelLine } from "react-icons/ri";
 import { MdOutlineTour, MdChevronLeft, MdChevronRight } from "react-icons/md";
 import { FaRegGem, FaRegGrinBeam } from "react-icons/fa";
 import { BiRefresh } from "react-icons/bi";
-
-import { sanityClient, urlFor } from "../../sanity";
-import Image from "next/image";
-import dynamic from "next/dynamic";
-import { useRouter } from "next/router";
-import { getCenter } from "geolib";
-import "mapbox-gl/dist/mapbox-gl.css";
-import Map, { Marker, Popup } from "react-map-gl";
-import { IoChevronUpOutline } from "react-icons/io5";
-import Footer from "../../components/Footer";
-import { useDispatch, useSelector } from "react-redux";
-import { selectDarkmode } from "../../features/darkmodeSlice";
-import { getUniqueValues } from "../../utils/helper";
-import {
-  selectPlaceInfo,
-  getAreaInfo,
-  removeInfo,
-} from "../../features/placeinfoSlice";
+const PostFeeds = dynamic(() => import("../../components/PostFeeds"));
+const Footer = dynamic(() => import("../../components/Footer"));
 import toast from "react-hot-toast";
 
-const PostFeeds = dynamic(() => import("../../components/PostFeeds"));
-
 function PlaceDetail({ posts, location }) {
+  const router = useRouter();
   const dispatch = useDispatch();
   const darkMode = useSelector(selectDarkmode);
   const placeInfo = useSelector(selectPlaceInfo);
 
   const topRef = useRef(null);
-  const [areaInfo, setAreaInfo] = useState([]);
   const [searchLocation, setSearchLocation] = useState("");
   const [searchLocationResult, setSearchLocationResult] = useState([]);
   const [showResults, setShowResults] = useState(false);
   const excludeColumns = [];
 
-  const router = useRouter();
   const coordinates = posts.map((result) => ({
     longitude: result?.location?.longitude,
     latitude: result?.location?.latitude,
   }));
-  const [selectedLocation, setSelectedLocation] = useState({});
-  const [locationDetails, setLocationDetails] = useState({});
+
   const center = getCenter(coordinates);
   const [viewport, setViewport] = useState({
     longitude: center?.longitude,
@@ -54,6 +45,8 @@ function PlaceDetail({ posts, location }) {
     width: "100%",
     height: "100%",
   });
+  const [selectedLocation, setSelectedLocation] = useState({});
+  const [locationDetails, setLocationDetails] = useState({});
   const [currentpage, setCurrentPage] = useState(1);
   const [postsPerPage] = useState(4);
   const [activeNumber, setActiveNumber] = useState("");
@@ -78,49 +71,12 @@ function PlaceDetail({ posts, location }) {
     const refresnToast = toast.loading(
       `Getting ${location[0]?.title} area info`
     );
-
-    const checkValue = location[0]?.city.toLocaleUpperCase();
-    // console.log("checkValue: ", checkValue);
-    const infoExist = placeInfo?.features?.find((item) =>
-      item?.properties.city?.toLocaleUpperCase().includes(checkValue)
-    );
-    // console.log("infoExist: ", !!infoExist);
-
-    // if (!!infoExist == true) {
-    //   toast.error(`You already have  ${location[0]?.title} area info`, {
-    //     id: refresnToast,
-    //   });
-    //   return false;
-    // }
-
-    // if (!!infoExist == false) {
-    //   var requestOptions = {
-    //     method: "GET",
-    //   };
-    //   const url = `https://api.geoapify.com/v2/places?categories=catering,tourism,heritage,accommodation,entertainment&filter=circle:${location[0].longitude},${location[0].latitude},10000&bias=proximity:${location[0].longitude},${location[0].latitude}&limit=30&apiKey=${process.env.NEXT_PUBLIC_GEOAPIFY_KEY}`;
-    //   await fetch(url, requestOptions)
-    //     .then((response) => response.json())
-    //     .then((responseData) => {
-    //       setAreaInfo(responseData);
-    //       dispatch(getAreaInfo(responseData));
-    //       toast.success(
-    //         `${location[0]?.title} area info updated successfully`,
-    //         {
-    //           id: refresnToast,
-    //         }
-    //       );
-    //     })
-    //     .catch((error) => console.log("error", error));
-    // }
-
-    var requestOptions = {
-      method: "GET",
+    const locationInfo = {
+      longitude: location[0].longitude,
+      latitude: location[0].latitude,
     };
-    const url = `https://api.geoapify.com/v2/places?categories=catering,tourism,heritage,accommodation,entertainment&filter=circle:${location[0].longitude},${location[0].latitude},10000&bias=proximity:${location[0].longitude},${location[0].latitude}&limit=30&apiKey=${process.env.NEXT_PUBLIC_GEOAPIFY_KEY}`;
-    await fetch(url, requestOptions)
-      .then((response) => response.json())
+    await fetchlocationInfo(locationInfo)
       .then((responseData) => {
-        setAreaInfo(responseData);
         dispatch(getAreaInfo(responseData));
         toast.success(`${location[0]?.title} area info updated successfully`, {
           id: refresnToast,
@@ -129,16 +85,11 @@ function PlaceDetail({ posts, location }) {
       .catch((error) => console.log("error", error));
   };
 
-  // useEffect(() => {
-  //   if (location) {
-  //     getInfo();
-  //   }
-  // }, [location]);
-
   const handleChange = (value) => {
     setSearchLocation(value);
     filterData(value);
   };
+
   const filterData = (value) => {
     const Value = value.toLocaleUpperCase().trim();
     if (Value === "") {

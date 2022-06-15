@@ -1,26 +1,22 @@
 import React, { useState, useRef } from "react";
 import Head from "next/head";
-import { sanityClient, urlFor } from "../../sanity";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
+import { sanityClient, urlFor } from "../../sanity";
+import { useSelector } from "react-redux";
+import { selectDarkmode } from "../../features/darkmodeSlice";
+import Map, { Marker, Popup } from "react-map-gl";
 import { getCenter } from "geolib";
 import "mapbox-gl/dist/mapbox-gl.css";
-import Map, { Marker, Popup } from "react-map-gl";
 import { IoChevronUpOutline } from "react-icons/io5";
-import Footer from "../../components/Footer";
-import { useDispatch, useSelector } from "react-redux";
-import { selectDarkmode } from "../../features/darkmodeSlice";
-
 const PostFeeds = dynamic(() => import("../../components/PostFeeds"));
+const Footer = dynamic(() => import("../../components/Footer"));
 
 function Category({ posts, category }) {
-  console.log(category);
   const topRef = useRef(null);
-
   const router = useRouter();
   const darkMode = useSelector(selectDarkmode);
-
   const coordinates = posts.map((result) => ({
     longitude: result?.location?.longitude,
     latitude: result?.location?.latitude,
@@ -41,7 +37,6 @@ function Category({ posts, category }) {
   const indexOfFirstPost = indexOfLastPost - postsPerPage;
   const currentPost = posts?.slice(indexOfFirstPost, indexOfLastPost);
   const paginate = (pageNumber) => {
-    console.log(pageNumber);
     setCurrentPage(pageNumber);
   };
   const pageNumber = [];
@@ -184,7 +179,6 @@ function Category({ posts, category }) {
 export default Category;
 export const getServerSideProps = async (context) => {
   const id = context.query.id;
-
   const categoryquery = `*[_type == "category" && slug.current == $id ]{
     ...
   }`;
@@ -211,8 +205,6 @@ export const getServerSideProps = async (context) => {
 
   const posts = await sanityClient.fetch(query, { id: id });
   const category = await sanityClient.fetch(categoryquery, { id: id });
-
-  console.log("server", posts);
 
   return {
     props: {

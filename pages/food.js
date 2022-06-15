@@ -1,13 +1,12 @@
 import React, { useState, useRef } from "react";
 import Head from "next/head";
-
+import dynamic from "next/dynamic";
+import { sanityClient } from "../sanity";
+import { getUniqueValues } from "../utils/helper";
 import { useSelector } from "react-redux";
 import { selectDarkmode } from "../features/darkmodeSlice";
-import { sanityClient, urlFor } from "../sanity";
-import Footer from "../components/Footer";
-import PostFeeds from "../components/PostFeeds";
-import { getUniqueValues } from "../utils/helper";
-import Post from "../components/Post";
+const Post = dynamic(() => import("../components/Post"));
+const Footer = dynamic(() => import("../components/Footer"));
 
 function Food({ posts }) {
   const topRef = useRef(null);

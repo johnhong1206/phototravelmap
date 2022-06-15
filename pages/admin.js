@@ -1,32 +1,39 @@
-import React, { useState, useEffect } from "react";
-import AddCategoryModal from "../components/AddCategoryModal";
+import React, { useState } from "react";
 import Head from "next/head";
-
+import Link from "next/link";
+import dynamic from "next/dynamic";
+import { sanityClient } from "../sanity";
+import { fetchPost } from "../utils/fetchposts";
+import { fetchlocation } from "../utils/fetchlocation";
+import { useSelector } from "react-redux";
 import {
-  openCategoryModal,
-  closeCategoryModal,
-  openLocationModal,
-  closeLocationModal,
   selectCategoryModalIsOpen,
   selectLocationModalIsOpen,
 } from "../features/modalSlice";
-import { sanityClient, urlFor } from "../sanity";
-import AddLocationModal from "../components/AddLocationModal";
-import { AiOutlinePlusCircle, AiOutlineClose } from "react-icons/ai";
-import AddPost from "../components/AddPost";
-import { useDispatch, useSelector } from "react-redux";
-import AdminPostList from "../components/AdminPostList";
-import AddPostCategories from "../components/AddPostCategories";
-import { fetchPost } from "../utils/fetchpost";
-import AddImagetoPost from "../components/AddImagetoPost";
-import { BiRefresh } from "react-icons/bi";
-import toast from "react-hot-toast";
 import { selectDarkmode } from "../features/darkmodeSlice";
-import AddPostCategoriesTypes from "../components/AddPostCategoriesTypes";
+import { selectUser } from "../features/userSlice";
+import { BiRefresh } from "react-icons/bi";
+const AddLocationModal = dynamic(() =>
+  import("../components/AddLocationModal")
+);
+const AddCategoryModal = dynamic(() =>
+  import("../components/AddCategoryModal")
+);
+const AddPost = dynamic(() => import("../components/AddPost"));
+const AdminPostList = dynamic(() => import("../components/AdminPostList"));
+const AddPostCategories = dynamic(() =>
+  import("../components/AddPostCategories")
+);
+const AddImagetoPost = dynamic(() => import("../components/AddImagetoPost"));
+const AddPostCategoriesTypes = dynamic(() =>
+  import("../components/AddPostCategoriesTypes")
+);
+
+import toast from "react-hot-toast";
 
 function Admin({ location, categories, posts }) {
   const darkMode = useSelector(selectDarkmode);
-  const dispatch = useDispatch();
+  const user = useSelector(selectUser);
   const [phase, setPhase] = useState("Post");
   const [selectPost, setSelectPost] = useState(null);
   const [refetchpost, setRefetchPost] = useState(posts);
@@ -60,28 +67,20 @@ function Admin({ location, categories, posts }) {
 
   const handleRefresh = async () => {
     const refresnToast = toast.loading("Refreshing Post...");
-    const query = `*[_type == "post"]{
-      ...,
-       categories[]->{
-         ...,
-       },
-       mainImage,
-       location->{
-         ...,
-       },
-     }| order(_createdAt desc) `;
-    const posts = await sanityClient.fetch(query);
-    setRefetchPost(posts);
+    await fetchPost().then((posts) => {
+      setRefetchPost(posts);
+    });
+
     toast.success("Feeds Updated", { id: refresnToast });
   };
 
   const refreshAllLocation = async () => {
     const refresnToast = toast.loading("Refreshing Location...");
-    const locationquery = `*[_type == "location"]{
-      ...
-     }| order(_createdAt desc)`;
-    const location = await sanityClient.fetch(locationquery);
-    setRefetchLocation(location);
+
+    await fetchlocation().then((location) => {
+      setRefetchLocation(location);
+    });
+
     toast.success("Location Updated", { id: refresnToast });
   };
 
@@ -89,6 +88,22 @@ function Admin({ location, categories, posts }) {
     handleRefresh();
     refreshAllLocation();
   };
+
+  if (!user?.admin)
+    return (
+      <div
+        className={`flex flex-col items-center justify-center h-[93vh]  ${
+          darkMode ? "page-bg-dark text-white" : "bg-std text-black"
+        }`}
+      >
+        <h1 className="text-3xl font-bold mb-8">You are not Admin</h1>
+        <Link href="/">
+          <p className="cursor-pointer hover:underline">
+            Click here to Home Page
+          </p>
+        </Link>
+      </div>
+    );
 
   return (
     <div
@@ -130,7 +145,7 @@ function Admin({ location, categories, posts }) {
         <div className="flex flex-col items-center justify-center cursor-pointer">
           <h1 className={`font-bold hover:text-blue-300`}>Refresh</h1>
           <BiRefresh
-            onClick={handleRefresh}
+            onClick={refeshAll}
             className=" text-blue-500 h-6 w-6 cursor-pointer text-twitterBlue transition-all duration-500 ease-out hover:rotate-180 active:scale-125"
           />
         </div>
@@ -189,26 +204,11 @@ function Admin({ location, categories, posts }) {
 }
 export default Admin;
 export const getServerSideProps = async (context) => {
-  const query = `*[_type == "post"]{
-   ...,
-    categories[]->{
-      ...,
-    },
-    mainImage,
-    categoryTags,
-    location->{
-      ...,
-    },
-  }| order(_createdAt desc) `;
-
-  const locationquery = `*[_type == "location"]{
-     ...
-    }| order(_createdAt desc)`;
   const categoriesquery = `*[_type == "category"]{
         ...
        }| order(_createdAt desc)`;
-  const posts = await sanityClient.fetch(query);
-  const location = await sanityClient.fetch(locationquery);
+  const posts = await fetchPost();
+  const location = await fetchlocation();
   const categories = await sanityClient.fetch(categoriesquery);
 
   return {

@@ -1,8 +1,18 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  addInfoFromMap,
+  addItemFromMap,
+  openLocationModal,
+} from "../features/modalSlice";
+import { selectPlaceInfo, getAreaInfo } from "../features/placeinfoSlice";
+import {
+  fetchlocationInfo,
+  fetchlocationQueryInfo,
+} from "../utils/fetchareaInfo";
 import Map, { Marker, Popup } from "react-map-gl";
 import { getCenter } from "geolib";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { AiOutlineClose } from "react-icons/ai";
 import { BiMapPin } from "react-icons/bi";
 import { IoRestaurantOutline } from "react-icons/io5";
 import { RiHotelLine } from "react-icons/ri";
@@ -14,14 +24,7 @@ import {
 } from "react-icons/md";
 import { FaRegGem, FaRegGrinBeam } from "react-icons/fa";
 import { BiRefresh } from "react-icons/bi";
-import { useDispatch, useSelector } from "react-redux";
-import { selectPlaceInfo, getAreaInfo } from "../features/placeinfoSlice";
 import toast from "react-hot-toast";
-import {
-  addInfoFromMap,
-  addItemFromMap,
-  openLocationModal,
-} from "../features/modalSlice";
 
 function TripDetailsMap({
   initalLocationState,
@@ -65,65 +68,56 @@ function TripDetailsMap({
     const refresnToast = toast.loading(
       `Getting ${currentLocation?.title} area info`
     );
-
-    var requestOptions = {
-      method: "GET",
+    const locationInfo = {
+      longitude: currentLocation?.longitude,
+      latitude: currentLocation?.latitude,
     };
-    const url = `https://api.geoapify.com/v2/places?categories=catering,tourism,heritage,accommodation,entertainment&filter=circle:${currentLocation?.longitude},${currentLocation?.latitude},10000&bias=proximity:${currentLocation?.longitude},${currentLocation?.latitude}&limit=30&apiKey=${process.env.NEXT_PUBLIC_GEOAPIFY_KEY}`;
-    await fetch(url, requestOptions)
-      .then((response) => response.json())
+    await fetchlocationInfo(locationInfo)
       .then((responseData) => {
         dispatch(getAreaInfo(responseData));
         toast.success(
-          `${currentLocation?.title} area info updated successfully`,
+          `${plans?.location?.title} area info updated successfully`,
           {
             id: refresnToast,
           }
         );
       })
-      .catch((error) => {
-        return false;
-      });
+      .catch((error) => console.log("error", error));
   };
 
   const getSelectAreaInfo = async () => {
     const refresnToast = toast.loading(
       `Getting ${selectedLocation?.title} area info your gps is ${selectedLocation?.longitude} , ${selectedLocation?.longitude}`
     );
-    var requestOptions = {
-      method: "GET",
+    const locationInfo = {
+      queryOption: queryOption.toString(),
+      longitude: selectedLocation?.longitude.toString(),
+      latitude: selectedLocation?.latitude.toString(),
     };
-    const longitude = selectedLocation?.longitude.toString();
-    const latitude = selectedLocation?.latitude.toString();
-    const queryOptionUrl = `https://api.geoapify.com/v2/places?categories=${queryOption.toString()}&filter=circle:${longitude},${latitude},10000&bias=proximity:${longitude},${latitude}&limit=50&apiKey=${
-      process.env.NEXT_PUBLIC_GEOAPIFY_KEY
-    }`;
-    const defaultUrl = `https://api.geoapify.com/v2/places?categories=catering,tourism,heritage,accommodation,entertainment&filter=circle:${longitude},${latitude},10000&bias=proximity:${longitude},${latitude}&limit=30&apiKey=${process.env.NEXT_PUBLIC_GEOAPIFY_KEY}`;
-
-    const url = queryOption ? queryOptionUrl : defaultUrl;
-
-    try {
-      await fetch(url, requestOptions)
-        .then((response) => response.json())
+    if (queryOption) {
+      await fetchlocationQueryInfo(locationInfo)
         .then((responseData) => {
-          console.log("responseData", responseData);
-          setMyLocation(selectedLocation?.title);
           dispatch(getAreaInfo(responseData));
           toast.success(
-            `${selectedLocation?.title} area info updated successfully`,
+            `${plans?.location?.title} area info updated successfully`,
             {
               id: refresnToast,
             }
           );
         })
         .catch((error) => console.log("error", error));
-    } catch (error) {
-      toast.error(
-        `Something went wrong for fetching area info of ${selectedLocation?.title}`,
-        {
-          id: refresnToast,
-        }
-      );
+    } else {
+      await fetchlocationInfo(locationInfo)
+        .then((responseData) => {
+          dispatch(getAreaInfo(responseData));
+          toast.success(
+            `${plans?.location?.title} area info updated successfully`,
+            {
+              id: refresnToast,
+            }
+          );
+        })
+        .catch((error) => console.log("error", error));
     }
   };
 
@@ -206,13 +200,6 @@ function TripDetailsMap({
           <h1 className="text-center font-bold mb-2 text-xl">
             {selectedLocation?.title}
           </h1>
-          <div className="grid grid-flow-row-dense  md:grid-cols-2 gap-2">
-            {/* {locationDetails?.categories?.map((item, idx) => (
-      <div key={idx} className="">
-        <p>{item}</p>
-      </div>
-    ))} */}
-          </div>
           <div className="mt-2">
             <h2 className="text-center font-semibold mb-2 text-lg">Address</h2>
             <p>{selectedLocation?.address}</p>

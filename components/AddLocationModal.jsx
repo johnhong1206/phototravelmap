@@ -15,16 +15,12 @@ function AddLocationModal({ handleRefresh }) {
   const dispatch = useDispatch();
   const darkMode = useSelector(selectDarkmode);
   const addFromMap = useSelector(selectAddInfoFromMap);
-  console.log("addFromMap", addFromMap);
   const locationInfoFromMap = useSelector(selectItemFromMap);
-
   const [searchInput, setSearchInput] = useState("");
   const [searchResult, setSearchResult] = useState([]);
   const [selectResult, setSelectResult] = useState(null);
   const [selectAddress, setSelectAddress] = useState(null);
-  const newAddress = selectAddress;
   const [activeSelectResult, setActiveSelectResult] = useState(null);
-
   const [title, setTitle] = useState("");
   const [city, setCity] = useState("");
   const [state, setState] = useState("");

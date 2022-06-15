@@ -1,25 +1,24 @@
-import Head from "next/head";
 import React, { useState, useRef } from "react";
+import Head from "next/head";
 import Image from "next/image";
 import dynamic from "next/dynamic";
-
 import { useRouter } from "next/router";
+import { urlFor } from "../sanity";
+import { fetchPost } from "../utils/fetchposts";
+import { selectDarkmode } from "../features/darkmodeSlice";
+import { useSelector } from "react-redux";
 import Map, { Marker, Popup } from "react-map-gl";
-import { sanityClient, urlFor } from "../sanity";
 import { getCenter } from "geolib";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { IoChevronUpOutline } from "react-icons/io5";
-import Footer from "../components/Footer";
-import { selectDarkmode } from "../features/darkmodeSlice";
-import { useDispatch, useSelector } from "react-redux";
 import { MdChevronRight, MdChevronLeft } from "react-icons/md";
-
-// components
 const PostFeeds = dynamic(() => import("../components/PostFeeds"));
+const Footer = dynamic(() => import("../components/Footer"));
 
 export default function Home({ posts }) {
   const topRef = useRef(null);
   const router = useRouter();
+
   const darkMode = useSelector(selectDarkmode);
   const [showAll, setShowAll] = useState(false);
   const [currentpage, setCurrentPage] = useState(1);
@@ -234,22 +233,8 @@ export default function Home({ posts }) {
 }
 
 export const getServerSideProps = async (context) => {
-  const query = `*[_type == "post"]{
-    ...,
-    author->{
-      _id,
-      ...,
-    },
-    publishedAt,
-    categories[0]->{   
-      ...,
-    },
-    mainImage,
-    location->{
-          ...,
-    },
-  }| order(_createdAt desc)`;
-  const posts = await sanityClient.fetch(query);
+  const posts = await fetchPost();
+
   return {
     props: {
       posts,

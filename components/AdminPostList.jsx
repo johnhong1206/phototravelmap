@@ -7,7 +7,6 @@ import { selectDarkmode } from "../features/darkmodeSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 function AdminPostList({ posts, setSelectPost, selectPost }) {
-  console.log(selectPost);
   const router = useRouter();
   const darkMode = useSelector(selectDarkmode);
 
