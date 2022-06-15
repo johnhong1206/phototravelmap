@@ -182,6 +182,7 @@ function PostDetails({ post }) {
                 width={700}
                 height={700}
                 objectFit="contain"
+                alt="profile"
               />
             )}
             <div className="p-4 w-full">
