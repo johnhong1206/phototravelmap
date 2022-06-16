@@ -72,6 +72,8 @@
  4) edit page for travel plans
  5) user profile page
  6) routing on the map
+ 7) might include the blog form
+ 8) due to current trends , the video posting function will included
 
 
 --ambitious ambition
