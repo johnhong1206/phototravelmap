@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Head from "next/head";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
@@ -13,7 +13,12 @@ import {
   openLocationModal,
   selectLocationModalIsOpen,
 } from "../../features/modalSlice";
-import { AiOutlinePlusCircle, AiOutlineClose } from "react-icons/ai";
+import {
+  AiOutlinePlusCircle,
+  AiOutlineClose,
+  AiOutlineLeft,
+  AiOutlineRight,
+} from "react-icons/ai";
 import { BiRefresh } from "react-icons/bi";
 const PlanList = dynamic(() => import("../../components/PlanList"));
 const AddLocationModal = dynamic(() =>
@@ -22,6 +27,7 @@ const AddLocationModal = dynamic(() =>
 import toast from "react-hot-toast";
 
 function UserTripPlans({ location, userInfo, tripplans }) {
+  const scrollbarRef = useRef(null);
   const router = useRouter();
   const id = router.query.id;
   const dispatch = useDispatch();
@@ -138,6 +144,9 @@ function UserTripPlans({ location, userInfo, tripplans }) {
       });
     }
   };
+  const scroll = (scrollOffset) => {
+    scrollbarRef.current.scrollLeft += scrollOffset;
+  };
 
   return (
     <div
@@ -182,9 +191,9 @@ function UserTripPlans({ location, userInfo, tripplans }) {
           <div
             className={`${
               darkMode
-                ? "bg-gray-100 text-white hover:shadow-cyan-500/40 hover:shadow-lg"
+                ? "bg-gray-100 text-white"
                 : " bg-white text-black hover:shadow-2xl"
-            } space-y-4 mt-2  bg-opacity-10 shadow-md  rounded-md backdrop-filter backdrop-blur-3xl cursor-pointer px-2 py-4 hover:shadow-md w-full`}
+            } space-y-4 mt-2  bg-opacity-10 shadow-md  rounded-md backdrop-filter backdrop-blur-3xl cursor-pointer px-2 py-4 w-full`}
           >
             <div className="flex items-center space-x-1">
               <h2>Title:</h2>
@@ -206,7 +215,7 @@ function UserTripPlans({ location, userInfo, tripplans }) {
           <form
             className={`${
               darkMode
-                ? "bg-gray-100 text-white hover:shadow-cyan-500/40 hover:shadow-lg"
+                ? "bg-gray-100 text-white  hover:shadow-lg"
                 : " bg-white text-black hover:shadow-2xl"
             } space-y-4 mt-2  bg-opacity-10 shadow-md  rounded-md backdrop-filter backdrop-blur-3xl cursor-pointer px-2 py-4 hover:shadow-md w-full`}
           >
@@ -266,7 +275,7 @@ function UserTripPlans({ location, userInfo, tripplans }) {
                         "bg-gray-200  scale-110 shadow-fuchsia-500 ring-1 ring-fuchsia-500"
                       }`}
                     >
-                      {location.title}
+                      <p>{location.title}</p>
                     </div>
                   ))}
                 {!showResults &&
@@ -283,27 +292,36 @@ function UserTripPlans({ location, userInfo, tripplans }) {
                         "bg-gray-200  shadow-2xl scale-110 shadow-fuchsia-500 ring-1 ring-fuchsia-500"
                       }`}
                     >
-                      {location.title}
+                      <p>{location.title}</p>
                     </div>
                   ))}
               </div>
-              <div className="flex flex-row items-center justify-center space-x-2">
-                {pageNumber.map((number) => (
-                  <div
-                    key={number}
-                    className={`grid place-items-center transition-all duration-500 ease-in-out cursor-pointer hover:animate-pulse  bg-opacity-50 w-6 h-6 leading-6  text-white rounded-full 
+              <div className="flex flex-row items-center justify-between mb-4 w-full px-2">
+                <AiOutlineLeft
+                  onClick={() => scroll(-200)}
+                  className="w-5 h-5 cursor-pointer text-cyan-400"
+                />
+                <div
+                  ref={scrollbarRef}
+                  className="scroll-smooth h-12 flex flex-row items-center justify-between space-x-4 lg:space-x-1 w-full overflow-x-scroll scrollbar-hide"
+                >
+                  {pageNumber.map((number) => (
+                    <div
+                      onClick={() => paginate(number)}
+                      key={number}
+                      className={`w-6  h-6 flex items-center justify-center transition-all duration-500 ease-in-out cursor-pointer hover:animate-pulse  bg-opacity-50 text-white rounded-full 
                 ${darkMode ? "bg-gray-300 text-blue-700" : "bg-gray-900"}
                 ${currentpage == number && "bg-opacity-100 scale-125"}
              `}
-                  >
-                    <a
-                      onClick={() => paginate(number)}
-                      className="tracking-widest text-sm "
                     >
-                      {number}
-                    </a>
-                  </div>
-                ))}
+                      <a className="tracking-widest text-sm m-4">{number}</a>
+                    </div>
+                  ))}
+                </div>
+                <AiOutlineRight
+                  onClick={() => scroll(200)}
+                  className="w-5 h-5 cursor-pointer text-cyan-400"
+                />
               </div>
             </div>
             <div className="flex flex-col">
@@ -317,8 +335,9 @@ function UserTripPlans({ location, userInfo, tripplans }) {
             </div>
           </form>
           <button
+            disabled={!title || !tripDate || !selectlocation}
             onClick={createPlan}
-            className="bg-teal-400 px-1 py-2 w-full rounded-xl mt-2 font-bold text-lg hover:shadow-lg hover:shadow-fuchsia-300/50"
+            className="bg-teal-400 disabled:bg-opacity-50 px-1 py-2 w-full rounded-xl mt-2 font-bold text-lg hover:shadow-lg hover:shadow-fuchsia-300/50"
           >
             Create Plan
           </button>

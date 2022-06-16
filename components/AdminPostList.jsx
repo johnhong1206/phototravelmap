@@ -16,7 +16,7 @@ function AdminPostList({ posts, setSelectPost, selectPost }) {
 
   return (
     <div className={`flex flex-col lg:flex-row`}>
-      <div className="p-4 w-full lg:w-[50vw] h-[20vh] lg:h-[75vh] space-y-4 overflow-y-auto">
+      <div className=" scrollbar-hide p-4 w-full lg:w-[50vw] h-[20vh] lg:h-[75vh] space-y-4 overflow-y-auto">
         {posts?.map((post) => (
           <div
             key={post._id}

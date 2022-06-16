@@ -5,11 +5,13 @@ import { sanityClient } from "../sanity";
 import { getUniqueValues } from "../utils/helper";
 import { useSelector } from "react-redux";
 import { selectDarkmode } from "../features/darkmodeSlice";
+import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
 const Post = dynamic(() => import("../components/Post"));
 const Footer = dynamic(() => import("../components/Footer"));
 
 function Travel({ posts }) {
   const topRef = useRef(null);
+  const scrollbarRef = useRef(null);
   const darkMode = useSelector(selectDarkmode);
   const [foodPost, setFoodPost] = useState(posts);
   const dataList = foodPost;
@@ -17,7 +19,9 @@ function Travel({ posts }) {
   const [searchResults, setSearchResults] = useState(foodPost);
   const otherOptionFilter = ["location", "categoriesTypes"];
   const [activeCategoType, setActiveCategoType] = useState(null);
-  const foodTypes = foodPost ? getUniqueValues(foodPost, "categoryTags") : null;
+  const trvelTypes = foodPost
+    ? getUniqueValues(foodPost, "categoryTags")
+    : null;
 
   const handleChange = (value) => {
     setActiveCategoType(value);
@@ -39,6 +43,9 @@ function Travel({ posts }) {
 
       setSearchResults(filteredData);
     }
+  };
+  const scroll = (scrollOffset) => {
+    scrollbarRef.current.scrollLeft += scrollOffset;
   };
 
   return (
@@ -62,19 +69,40 @@ function Travel({ posts }) {
           `}
           type="text"
         />
-        <div className="flex flex-row items-center justify-center space-x-4 overflow-x-auto px-4 lg:grid grid-flow-row-dense lg:grid-cols-7 gap-3">
-          {foodTypes?.map((value, idx) => (
+        <div className="flex flex-row items-center mb-4 w-full px-2">
+          <AiOutlineLeft
+            onClick={() => scroll(-200)}
+            className="w-5 h-5 cursor-pointer text-cyan-400"
+          />
+
+          <div
+            ref={scrollbarRef}
+            className="scroll-smooth flex items-center justify-between space-x-12 w-full overflow-x-scroll scrollbar-hide mx-4"
+          >
             <div
-              onClick={(e) => handleChange(value)}
-              key={idx}
-              className={`bg-gray-800 uppercase  opacity-70 tracking-widest m-1 cursor-pointer transition-all duration-500  ease-in-out text-white flex items-center justify-center rounded-full w-40 h-6 text-sm ${
-                activeCategoType == value &&
-                "opacity-100 shadow border border-cyan-600 shadow-cyan-500 scale-110 "
-              }`}
+              onClick={(e) => handleChange("")}
+              className={`bg-gray-800 flex-1 w-full cursor-pointer transition-all duration-500  ease-in-out text-white flex items-center justify-center rounded-full text-sm 
+                `}
             >
-              {value}
+              <p className="uppercase tracking-widest mx-4 my-1 ">All</p>
             </div>
-          ))}
+            {trvelTypes?.map((value, idx) => (
+              <div
+                onClick={(e) => handleChange(value)}
+                key={idx}
+                className={`bg-gray-800 flex-1 w-full cursor-pointer transition-all duration-500  ease-in-out text-white flex items-center justify-center rounded-full text-sm ${
+                  activeCategoType == value &&
+                  "scale-125 shadow-2xl shadow-cyan-100 animate-pulse text-fuchsia-400"
+                }`}
+              >
+                <p className="uppercase tracking-widest mx-4 my-1 ">{value}</p>
+              </div>
+            ))}
+          </div>
+          <AiOutlineRight
+            onClick={() => scroll(200)}
+            className="w-5 h-5 cursor-pointer text-cyan-400"
+          />
         </div>
 
         <div className="p-2 lg:p-4 grid grid-flow-row-dense md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">

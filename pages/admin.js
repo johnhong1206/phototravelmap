@@ -48,7 +48,7 @@ function Admin({ location, categories, posts }) {
         className={`flex flex-col items-center cursor-pointer`}
       >
         <h1
-          className={`font-bold ${
+          className={`font-bold text-center ${
             isActive
               ? `${darkMode ? "text-white" : "text-blue-500"}`
               : "text-gray-400"
@@ -107,7 +107,7 @@ function Admin({ location, categories, posts }) {
 
   return (
     <div
-      className={`flex flex-col  ${
+      className={`flex flex-col h-screen overflow-y-scroll scrollbar-hide ${
         darkMode ? "page-bg-dark text-white" : "bg-std text-black"
       }`}
     >

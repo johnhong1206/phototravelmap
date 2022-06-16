@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -20,7 +20,12 @@ import {
 } from "../../features/modalSlice";
 import { selectUser } from "../../features/userSlice";
 import { getAreaInfo } from "../../features/placeinfoSlice";
-import { AiOutlinePlusCircle, AiOutlineClose } from "react-icons/ai";
+import {
+  AiOutlinePlusCircle,
+  AiOutlineClose,
+  AiOutlineLeft,
+  AiOutlineRight,
+} from "react-icons/ai";
 import { IoRestaurantOutline } from "react-icons/io5";
 import { RiHotelLine } from "react-icons/ri";
 import { MdOutlineTour } from "react-icons/md";
@@ -33,6 +38,7 @@ const AddLocationModal = dynamic(() =>
 );
 
 function Plandetails({ plan, location, tripdetails }) {
+  const scrollbarRef = useRef(null);
   const router = useRouter();
   const id = router.query.id;
   const dispatch = useDispatch();
@@ -212,6 +218,10 @@ function Plandetails({ plan, location, tripdetails }) {
       setInitalLocationState(true);
     }
   }, [refetchTripDetails]);
+
+  const scroll = (scrollOffset) => {
+    scrollbarRef.current.scrollLeft += scrollOffset;
+  };
 
   return (
     <div
@@ -447,22 +457,32 @@ function Plandetails({ plan, location, tripdetails }) {
                     </div>
                   ))}
               </div>
-              <div className="flex flex-row items-center justify-center space-x-2 my-2">
-                {pageNumber.map((number) => (
-                  <div
-                    onClick={() => {
-                      setActiveNumber(number);
-                      paginate(number);
-                    }}
-                    key={number}
-                    className={`bg-std text-black transition-all duration-500  ease-in-out flex items-center justify-center min-h-12 overflow-hidden truncate px-2 w-auto text-center cursor-pointer rounded-xl ${
-                      activeNumber == number &&
-                      "bg-gray-200  scale-110 shadow-fuchsia-500 ring-1 ring-fuchsia-500"
-                    }`}
-                  >
-                    <a className="tracking-widest text-sm ">{number}</a>
-                  </div>
-                ))}
+              <div className="flex flex-row items-center justify-between mb-4 w-full px-2">
+                <AiOutlineLeft
+                  onClick={() => scroll(-200)}
+                  className="w-5 h-5 cursor-pointer text-cyan-400"
+                />
+                <div
+                  ref={scrollbarRef}
+                  className="scroll-smooth h-12 flex flex-row items-center justify-between space-x-4 lg:space-x-1 w-full overflow-x-scroll scrollbar-hide"
+                >
+                  {pageNumber.map((number) => (
+                    <div
+                      onClick={() => paginate(number)}
+                      key={number}
+                      className={`w-6  h-6 flex items-center justify-center transition-all duration-500 ease-in-out cursor-pointer hover:animate-pulse  bg-opacity-50 text-white rounded-full 
+                ${darkMode ? "bg-gray-300 text-blue-700" : "bg-gray-900"}
+                ${currentpage == number && "bg-opacity-100 scale-125"}
+             `}
+                    >
+                      <a className="tracking-widest text-sm m-4">{number}</a>
+                    </div>
+                  ))}
+                </div>
+                <AiOutlineRight
+                  onClick={() => scroll(200)}
+                  className="w-5 h-5 cursor-pointer text-cyan-400"
+                />
               </div>
             </div>
             <div className="flex flex-col">
@@ -478,7 +498,7 @@ function Plandetails({ plan, location, tripdetails }) {
           <button
             disabled={!user || !selectlocation || !time}
             onClick={addPlan}
-            className="bg-teal-400 px-1 py-2 w-full rounded-xl mt-2 font-bold text-lg hover:shadow-lg hover:shadow-fuchsia-300/50"
+            className="bg-teal-400 disabled:bg-opacity-50 px-1 py-2 w-full rounded-xl mt-2 font-bold text-lg hover:shadow-lg hover:shadow-fuchsia-300/50"
           >
             Add Plan
           </button>

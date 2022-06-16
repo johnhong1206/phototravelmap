@@ -16,11 +16,14 @@ import { RiHotelLine } from "react-icons/ri";
 import { MdOutlineTour, MdChevronLeft, MdChevronRight } from "react-icons/md";
 import { FaRegGem, FaRegGrinBeam } from "react-icons/fa";
 import { BiRefresh } from "react-icons/bi";
+import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
+
 const PostFeeds = dynamic(() => import("../../components/PostFeeds"));
 const Footer = dynamic(() => import("../../components/Footer"));
 import toast from "react-hot-toast";
 
 function PlaceDetail({ posts, location }) {
+  const scrollbarRef = useRef(null);
   const router = useRouter();
   const dispatch = useDispatch();
   const darkMode = useSelector(selectDarkmode);
@@ -65,6 +68,9 @@ function PlaceDetail({ posts, location }) {
     topRef.current.scrollIntoView({
       behavior: "smooth",
     });
+  };
+  const scroll = (scrollOffset) => {
+    scrollbarRef.current.scrollLeft += scrollOffset;
   };
 
   const getInfo = async () => {
@@ -138,21 +144,32 @@ function PlaceDetail({ posts, location }) {
             />
           ))}
         </div>
-        <div className="flex flex-row items-center justify-center space-x-10 my-2">
-          {pageNumber?.map((number) => (
-            <div
-              onClick={() => {
-                paginate(number);
-                setActiveNumber(number);
-              }}
-              key={number}
-              className={`grid place-items-center transition-all duration-500 ease-in-out cursor-pointer hover:animate-pulse bg-gray-900 bg-opacity-50 w-6 h-6 leading-6  text-white rounded-full 
-              ${activeNumber == number && " bg-opacity-100 scale-125"}
-           `}
-            >
-              <a className="tracking-widest text-sm">{number}</a>
-            </div>
-          ))}
+        <div className="flex flex-row items-center justify-between  mb-4 w-full px-2">
+          <AiOutlineLeft
+            onClick={() => scroll(-200)}
+            className="w-5 h-5 cursor-pointer text-cyan-400"
+          />
+          <div
+            ref={scrollbarRef}
+            className="scroll-smooth h-12 flex flex-row items-center justify-between lg:justify-center space-x-4 lg:space-x-4 w-full overflow-x-scroll scrollbar-hide"
+          >
+            {pageNumber.map((number) => (
+              <div
+                onClick={() => paginate(number)}
+                key={number}
+                className={`w-6  h-6 flex items-center justify-center transition-all duration-500 ease-in-out cursor-pointer hover:animate-pulse  bg-opacity-50 text-white rounded-full 
+                ${darkMode ? "bg-gray-300 text-blue-700" : "bg-gray-900"}
+                ${currentpage == number && "bg-opacity-100 scale-125"}
+             `}
+              >
+                <a className="tracking-widest text-sm m-4">{number}</a>
+              </div>
+            ))}
+          </div>
+          <AiOutlineRight
+            onClick={() => scroll(200)}
+            className="w-5 h-5 cursor-pointer text-cyan-400"
+          />
         </div>
         <div className="my-4">
           <h2 className="text-3xl font-bold text-center">My Map</h2>

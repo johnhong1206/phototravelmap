@@ -47,14 +47,13 @@ function AddPostCategories({
       <div className="flex flex-row items-center space-x-2">
         <h2 className="text-xl font-medium">category to add</h2>
         <p className="font-light">{selectCategory?.title}</p>
-        <p className="font-light">{selectCategory?._id}</p>
       </div>
       <div className="grid grid-flow-row-dense md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-10 ">
         {categories?.map((category) => (
           <div
             className={`transition-all duration-500 ease-in-out flex items-center justify-center h-12 min-h-12 max-h-24 px-2 w-auto text-center cursor-pointer rounded-xl ${
               activeCategory === category._id &&
-              "bg-gray-200 font-semibold shadow-md scale-110"
+              "bg-gray-300 text-blue-500 font-semibold shadow-md scale-110"
             }`}
             key={category._id}
             value={category._id}
@@ -67,12 +66,15 @@ function AddPostCategories({
           </div>
         ))}
       </div>
-      <button
-        className=" bg-pink-400 w-full px-1 py-2 rounded-lg mt-10 shadow-lg hover:shadow-xl font-bold hover:text-white"
-        onClick={addCategory}
-      >
-        Add
-      </button>
+      <div className="w-full px-10">
+        <button
+          disabled={!selectCategory}
+          className=" bg-pink-400 disabled:bg-opacity-50 w-full px-1 py-2 rounded-lg mt-10 shadow-lg hover:shadow-xl font-bold hover:text-white"
+          onClick={addCategory}
+        >
+          Add
+        </button>
+      </div>
     </div>
   );
 }

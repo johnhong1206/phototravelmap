@@ -1,19 +1,19 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { selectDarkmode } from "../features/darkmodeSlice";
 import { getUniqueValues } from "../utils/helper";
+import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
 
 function AddPostCategoriesTypes({
   handleRefresh,
   selectPost,
-  categories,
   setPhase,
   setSelectPost,
   posts,
 }) {
   const darkMode = useSelector(selectDarkmode);
-
+  const scrollbarRef = useRef(null);
   const [newCategoryTags, setNewCategoryTags] = useState("");
   const [searchCatTypesResult, setSearchCatTypesResult] = useState([]);
   const [showResults, setShowResults] = useState(false);
@@ -89,7 +89,9 @@ function AddPostCategoriesTypes({
       setPhase("Post");
     }
   };
-
+  const scroll = (scrollOffset) => {
+    scrollbarRef.current.scrollLeft += scrollOffset;
+  };
   return (
     <div>
       <div className="flex flex-row items-center space-x-2">
@@ -155,38 +157,46 @@ function AddPostCategoriesTypes({
             </div>
           ))}
       </div>
-      <div className="mt-4 flex flex-row items-center justify-center space-x-2">
-        {pageNumber.map((number) => (
-          <div
-            key={number}
-            className={`grid place-items-center transition-all duration-500 ease-in-out cursor-pointer hover:animate-pulse  bg-opacity-50 w-6 h-6 leading-6  text-white rounded-full 
+      <div className="flex flex-row items-center justify-between mb-4 w-full px-2">
+        <AiOutlineLeft
+          onClick={() => scroll(-200)}
+          className="w-5 h-5 cursor-pointer text-cyan-400"
+        />
+        <div
+          ref={scrollbarRef}
+          className="scroll-smooth h-12 flex flex-row items-center justify-between lg:justify-center space-x-4 lg:space-x-1 w-full overflow-x-scroll scrollbar-hide"
+        >
+          {pageNumber.map((number) => (
+            <div
+              key={number}
+              className={`w-6  h-6 flex items-center justify-center transition-all duration-500 ease-in-out cursor-pointer hover:animate-pulse  bg-opacity-50 text-white rounded-full 
                 ${darkMode ? "bg-gray-300 text-blue-700" : "bg-gray-900"}
                 ${currentpage == number && "bg-opacity-100 scale-125"}
              `}
-          >
-            <a
-              onClick={() => paginate(number)}
-              className="tracking-widest text-sm "
             >
-              {number}
-            </a>
-          </div>
-        ))}
+              <a
+                onClick={() => paginate(number)}
+                className="tracking-widest text-sm m-4"
+              >
+                {number}
+              </a>
+            </div>
+          ))}
+        </div>
+        <AiOutlineRight
+          onClick={() => scroll(200)}
+          className="w-5 h-5 cursor-pointer text-cyan-400"
+        />
       </div>
-
-      {/* <div className="flex flex-row items-center space-x-2">
-        <h2 className="text-xl font-medium">category to add</h2>
-        <p className="font-light">{selectCategory?.title}</p>
-        <p className="font-light">{selectCategory?._id}</p>
-      </div> */}
-      <div className="grid grid-flow-row-dense md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-10 "></div>
-      <button
-        disabled={!newCategoryTags}
-        className=" bg-pink-400 w-full px-1 py-2 rounded-lg mt-10 shadow-lg hover:shadow-xl font-bold hover:text-white"
-        onClick={addCategoryTypes}
-      >
-        Add
-      </button>
+      <div className="w-full px-10">
+        <button
+          disabled={!newCategoryTags}
+          className=" bg-pink-400 disabled:bg-opacity-50 w-full px-1 py-2 rounded-lg mt-10 shadow-lg hover:shadow-xl font-bold hover:text-white"
+          onClick={addCategoryTypes}
+        >
+          Add
+        </button>
+      </div>
     </div>
   );
 }

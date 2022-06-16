@@ -1,8 +1,3 @@
-const url =
-  process.env.NODE_ENV === "production"
-    ? process.env.NEXT_PUBLIC_PRODUCTION_URL
-    : process.env.NEXT_PUBLIC_BASE_URL;
-
 export const fetchtripplans = async (email) => {
   const tripplansInfo = {
     email: email,

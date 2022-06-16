@@ -285,7 +285,7 @@ function PostDetails({ post }) {
             <button
               disabled={!user || rate == null || !email}
               onClick={rateThePost}
-              className="bg-red-300 text-white font-bold px-2 py-1 rounded-xl"
+              className="bg-red-300 text-white font-bold px-2 py-1 rounded-xl disabled:bg-opacity-50"
             >
               Submit Rating
             </button>

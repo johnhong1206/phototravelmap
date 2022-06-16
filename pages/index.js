@@ -12,11 +12,14 @@ import { getCenter } from "geolib";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { IoChevronUpOutline } from "react-icons/io5";
 import { MdChevronRight, MdChevronLeft } from "react-icons/md";
+import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
 const PostFeeds = dynamic(() => import("../components/PostFeeds"));
 const Footer = dynamic(() => import("../components/Footer"));
 
 export default function Home({ posts }) {
   const topRef = useRef(null);
+  const scrollbarRef = useRef(null);
+
   const router = useRouter();
 
   const darkMode = useSelector(selectDarkmode);
@@ -55,6 +58,9 @@ export default function Home({ posts }) {
       behavior: "smooth",
     });
   };
+  const scroll = (scrollOffset) => {
+    scrollbarRef.current.scrollLeft += scrollOffset;
+  };
 
   return (
     <div
@@ -69,68 +75,91 @@ export default function Home({ posts }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="max-w-screen mx-auto">
-        <div
-          id="#post"
-          className="p-2 lg:p-4 grid grid-flow-row-dense md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3"
-        >
-          {currentPost?.map((post) => (
-            <>
-              {post?.mainImage && (
-                <PostFeeds
-                  id={post?._id}
-                  key={post?._id}
-                  title={post?.title}
-                  author={post?.author}
-                  slug={post?.slug}
-                  mainImage={post?.mainImage}
-                  categories={post?.categories}
-                  publishedAt={post?.publishedAt}
-                  location={post?.location}
-                  body={post?.body}
-                />
-              )}
-            </>
-          ))}
-        </div>
-
-        <div className="flex flex-row items-center justify-center space-x-10 my-2">
-          {pageNumber?.map((number) => (
+        <div className="w-full mb-48">
+          <div className=" p-2 lg:p-4 grid grid-flow-row-dense md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+            {currentPost?.map((post) => (
+              <>
+                {post?.mainImage && (
+                  <PostFeeds
+                    id={post?._id}
+                    key={post?._id}
+                    title={post?.title}
+                    author={post?.author}
+                    slug={post?.slug}
+                    mainImage={post?.mainImage}
+                    categories={post?.categories}
+                    publishedAt={post?.publishedAt}
+                    location={post?.location}
+                    body={post?.body}
+                  />
+                )}
+              </>
+            ))}
+          </div>
+          <div className="flex flex-row items-center justify-between  mb-4 w-full px-2">
+            <AiOutlineLeft
+              onClick={() => scroll(-200)}
+              className="w-5 h-5 cursor-pointer text-cyan-400"
+            />
             <div
-              onClick={() => {
-                paginate(number);
-                setActiveNumber(number);
-              }}
-              key={number}
-              className={`grid place-items-center transition-all duration-500 ease-in-out cursor-pointer hover:animate-pulse  bg-opacity-50 w-6 h-6 leading-6  text-white rounded-full 
-              ${darkMode ? "bg-gray-700 text-blue-400" : "bg-gray-900"}
-              ${activeNumber == number && "bg-opacity-100 scale-125"}
-           `}
+              ref={scrollbarRef}
+              className="scroll-smooth h-12 flex flex-row items-center justify-between lg:justify-center space-x-4 lg:space-x-4 w-full overflow-x-scroll scrollbar-hide"
             >
-              <a className="tracking-widest text-sm">{number}</a>
+              {pageNumber.map((number) => (
+                <div
+                  onClick={() => paginate(number)}
+                  key={number}
+                  className={`w-6  h-6 flex items-center justify-center transition-all duration-500 ease-in-out cursor-pointer hover:animate-pulse  bg-opacity-50 text-white rounded-full 
+                ${darkMode ? "bg-gray-300 text-blue-700" : "bg-gray-900"}
+                ${currentpage == number && "bg-opacity-100 scale-125"}
+             `}
+                >
+                  <a className="tracking-widest text-sm m-4">{number}</a>
+                </div>
+              ))}
             </div>
-          ))}
+            <AiOutlineRight
+              onClick={() => scroll(200)}
+              className="w-5 h-5 cursor-pointer text-cyan-400"
+            />
+          </div>
         </div>
         <div className="my-4">
           <h2 className="text-3xl font-bold text-center">My Map</h2>
         </div>
         <div id="#map" className="relative flex items-center justify-center">
           <div className=" transition-all duration-700 ease-in-out z-50 absolute top-5 right-5 flex flex-row items-center justify-center space-x-2 my-2">
-            {!showAll &&
-              pageNumber?.map((number) => (
-                <div
-                  onClick={() => {
-                    paginate(number);
-                    setActiveNumber(number);
-                  }}
-                  key={number}
-                  className={`grid place-items-center transition-all duration-500 ease-in-out cursor-pointer hover:animate-pulse  bg-opacity-50 w-6 h-6 leading-6  text-white rounded-full 
-              ${darkMode ? "bg-gray-700 text-blue-400" : "bg-gray-900"}
-              ${activeNumber == number && "bg-opacity-100 scale-125"}
-           `}
-                >
-                  <a className="tracking-widest text-sm">{number}</a>
-                </div>
-              ))}
+            <div className="flex flex-row items-center justify-between  mb-4 w-full px-2">
+              <AiOutlineLeft
+                onClick={() => scroll(-200)}
+                className="w-5 h-5 cursor-pointer text-cyan-400"
+              />
+              <div
+                ref={scrollbarRef}
+                className="scroll-smooth h-12 flex flex-row items-center justify-between lg:justify-center space-x-4 lg:space-x-4 w-full overflow-x-scroll scrollbar-hide"
+              >
+                {pageNumber.map((number) => (
+                  <div
+                    key={number}
+                    className={`w-6  h-6 flex items-center justify-center transition-all duration-500 ease-in-out cursor-pointer hover:animate-pulse  bg-opacity-50 text-white rounded-full 
+                ${darkMode ? "bg-gray-300 text-blue-700" : "bg-gray-900"}
+                ${currentpage == number && "bg-opacity-100 scale-125"}
+             `}
+                  >
+                    <a
+                      onClick={() => paginate(number)}
+                      className="tracking-widest text-sm m-4"
+                    >
+                      {number}
+                    </a>
+                  </div>
+                ))}
+              </div>
+              <AiOutlineRight
+                onClick={() => scroll(200)}
+                className="w-5 h-5 cursor-pointer text-cyan-400"
+              />
+            </div>
             {showAll ? (
               <>
                 <div

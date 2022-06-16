@@ -10,11 +10,17 @@ import {
   selectLocationModalIsOpen,
 } from "../features/modalSlice";
 import { selectUser } from "../features/userSlice";
-import { AiOutlinePlusCircle, AiOutlineClose } from "react-icons/ai";
+import {
+  AiOutlinePlusCircle,
+  AiOutlineClose,
+  AiOutlineLeft,
+  AiOutlineRight,
+} from "react-icons/ai";
 import toast from "react-hot-toast";
 
 function AddPost({ posts, location, categories, setPhase, handleRefresh }) {
   const dispatch = useDispatch();
+  const scrollbarRef = useRef(null);
   const darkMode = useSelector(selectDarkmode);
   const user = useSelector(selectUser);
   const locationModalisOpen = useSelector(selectLocationModalIsOpen);
@@ -65,11 +71,6 @@ function AddPost({ posts, location, categories, setPhase, handleRefresh }) {
       setSearchLocationResult(filteredData);
     }
   };
-
-  const postTitleExist = posts?.find(
-    (post) => post?.title.toLocaleLowerCase() === title.toLocaleLowerCase()
-  );
-  console.log("!!postTitleExist", !!postTitleExist, postTitleExist);
 
   const post = async (e) => {
     e.preventDefault();
@@ -155,6 +156,10 @@ function AddPost({ posts, location, categories, setPhase, handleRefresh }) {
     } else {
       dispatch(closeCategoryModal());
     }
+  };
+
+  const scroll = (scrollOffset) => {
+    scrollbarRef.current.scrollLeft += scrollOffset;
   };
 
   return (
@@ -287,23 +292,32 @@ function AddPost({ posts, location, categories, setPhase, handleRefresh }) {
               ))}
           </div>
 
-          <div className="flex flex-row items-center justify-center space-x-2">
-            {pageNumber.map((number) => (
-              <div
-                key={number}
-                className={`grid place-items-center transition-all duration-500 ease-in-out cursor-pointer hover:animate-pulse  bg-opacity-50 w-6 h-6 leading-6  text-white rounded-full 
+          <div className="flex flex-row items-center justify-between mb-4 w-full px-2">
+            <AiOutlineLeft
+              onClick={() => scroll(-200)}
+              className="w-5 h-5 cursor-pointer text-cyan-400"
+            />
+            <div
+              ref={scrollbarRef}
+              className="scroll-smooth h-12 flex flex-row items-center justify-between space-x-4 lg:space-x-1 w-full overflow-x-scroll scrollbar-hide"
+            >
+              {pageNumber.map((number) => (
+                <div
+                  onClick={() => paginate(number)}
+                  key={number}
+                  className={`w-6  h-6 flex items-center justify-center transition-all duration-500 ease-in-out cursor-pointer hover:animate-pulse  bg-opacity-50 text-white rounded-full 
                 ${darkMode ? "bg-gray-300 text-blue-700" : "bg-gray-900"}
                 ${currentpage == number && "bg-opacity-100 scale-125"}
              `}
-              >
-                <a
-                  onClick={() => paginate(number)}
-                  className="tracking-widest text-sm "
                 >
-                  {number}
-                </a>
-              </div>
-            ))}
+                  <a className="tracking-widest text-sm m-4">{number}</a>
+                </div>
+              ))}
+            </div>
+            <AiOutlineRight
+              onClick={() => scroll(200)}
+              className="w-5 h-5 cursor-pointer text-cyan-400"
+            />
           </div>
         </div>
         <div>
@@ -341,14 +355,15 @@ function AddPost({ posts, location, categories, setPhase, handleRefresh }) {
             ))}
           </div>
         </div>
-
-        <button
-          disabled={!title || !selectCategory || !selectlocation}
-          className=" bg-pink-400 w-full px-1 py-2 rounded-lg mt-10 shadow-lg hover:shadow-xl font-bold hover:text-white"
-          onClick={post}
-        >
-          Post
-        </button>
+        <div className="w-full px-10">
+          <button
+            disabled={!title || !selectCategory || !selectlocation}
+            className=" bg-pink-400 disabled:bg-opacity-50 w-full px-1 py-2 rounded-lg mt-10 shadow-lg hover:shadow-xl font-bold hover:text-white"
+            onClick={post}
+          >
+            Post
+          </button>
+        </div>
       </div>
     </div>
   );
