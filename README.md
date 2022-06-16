@@ -1,5 +1,6 @@
 --This is The website call photo travel map
-    This website built by NextJS, Sanity,tailwind CSS, Geoapify and react-map-gl
+
+This website built by NextJS, Sanity,tailwind CSS, Geoapify and react-map-gl
 --the main functions of this website is to present and share my photo which related to food photo and travel
 -- all of the post able to shown on the map
 -- user able to filter and find the photo on the map
