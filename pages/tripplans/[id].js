@@ -349,6 +349,7 @@ function UserTripPlans({ location, userInfo, tripplans }) {
 }
 
 export default UserTripPlans;
+
 export const getServerSideProps = async (context) => {
   const email = context.query.id;
   const userquery = `*[_type == "author" && email == $email][0]{

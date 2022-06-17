@@ -117,7 +117,11 @@ function Travel({ posts }) {
 }
 
 export default Travel;
-export const getServerSideProps = async (context) => {
+export const getServerSideProps = async ({ req, res }) => {
+  res.setHeader(
+    "Cache-Control",
+    "public, s-maxage=10, stale-while-revalidate=59"
+  );
   const query = `*[_type == "post" && postType == 'public' && count((categories[]->slug.current)[@ in ['travel']]) > 0  ]{
     ...,
     publishedAt,

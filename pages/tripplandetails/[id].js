@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import Head from "next/head";
-import { useRouter } from "next/router";
+import { sanityClient } from "../../sanity";
 import { fetchlocation } from "../../utils/fetchlocation";
 import {
   fetchlocationInfo,
@@ -37,10 +37,9 @@ const AddLocationModal = dynamic(() =>
   import("../../components/AddLocationModal")
 );
 
-function Plandetails({ plan, location, tripdetails }) {
+function Plandetails({ plan, location, tripdetails, params }) {
+  const id = params.id;
   const scrollbarRef = useRef(null);
-  const router = useRouter();
-  const id = router.query.id;
   const dispatch = useDispatch();
   const darkMode = useSelector(selectDarkmode);
   const user = useSelector(selectUser);
@@ -521,17 +520,40 @@ function Plandetails({ plan, location, tripdetails }) {
 }
 
 export default Plandetails;
+export const getStaticPaths = async () => {
+  const planquery = `*[_type == "tripplans"]{
+    _id
+}| order(_createdAt desc)`;
 
-export const getServerSideProps = async (context) => {
-  const id = context.query.id.toString();
+  const plan = await sanityClient.fetch(planquery);
+
+  const paths = plan.map((result) => ({
+    params: {
+      id: result?._id,
+    },
+  }));
+
+  return { paths, fallback: "blocking" };
+};
+
+export const getStaticProps = async ({ params }) => {
+  const id = params.id.toString();
   const plan = await fetchtripplansById(id);
   const tripdetails = await fetchtripdetailsById(id);
   const location = await fetchlocation();
+
+  if (!plan) {
+    return {
+      notFound: true,
+    };
+  }
   return {
     props: {
       plan,
       tripdetails,
       location,
+      params,
     },
+    revalidate: 60, // In sec
   };
 };

@@ -14,7 +14,7 @@ import { IoChevronUpOutline } from "react-icons/io5";
 import { MdChevronRight, MdChevronLeft } from "react-icons/md";
 import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
 const PostFeeds = dynamic(() => import("../components/PostFeeds"));
-const Footer = dynamic(() => import("../components/Footer"));
+const Footer = dynamic(() => import("../components/Footer"), { ssr: false });
 
 export default function Home({ posts }) {
   const topRef = useRef(null);
@@ -261,7 +261,11 @@ export default function Home({ posts }) {
   );
 }
 
-export const getServerSideProps = async (context) => {
+export const getServerSideProps = async ({ req, res }) => {
+  res.setHeader(
+    "Cache-Control",
+    "public, s-maxage=10, stale-while-revalidate=59"
+  );
   const posts = await fetchPost();
 
   return {

@@ -540,6 +540,15 @@ export const getServerSideProps = async (context) => {
   const posts = await sanityClient.fetch(query, { id: id });
   const location = await sanityClient.fetch(locationquery, { id: id });
 
+  if (!posts) {
+    return {
+      redirect: {
+        destination: "/",
+        permanent: false,
+      },
+    };
+  }
+
   return {
     props: {
       posts,

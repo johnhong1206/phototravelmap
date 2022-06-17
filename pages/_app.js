@@ -20,7 +20,7 @@ Router.events.on("routeChangeComplete", progress.finish);
 Router.events.on("routeChangeError", progress.finish);
 
 import dynamic from "next/dynamic";
-const Header = dynamic(() => import("../components/Header"));
+const Header = dynamic(() => import("../components/Header"), { ssr: false });
 let persistor = persistStore(store);
 
 function MyApp({ Component, pageProps }) {
