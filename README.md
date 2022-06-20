@@ -1,18 +1,20 @@
---This is The website call photo travel map
+## Photo Travel Map
+This is The website call photo travel map
+This website built by NextJS, Sanity,tailwind CSS, Geoapify and react-map-gl
 
-#This website built by NextJS, Sanity,tailwind CSS, Geoapify and react-map-gl
+## Main Function
 1) the main functions of this website is to present and share my photo which related to food photo and travel
 2) all of the post able to shown on the map
 3) user able to filter and find the photo on the map
 4) by refering the info, user able to create own travel plans
 
-#current release funtion for public---
-  1) post rating function
-  2) filter photo by tag
-  3) creaate travel plans
-  4) find info on the maps
+## current release funtion for public
+1) post rating function
+2) filter photo by tag
+3) creaate travel plans
+4) find info on the maps
 
-#user guide
+## user guide
 --General 
 1) sign up an account
 2) click the photo on main page to view the post details
@@ -65,7 +67,7 @@
 22) after submit the location be patient or click the refresh icon on the title to get the plan details
 23) if the plan did not update click back button on web browser and nav in the page again
 
---future release plan
+## future release plan
  1) release public to post the photo or post
  2) more advance filter function
  3) edit page for the post to update post details
@@ -76,10 +78,10 @@
  8) due to current trends , the video posting function will included
 
 
---ambitious ambition
+## ambitious ambition
 1) to make the website like tripadvisor and power enough can replace it
   
--- technical limitation
+## technical limitation
 1) due to free using the api,the searh result are limited
   
     
