@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
 import { selectDarkmode } from "../features/darkmodeSlice";
+import { AiTwotoneFire } from "react-icons/ai";
 
 function PostFeeds({
   key,
@@ -13,6 +14,7 @@ function PostFeeds({
   mainImage,
   location,
   publishedAt,
+  rating,
 }) {
   const router = useRouter();
   const darkMode = useSelector(selectDarkmode);
@@ -25,12 +27,17 @@ function PostFeeds({
     <div
       key={key}
       onClick={navDetails}
-      className={`${
+      className={`relative ${
         darkMode
           ? "bg-gray-100 text-white hover:shadow-cyan-500/40 hover:shadow-lg"
           : " bg-white text-black hover:shadow-2xl"
       }  bg-opacity-10 shadow-md  rounded-md backdrop-filter backdrop-blur-3xl cursor-pointer px-2 py-4 hover:shadow-md w-full h-full`}
     >
+      <div className="absolute top-1 right-2 flex flex-row items-center">
+        <p>{rating}</p>
+        <AiTwotoneFire className=" w-4 h-4 text-rose-400" />
+      </div>
+
       <div className="w-full">
         <div className="flex flex-row items-center h-16">
           <div className="flex flex-col items-start flex-1">
