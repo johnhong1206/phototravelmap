@@ -6,28 +6,28 @@ const config = {
   token: process.env.SANITY_API_TOKEN,
 };
 const client = sanityClient(config);
+
 export default async function handler(req, res) {
-  const { slug } = JSON.parse(req.body);
-  const query = `*[_type == "post" && slug.current == $slug][0]{
-          _id,
-          title,
-          author->{
-            ...
-          },
-          description,
-          mainImage,
-          slug,
-          categories[]->{
-            ...
-          },
-          rating,
-          location->{
-            ...
-          },
-          categoryTags
-        }`;
+  const { email } = JSON.parse(req.body);
+  const query = `*[_type == "post" && references(*[_type=='author' && email == $email]._id)]{
+    ...,
+    author->{
+      _id,
+      ...,
+    },
+    rating,
+    publishedAt,
+    categories[]->{   
+      ...,
+    },
+    mainImage,
+    location->{
+          ...,
+    },
+  }| order(rating desc)`;
+
   const posts = await client.fetch(query, {
-    slug: slug,
+    email: email,
   });
 
   res.status(200).json({ posts });

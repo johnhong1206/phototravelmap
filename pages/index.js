@@ -7,6 +7,7 @@ import { urlFor } from "../sanity";
 import {
   fetchPostOrderByRating,
   fetchFoodPostOrderByRating,
+  fetchPost,
 } from "../utils/fetchposts";
 import { selectDarkmode } from "../features/darkmodeSlice";
 import { useSelector } from "react-redux";
@@ -20,8 +21,7 @@ import OptionCard from "../components/OptionCard";
 const PostFeeds = dynamic(() => import("../components/PostFeeds"));
 const Footer = dynamic(() => import("../components/Footer"), { ssr: false });
 
-export default function Home({ posts, foodPost }) {
-  console.log(foodPost);
+export default function Home({ posts, foodPost, latestPost }) {
   const topRef = useRef(null);
   const scrollbarRef = useRef(null);
   const router = useRouter();
@@ -188,6 +188,30 @@ export default function Home({ posts, foodPost }) {
             ))}
           </div>
         </div>
+        <div>
+          <h2 className="text-xl font-bold tracking-widest">The Latest Post</h2>
+          <div className=" p-2 lg:p-4 grid grid-flow-row-dense md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+            {latestPost?.slice(0, 4).map((post) => (
+              <>
+                {post?.mainImage && (
+                  <PostFeeds
+                    id={post?._id}
+                    key={post?._id}
+                    title={post?.title}
+                    author={post?.author}
+                    slug={post?.slug}
+                    mainImage={post?.mainImage}
+                    categories={post?.categories}
+                    publishedAt={post?.publishedAt}
+                    location={post?.location}
+                    body={post?.body}
+                    rating={post?.rating}
+                  />
+                )}
+              </>
+            ))}
+          </div>
+        </div>
         <div></div>
       </main>
       <Footer />
@@ -203,11 +227,13 @@ export const getServerSideProps = async ({ req, res }) => {
 
   const posts = await fetchPostOrderByRating();
   const foodPost = await fetchFoodPostOrderByRating();
+  const latestPost = await fetchPost();
 
   return {
     props: {
       posts,
       foodPost,
+      latestPost,
     },
   };
 };

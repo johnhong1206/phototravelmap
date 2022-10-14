@@ -7,6 +7,7 @@ import {
   fetchPost,
   fetchpostdetails,
   fetchpostrating,
+  fetchgeopostwithemail,
 } from "../../utils/fetchposts";
 import { useSelector } from "react-redux";
 import { selectUser } from "../../features/userSlice";
@@ -31,6 +32,178 @@ function PostDetails({ post }) {
   const [comment, setComment] = useState("");
   const [refetchpost, setRefetchPost] = useState(post);
   const id = post?._id;
+  const postAuthorId = post?.author._id;
+  const postAuthorEmail = post?.author?.email;
+  const [authorPost, setAuthorPost] = useState([]);
+  const [authorPostCount, setAuthorPostCount] = useState([]);
+  const [userRating, setUserRating] = useState(null);
+  const [userAverageRating, setUserAverageRating] = useState(null);
+  const [totalRatingUpdate, setTotalRatingUpdate] = useState(null);
+
+  const [finalAvgRatingUpdate, setFinalAvgRatingUpdate] = useState(null);
+
+  useEffect(() => {
+    if (postAuthorEmail) {
+      const getuserPost = async () => {
+        const email = postAuthorEmail;
+        const newdata = await fetchgeopostwithemail(email);
+        setAuthorPost(newdata);
+      };
+      getuserPost();
+    }
+  }, [postAuthorEmail]);
+  useEffect(() => {
+    const postCount = authorPost?.length;
+    const currentRating = authorPost?.reduce(
+      (total, item) => (total += item.rating),
+      0
+    );
+    const rating = Number(currentRating) / Number(postCount);
+    setUserRating(Number(currentRating));
+    setAuthorPostCount(postCount);
+    setUserAverageRating(rating);
+  }, [authorPost]);
+
+  console.log(
+    "totalRating",
+    userRating,
+    "postCount",
+    authorPostCount,
+    "userAverageRating",
+    userAverageRating,
+    " to rate",
+    rate
+  );
+
+  useEffect(() => {
+    if (rate) {
+      const currentPostCount = authorPostCount;
+      const authorTotalRating = authorPost?.reduce(
+        (total, item) => (total += item.rating),
+        0
+      );
+      const finalTotalRating = Number(authorTotalRating) + Number(rate);
+      const finalAvarageRating =
+        Number(finalTotalRating) / Number(currentPostCount);
+      setTotalRatingUpdate(finalTotalRating);
+      setFinalAvgRatingUpdate(finalAvarageRating);
+    } else {
+      const currentPostCount = authorPostCount;
+      const authorTotalRating = authorPost?.reduce(
+        (total, item) => (total += item.rating),
+        0
+      );
+      const finalTotalRating = Number(authorTotalRating);
+      const finalAvarageRating =
+        Number(finalTotalRating) / Number(currentPostCount);
+      setTotalRatingUpdate(finalTotalRating);
+      setFinalAvgRatingUpdate(finalAvarageRating);
+    }
+  }, [authorPostCount, authorPost, rate]);
+
+  console.log(
+    "totalRatingUpdate",
+    totalRatingUpdate,
+    "finalAvgRatingUpdate",
+    finalAvgRatingUpdate
+  );
+
+  // useEffect(() => {
+  //   if (!rate) {
+  //     if (authorPost?.length > 1) {
+  //       const postCount = Number(authorPost?.length);
+  //       const currentRating = authorPost?.reduce(
+  //         (total, item) => (total += item.rating),
+  //         0
+  //       );
+  //       const rating = Number(currentRating) / Number(postCount);
+  //       setAuthorRating(rating);
+  //     } else {
+  //       const postCount = Number(authorPost?.length);
+  //       const currentRating = authorPost?.reduce(
+  //         (total, item) => (total += item.rating),
+  //         0
+  //       );
+  //       const rating = Number(currentRating) / Number(postCount);
+  //       setAuthorRating(rating);
+  //     }
+  //   }
+  //   if (rate) {
+  //     if (authorPost?.length > 1) {
+  //       const postCount = Number(authorPost?.length) + 1;
+  //       console.log(postCount);
+  //       const currentRating = authorPost?.reduce(
+  //         (total, item) => (total += item.rating),
+  //         0
+  //       );
+
+  //       const finalTotalRating = Number(currentRating) + Number(rate);
+
+  //       const rating = Number(finalTotalRating) / Number(postCount);
+  //       console.log(
+  //         "currentRating total",
+  //         currentRating,
+  //         "postCount",
+  //         postCount,
+  //         "finalTotalRating ",
+  //         finalTotalRating,
+  //         "rating",
+  //         rating
+  //       );
+  //       setAuthorRating(rating);
+  //     } else {
+  //       const postCount = Number(authorPost?.length);
+
+  //       const currentRating = authorPost?.reduce(
+  //         (total, item) => (total += item.rating),
+  //         0
+  //       );
+
+  //       const finalTotalRating = Number(currentRating) + Number(rate);
+
+  //       const rating = Number(finalTotalRating) / Number(postCount);
+  //       console.log(
+  //         "currentRating total",
+  //         currentRating,
+  //         "postCount",
+  //         postCount,
+  //         "finalTotalRating ",
+  //         finalTotalRating,
+  //         "rating to rate",
+  //         rating
+  //       );
+  //       setAuthorRating(rating);
+  //     }
+  //   }
+  // }, [authorPost, rate]);
+
+  // console.log("authorRating", authorRating);
+
+  const updateuserRating = async () => {
+    const postInfo = {
+      id: postAuthorId,
+      rating: totalRatingUpdate,
+      averageRating: finalAvgRatingUpdate,
+      authorPostCount: Number(authorPostCount),
+    };
+    const notification = toast.loading("Rate the User...");
+
+    try {
+      await fetch(`/api/updateuserrating`, {
+        body: JSON.stringify(postInfo),
+        method: "POST",
+      }).then((res) => {
+        toast.success(" Rate User Success", {
+          id: notification,
+        });
+      });
+    } catch (error) {
+      console.error(error);
+      toast.error("Something went wrong", {
+        id: notification,
+      });
+    }
+  };
 
   const fetchPost = async () => {
     fetchpostdetails(postSlug).then((refetchpost) =>
@@ -47,6 +220,7 @@ function PostDetails({ post }) {
         method: "POST",
       }).then((res) => {
         fetchPost();
+        updateuserRating();
         toast.success("Post Update Rate Success", {
           id: notification,
         });

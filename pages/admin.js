@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Head from "next/head";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { sanityClient } from "../sanity";
-import { fetchPost } from "../utils/fetchposts";
+import { fetchPost, fetchgeopostwithemail } from "../utils/fetchposts";
 import { fetchlocation } from "../utils/fetchlocation";
 import { useSelector } from "react-redux";
 import {
@@ -34,12 +34,41 @@ import toast from "react-hot-toast";
 function Admin({ location, categories, posts }) {
   const darkMode = useSelector(selectDarkmode);
   const user = useSelector(selectUser);
+
   const [phase, setPhase] = useState("Post");
   const [selectPost, setSelectPost] = useState(null);
   const [refetchpost, setRefetchPost] = useState(posts);
   const [refetchLocation, setRefetchLocation] = useState(location);
   const locationModalisOpen = useSelector(selectLocationModalIsOpen);
   const categoryModalisOpen = useSelector(selectCategoryModalIsOpen);
+  const [authorPost, setAuthorPost] = useState([]);
+  const [authorPostCount, setAuthorPostCount] = useState([]);
+  const [userRating, setUserRating] = useState(null);
+  const [userAverageRating, setUserAverageRating] = useState(null);
+  const userId = user?.id;
+
+  useEffect(() => {
+    if (user) {
+      const getuserPost = async () => {
+        const email = user?.email;
+        const newdata = await fetchgeopostwithemail(email);
+        setAuthorPost(newdata);
+      };
+      getuserPost();
+    }
+  }, [user]);
+
+  useEffect(() => {
+    const postCount = authorPost?.length;
+    const currentRating = authorPost?.reduce(
+      (total, item) => (total += item.rating),
+      0
+    );
+    const rating = Number(currentRating) / Number(postCount);
+    setUserRating(Number(currentRating));
+    setAuthorPostCount(postCount);
+    setUserAverageRating(rating);
+  }, [authorPost]);
 
   const Phase = ({ name, isActive, setPhase }) => {
     return (
@@ -89,21 +118,21 @@ function Admin({ location, categories, posts }) {
     refreshAllLocation();
   };
 
-  if (!user?.admin)
-    return (
-      <div
-        className={`flex flex-col items-center justify-center h-[93vh]  ${
-          darkMode ? "page-bg-dark text-white" : "bg-std text-black"
-        }`}
-      >
-        <h1 className="text-3xl font-bold mb-8">You are not Admin</h1>
-        <Link href="/">
-          <p className="cursor-pointer hover:underline">
-            Click here to Home Page
-          </p>
-        </Link>
-      </div>
-    );
+  // if (!user?.admin)
+  //   return (
+  //     <div
+  //       className={`flex flex-col items-center justify-center h-[93vh]  ${
+  //         darkMode ? "page-bg-dark text-white" : "bg-std text-black"
+  //       }`}
+  //     >
+  //       <h1 className="text-3xl font-bold mb-8">You are not Admin</h1>
+  //       <Link href="/">
+  //         <p className="cursor-pointer hover:underline">
+  //           Click here to Home Page
+  //         </p>
+  //       </Link>
+  //     </div>
+  //   );
 
   return (
     <div
@@ -165,6 +194,10 @@ function Admin({ location, categories, posts }) {
             categories={categories}
             handleRefresh={refeshAll}
             setPhase={setPhase}
+            authorPostCount={authorPostCount}
+            userRating={userRating}
+            userAverageRating={userAverageRating}
+            userId={userId}
           />
         )}
         {phase == "Add Image" && (

@@ -18,7 +18,17 @@ import {
 } from "react-icons/ai";
 import toast from "react-hot-toast";
 
-function AddPost({ posts, location, categories, setPhase, handleRefresh }) {
+function AddPost({
+  posts,
+  location,
+  categories,
+  setPhase,
+  handleRefresh,
+  authorPostCount,
+  userRating,
+  userAverageRating,
+  userId,
+}) {
   const dispatch = useDispatch();
   const scrollbarRef = useRef(null);
   const darkMode = useSelector(selectDarkmode);
@@ -72,6 +82,32 @@ function AddPost({ posts, location, categories, setPhase, handleRefresh }) {
     }
   };
 
+  const updateuserRating = async () => {
+    const postInfo = {
+      id: userId,
+      rating: userRating,
+      averageRating: userAverageRating,
+      authorPostCount: Number(authorPostCount) + Number(1),
+    };
+    const notification = toast.loading("Rate the Author...");
+
+    try {
+      await fetch(`/api/updateuserrating`, {
+        body: JSON.stringify(postInfo),
+        method: "POST",
+      }).then((res) => {
+        toast.success(" Rate Success", {
+          id: notification,
+        });
+      });
+    } catch (error) {
+      console.error(error);
+      toast.error("You Already Rate This Post", {
+        id: notification,
+      });
+    }
+  };
+
   const post = async (e) => {
     e.preventDefault();
     const notification = toast.loading("Posting...");
@@ -122,6 +158,7 @@ function AddPost({ posts, location, categories, setPhase, handleRefresh }) {
           body: JSON.stringify(postInfo),
           method: "POST",
         }).then((res) => {
+          updateuserRating();
           console.log("res", res.body, res.json());
           toast.success("Post Success", {
             id: notification,
@@ -363,6 +400,12 @@ function AddPost({ posts, location, categories, setPhase, handleRefresh }) {
           >
             Post
           </button>
+          {/* <button
+            className=" bg-pink-400 disabled:bg-opacity-50 w-full px-1 py-2 rounded-lg mt-10 shadow-lg hover:shadow-xl font-bold hover:text-white"
+            onClick={updateuserRating}
+          >
+            Post
+          </button> */}
         </div>
       </div>
     </div>
