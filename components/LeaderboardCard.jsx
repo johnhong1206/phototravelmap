@@ -54,27 +54,25 @@ function LeaderboardCard({
         </div>
         <div className="w-full grid gap-3 mt-4 place-items-center md:grid-cols-2 lg:grid-cols-4">
           {!loading ? (
-            posts
-              ?.slice(0, 4)
-              .map((post) => (
-                <div className="w-full">
-                  {post?.mainImage && (
-                    <PostFeeds
-                      id={post?._id}
-                      key={post?._id}
-                      title={post?.title}
-                      author={post?.author}
-                      slug={post?.slug}
-                      mainImage={post?.mainImage}
-                      categories={post?.categories}
-                      publishedAt={post?.publishedAt}
-                      location={post?.location}
-                      body={post?.body}
-                      rating={post?.rating}
-                    />
-                  )}
-                </div>
-              ))
+            posts?.slice(0, 4).map((post) => (
+              <div key={post?._id} className="w-full">
+                {post?.mainImage && (
+                  <PostFeeds
+                    id={post?._id}
+                    key={post?._id}
+                    title={post?.title}
+                    author={post?.author}
+                    slug={post?.slug}
+                    mainImage={post?.mainImage}
+                    categories={post?.categories}
+                    publishedAt={post?.publishedAt}
+                    location={post?.location}
+                    body={post?.body}
+                    rating={post?.rating}
+                  />
+                )}
+              </div>
+            ))
           ) : (
             <p>loading...</p>
           )}
