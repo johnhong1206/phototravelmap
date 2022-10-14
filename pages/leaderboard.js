@@ -5,7 +5,7 @@ import LeaderboardCard from "../components/LeaderboardCard";
 import { selectDarkmode } from "../features/darkmodeSlice";
 import { fetchalluser } from "../utils/fetchuserinfo";
 
-function leaderboard({ profiles }) {
+function Leaderboard({ profiles }) {
   const darkMode = useSelector(selectDarkmode);
 
   return (
@@ -35,7 +35,7 @@ function leaderboard({ profiles }) {
   );
 }
 
-export default leaderboard;
+export default Leaderboard;
 export const getServerSideProps = async ({ req, res }) => {
   res.setHeader(
     "Cache-Control",
