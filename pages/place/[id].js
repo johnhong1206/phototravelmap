@@ -3,24 +3,27 @@ import Head from "next/head";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
+import toast from "react-hot-toast";
+// sanity && fetching
 import { sanityClient, urlFor } from "../../sanity";
 import { fetchlocationInfo } from "../../utils/fetchareaInfo";
 import { useDispatch, useSelector } from "react-redux";
 import { selectDarkmode } from "../../features/darkmodeSlice";
 import { selectPlaceInfo, getAreaInfo } from "../../features/placeinfoSlice";
+// map
 import Map, { Marker, Popup } from "react-map-gl";
 import { getCenter } from "geolib";
 import "mapbox-gl/dist/mapbox-gl.css";
+// icons
 import { IoRestaurantOutline, IoChevronUpOutline } from "react-icons/io5";
 import { RiHotelLine } from "react-icons/ri";
 import { MdOutlineTour, MdChevronLeft, MdChevronRight } from "react-icons/md";
 import { FaRegGem, FaRegGrinBeam } from "react-icons/fa";
 import { BiRefresh } from "react-icons/bi";
 import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
-
+// components
 const PostFeeds = dynamic(() => import("../../components/PostFeeds"));
 const Footer = dynamic(() => import("../../components/Footer"));
-import toast from "react-hot-toast";
 
 function PlaceDetail({ posts, location }) {
   const scrollbarRef = useRef(null);

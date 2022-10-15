@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { sanityClient } from "../../sanity";
+import Link from "next/link";
+import { useRouter } from "next/router";
+
 import { fetchgeopostwithemail } from "../../utils/fetchposts";
 import { fetuserprofile } from "../../utils/fetchuserinfo";
 import { useSelector } from "react-redux";
@@ -15,6 +18,7 @@ import { selectUser } from "../../features/userSlice";
 function Index({ posts, userprofile, location, categories }) {
   const darkMode = useSelector(selectDarkmode);
   const user = useSelector(selectUser);
+  const router = useRouter();
 
   const [phase, setPhase] = useState("photo");
   const [authorPost, setAuthorPost] = useState(posts);
@@ -89,18 +93,21 @@ function Index({ posts, userprofile, location, categories }) {
             averageRating={userprofile.averageRating}
           />
         </div>
-        <div className="flex items-center justify-center w-full space-x-8 py-3">
-          <Phase
-            setPhase={setPhase}
-            name="photo"
-            isActive={phase == "Post" ? true : false}
-          />
-          <Phase
-            setPhase={setPhase}
-            name="upload"
-            isActive={phase == "Post" ? true : false}
-          />
-        </div>
+        {user?.email == router.query.id && (
+          <div className="flex items-center justify-center w-full space-x-8 py-3">
+            <Phase
+              setPhase={setPhase}
+              name="photo"
+              isActive={phase == "Post" ? true : false}
+            />
+            <Phase
+              setPhase={setPhase}
+              name="upload"
+              isActive={phase == "Post" ? true : false}
+            />
+          </div>
+        )}
+
         {phase === "photo" && (
           <UserProfilePost
             posts={posts}
@@ -139,6 +146,11 @@ export const getServerSideProps = async (context) => {
   const categories = await sanityClient.fetch(categoriesquery);
 
   return {
-    props: { posts, userprofile, location, categories: categories },
+    props: {
+      posts,
+      userprofile,
+      location,
+      categories: categories,
+    },
   };
 };

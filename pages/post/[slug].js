@@ -1,7 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import Head from "next/head";
 import Image from "next/image";
+import toast from "react-hot-toast";
+
 import { useRouter } from "next/router";
+// sanity && fetching
 import { urlFor } from "../../sanity";
 import {
   fetchPost,
@@ -9,15 +12,18 @@ import {
   fetchpostrating,
   fetchgeopostwithemail,
 } from "../../utils/fetchposts";
+// redux
 import { useSelector } from "react-redux";
 import { selectUser } from "../../features/userSlice";
 import { selectDarkmode } from "../../features/darkmodeSlice";
+// map
 import Map, { Marker } from "react-map-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
+// icons
 import { IoChevronUpOutline } from "react-icons/io5";
 import { AiTwotoneFire } from "react-icons/ai";
+// components
 import Footer from "../../components/Footer";
-import toast from "react-hot-toast";
 
 function PostDetails({ post }) {
   const router = useRouter();

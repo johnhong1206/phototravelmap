@@ -1,17 +1,21 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/router";
+import dynamic from "next/dynamic";
+
+// map
 import Map, { Marker, Popup } from "react-map-gl";
 import { getCenter } from "geolib";
 import "mapbox-gl/dist/mapbox-gl.css";
+// redux
 import { useSelector } from "react-redux";
 import { selectDarkmode } from "../../../../features/darkmodeSlice";
-import { BiMapPin } from "react-icons/bi";
+// fetching
 import {
   fetchgeoInfo,
   fetchAreageo,
   fetchAreaInfo,
-  fetchCommonAreaInfo,
 } from "../../../../utils/fetchgeoinfo";
+// icons
 import { fetchgeopost } from "../../../../utils/fetchposts";
 import {
   IoRestaurantOutline,
@@ -21,22 +25,19 @@ import {
 } from "react-icons/io5";
 import { RiHotelLine } from "react-icons/ri";
 
-import { FaRegGem, FaRegGrinBeam } from "react-icons/fa";
+import { FaRegGem } from "react-icons/fa";
 import { MdOutlineTour } from "react-icons/md";
-import PostFeeds from "../../../../components/PostFeeds";
-import Footer from "../../../../components/Footer";
+const PostFeeds = dynamic(() => import("../../../../components/PostFeeds"));
+const Footer = dynamic(() => import("../../../../components/Footer"));
 
-function Index({ location, type, areaGeo, locationInfo, posts }) {
-  console.log("posts", posts);
+function Index({ type, areaGeo, locationInfo, posts }) {
   const darkMode = useSelector(selectDarkmode);
   const router = useRouter();
   const [selectLocation, setSelectLocation] = useState(null);
   const [selectedLocation, setSelectedLocation] = useState({});
   const [locationDetails, setLocationDetails] = useState(null);
-  const [selectAreaInfo, setSelectAreaInfo] = useState(null);
   const [closeResult, setCloseResult] = useState(false);
 
-  const [queryResult, setQueryResult] = useState([]);
   const coordinates = locationInfo?.map((result) => ({
     longitude: result?.properties?.lon,
     latitude: result?.properties?.lat,
@@ -59,7 +60,7 @@ function Index({ location, type, areaGeo, locationInfo, posts }) {
     >
       <main className="flex flex-col h-full w-full p-3">
         <div className="flex flex-col items-center justify-center lg:flex-row w-full">
-          <div className="h-full flex flex-col w-full lg:w-fit items-center justify-center mr-4 z-40">
+          <div className="h-full flex flex-col w-full lg:w-fit items-center justify-center mr-4 z-40 mb-10 lg:mb-0">
             <div className="flex flex-row items-center justify-center space-x-2">
               <h2 className="font-bold text-center tracking-widest my-4 text-xl">
                 Result

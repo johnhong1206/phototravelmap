@@ -6,7 +6,7 @@ import { getUniqueValues } from "../utils/helper";
 import { useSelector } from "react-redux";
 import { selectDarkmode } from "../features/darkmodeSlice";
 import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
-const Post = dynamic(() => import("../components/Post"));
+const Post = dynamic(() => import("../components/Post"), { ssr: true });
 const Footer = dynamic(() => import("../components/Footer"));
 
 function Food({ posts }) {

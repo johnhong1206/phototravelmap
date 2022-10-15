@@ -1,9 +1,14 @@
 import React from "react";
+import dynamic from "next/dynamic";
+
 import { useSelector } from "react-redux";
-import Footer from "../components/Footer";
-import LeaderboardCard from "../components/LeaderboardCard";
 import { selectDarkmode } from "../features/darkmodeSlice";
 import { fetchalluser } from "../utils/fetchuserinfo";
+// components
+const Footer = dynamic(() => import("../components/Footer"), { ssr: true });
+const LeaderboardCard = dynamic(() => import("../components/LeaderboardCard"), {
+  ssr: false,
+});
 
 function Leaderboard({ profiles }) {
   const darkMode = useSelector(selectDarkmode);
@@ -31,6 +36,7 @@ function Leaderboard({ profiles }) {
           ))}
         </div>
       </main>
+      <Footer />
     </div>
   );
 }

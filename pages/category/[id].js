@@ -4,14 +4,17 @@ import Image from "next/image";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import { sanityClient, urlFor } from "../../sanity";
+// redux
 import { useSelector } from "react-redux";
 import { selectDarkmode } from "../../features/darkmodeSlice";
+// map
 import Map, { Marker, Popup } from "react-map-gl";
 import { getCenter } from "geolib";
 import "mapbox-gl/dist/mapbox-gl.css";
+// icons
 import { IoChevronUpOutline } from "react-icons/io5";
 import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
-
+// components
 const PostFeeds = dynamic(() => import("../../components/PostFeeds"));
 const Footer = dynamic(() => import("../../components/Footer"));
 

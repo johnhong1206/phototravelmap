@@ -1,7 +1,6 @@
 import React from "react";
 
 function OptionCard({ title, Icon, style, onClick, searchType, value }) {
-  console.log(searchType, title);
   return (
     <div
       onClick={onClick}

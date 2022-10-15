@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import Head from "next/head";
 import dynamic from "next/dynamic";
+import toast from "react-hot-toast";
+
+// sanity &fetching
 import { sanityClient } from "../sanity";
 import { fetchPost, fetchgeopostwithemail } from "../utils/fetchposts";
 import { fetchlocation } from "../utils/fetchlocation";
+// redux
 import { useSelector } from "react-redux";
 import {
   selectCategoryModalIsOpen,
@@ -11,7 +16,9 @@ import {
 } from "../features/modalSlice";
 import { selectDarkmode } from "../features/darkmodeSlice";
 import { selectUser } from "../features/userSlice";
+// icons
 import { BiRefresh } from "react-icons/bi";
+// components
 const AddLocationModal = dynamic(() =>
   import("../components/AddLocationModal")
 );
@@ -28,12 +35,9 @@ const AddPostCategoriesTypes = dynamic(() =>
   import("../components/AddPostCategoriesTypes")
 );
 
-import toast from "react-hot-toast";
-
 function Admin({ location, categories, posts }) {
   const darkMode = useSelector(selectDarkmode);
   const user = useSelector(selectUser);
-
   const [phase, setPhase] = useState("Post");
   const [selectPost, setSelectPost] = useState(null);
   const [refetchpost, setRefetchPost] = useState(posts);
@@ -117,21 +121,21 @@ function Admin({ location, categories, posts }) {
     refreshAllLocation();
   };
 
-  // if (!user?.admin)
-  //   return (
-  //     <div
-  //       className={`flex flex-col items-center justify-center h-[93vh]  ${
-  //         darkMode ? "page-bg-dark text-white" : "bg-std text-black"
-  //       }`}
-  //     >
-  //       <h1 className="text-3xl font-bold mb-8">You are not Admin</h1>
-  //       <Link href="/">
-  //         <p className="cursor-pointer hover:underline">
-  //           Click here to Home Page
-  //         </p>
-  //       </Link>
-  //     </div>
-  //   );
+  if (!user?.admin)
+    return (
+      <div
+        className={`flex flex-col items-center justify-center h-[93vh]  ${
+          darkMode ? "page-bg-dark text-white" : "bg-std text-black"
+        }`}
+      >
+        <h1 className="text-3xl font-bold mb-8">You are not Admin</h1>
+        <Link href="/">
+          <p className="cursor-pointer hover:underline">
+            Click here to Home Page
+          </p>
+        </Link>
+      </div>
+    );
 
   return (
     <div

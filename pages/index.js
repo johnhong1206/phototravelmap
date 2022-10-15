@@ -1,24 +1,26 @@
 import React, { useState, useRef } from "react";
 import Head from "next/head";
-import Image from "next/image";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
-import { urlFor } from "../sanity";
+//fetching
 import {
   fetchPostOrderByRating,
   fetchFoodPostOrderByRating,
   fetchPost,
 } from "../utils/fetchposts";
+//redux
 import { selectDarkmode } from "../features/darkmodeSlice";
 import { useSelector } from "react-redux";
-
+//icons
 import { RiHotelLine } from "react-icons/ri";
 import { IoRestaurantOutline, IoCameraOutline } from "react-icons/io5";
-
 import { MdOutlineTour } from "react-icons/md";
 import { AiOutlineSearch } from "react-icons/ai";
-import OptionCard from "../components/OptionCard";
-const PostFeeds = dynamic(() => import("../components/PostFeeds"));
+// components
+const OptionCard = dynamic(() => import("../components/OptionCard"));
+const PostFeeds = dynamic(() => import("../components/PostFeeds"), {
+  ssr: true,
+});
 const Footer = dynamic(() => import("../components/Footer"), { ssr: false });
 
 export default function Home({ posts, foodPost, latestPost }) {
@@ -27,32 +29,12 @@ export default function Home({ posts, foodPost, latestPost }) {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [searchType, setSearchType] = useState(null);
-
   const darkMode = useSelector(selectDarkmode);
-  const [showAll, setShowAll] = useState(false);
   const [currentpage, setCurrentPage] = useState(1);
   const [postsPerPage] = useState(4);
-  const [activeNumber, setActiveNumber] = useState("");
   const indexOfLastPost = currentpage * postsPerPage;
   const indexOfFirstPost = indexOfLastPost - postsPerPage;
   const currentPost = posts?.slice(indexOfFirstPost, indexOfLastPost);
-  const mapImgPost = showAll ? posts : currentPost;
-  const paginate = (pageNumber) => {
-    setCurrentPage(pageNumber);
-  };
-  const pageNumber = [];
-  for (let i = 1; i <= Math.ceil(posts?.length / postsPerPage); i++) {
-    pageNumber.push(i);
-  }
-
-  const scrollToTop = () => {
-    topRef.current.scrollIntoView({
-      behavior: "smooth",
-    });
-  };
-  const scroll = (scrollOffset) => {
-    scrollbarRef.current.scrollLeft += scrollOffset;
-  };
 
   const searchInfo = (e) => {
     e.preventDefault();

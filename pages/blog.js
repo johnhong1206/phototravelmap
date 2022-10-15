@@ -13,7 +13,9 @@ import "mapbox-gl/dist/mapbox-gl.css";
 import { IoChevronUpOutline } from "react-icons/io5";
 import { MdChevronRight, MdChevronLeft } from "react-icons/md";
 import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
-const PostFeeds = dynamic(() => import("../components/PostFeeds"));
+const PostFeeds = dynamic(() => import("../components/PostFeeds"), {
+  ssr: true,
+});
 const Footer = dynamic(() => import("../components/Footer"), { ssr: false });
 
 export default function Blog({ posts }) {

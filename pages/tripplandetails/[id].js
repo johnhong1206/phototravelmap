@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import dynamic from "next/dynamic";
 import Head from "next/head";
+import toast from "react-hot-toast";
+
+// sanity && fetching
 import { sanityClient } from "../../sanity";
 import { fetchlocation } from "../../utils/fetchlocation";
 import {
@@ -11,6 +14,7 @@ import {
   fetchtripplansById,
   fetchtripdetailsById,
 } from "../../utils/fetchtripplans";
+// redux
 import { useDispatch, useSelector } from "react-redux";
 import { selectDarkmode } from "../../features/darkmodeSlice";
 import {
@@ -20,6 +24,7 @@ import {
 } from "../../features/modalSlice";
 import { selectUser } from "../../features/userSlice";
 import { getAreaInfo } from "../../features/placeinfoSlice";
+// icons
 import {
   AiOutlinePlusCircle,
   AiOutlineClose,
@@ -31,7 +36,7 @@ import { RiHotelLine } from "react-icons/ri";
 import { MdOutlineTour } from "react-icons/md";
 import { FaRegGem, FaRegGrinBeam } from "react-icons/fa";
 import { BiRefresh } from "react-icons/bi";
-import toast from "react-hot-toast";
+// components
 const TripDetailsMap = dynamic(() => import("../../components/TripDetailsMap"));
 const AddLocationModal = dynamic(() =>
   import("../../components/AddLocationModal")
@@ -51,7 +56,6 @@ function Plandetails({ plan, location, tripdetails, params }) {
   const [refetchLocation, setRefetchLocation] = useState(location);
   const [refetchTripDetails, setRefetchTripDetails] = useState(tripdetails);
   const [initalLocationState, setInitalLocationState] = useState(true);
-  const [activeNumber, setActiveNumber] = useState("");
   const [selectlocation, setSelectLocation] = useState(null);
   const [activeLocation, setActiveLocation] = useState(selectlocation);
   const [searchLocation, setSearchLocation] = useState("");

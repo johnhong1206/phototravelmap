@@ -1,18 +1,21 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/router";
+import dynamic from "next/dynamic";
+// map
 import Map, { Marker, Popup } from "react-map-gl";
 import { getCenter } from "geolib";
 import "mapbox-gl/dist/mapbox-gl.css";
+// redux
 import { useSelector } from "react-redux";
 import { selectDarkmode } from "../../../features/darkmodeSlice";
-import { BiMapPin } from "react-icons/bi";
+// fetching
 import {
   fetchgeoInfo,
   fetchAreageo,
   fetchCommonAreaInfo,
-  fetchAreaInfo,
 } from "../../../utils/fetchgeoinfo";
 import { fetchgeopost } from "../../../utils/fetchposts";
+// icins
 import {
   IoRestaurantOutline,
   IoCloseOutline,
@@ -21,13 +24,12 @@ import {
 } from "react-icons/io5";
 import { RiHotelLine } from "react-icons/ri";
 
-import { FaRegGem, FaRegGrinBeam } from "react-icons/fa";
+import { FaRegGem } from "react-icons/fa";
 import { MdOutlineTour } from "react-icons/md";
-import PostFeeds from "../../../components/PostFeeds";
-import Footer from "../../../components/Footer";
+const PostFeeds = dynamic(() => import("../../../components/PostFeeds"));
+const Footer = dynamic(() => import("../../../components/Footer"));
 
-function Index({ location, type, areaGeo, locationInfo, posts, input }) {
-  console.log("posts", posts);
+function Index({ type, areaGeo, locationInfo, posts }) {
   const darkMode = useSelector(selectDarkmode);
   const router = useRouter();
   const [selectLocation, setSelectLocation] = useState(null);

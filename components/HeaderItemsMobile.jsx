@@ -63,13 +63,15 @@ function HeaderItemsMobile({ open, setOpen }) {
           }`}
         />
       </Link>
-      <Link href={`/userprofile/${user?.email}`}>
-        <IoPersonOutline
-          className={`w-6 h-6 hover:text-rose-400  cursor-pointer ${
-            darkMode ? "text-white" : "text-gray-500/90"
-          }`}
-        />
-      </Link>
+      {user && (
+        <Link href={`/userprofile/${user?.email}`}>
+          <IoPersonOutline
+            className={`w-6 h-6 hover:text-rose-400  cursor-pointer ${
+              darkMode ? "text-white" : "text-gray-500/90"
+            }`}
+          />
+        </Link>
+      )}
 
       {user && (
         <Link href={`/tripplans/${user?.email}`}>
