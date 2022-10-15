@@ -1,73 +1,47 @@
-import React, { useState, useEffect } from "react";
-import Head from "next/head";
-import dynamic from "next/dynamic";
-import { sanityClient } from "../sanity";
-import { fetchPost, fetchgeopostwithemail } from "../utils/fetchposts";
-import { fetchlocation } from "../utils/fetchlocation";
-import { useSelector } from "react-redux";
-import {
-  selectCategoryModalIsOpen,
-  selectLocationModalIsOpen,
-} from "../features/modalSlice";
-import { selectDarkmode } from "../features/darkmodeSlice";
-import { selectUser } from "../features/userSlice";
+import React, { useState } from "react";
+import { useRouter } from "next/router";
 import { BiRefresh } from "react-icons/bi";
-const AddLocationModal = dynamic(() =>
-  import("../components/AddLocationModal")
-);
-const AddCategoryModal = dynamic(() =>
-  import("../components/AddCategoryModal")
-);
-const AddPost = dynamic(() => import("../components/AddPost"));
-const AdminPostList = dynamic(() => import("../components/AdminPostList"));
-const AddPostCategories = dynamic(() =>
-  import("../components/AddPostCategories")
-);
-const AddImagetoPost = dynamic(() => import("../components/AddImagetoPost"));
-const AddPostCategoriesTypes = dynamic(() =>
-  import("../components/AddPostCategoriesTypes")
-);
+import { useSelector } from "react-redux";
+import { selectDarkmode } from "../features/darkmodeSlice";
+import { fetchgeopostwithemail } from "../utils/fetchposts";
+import { fetchlocation } from "../utils/fetchlocation";
 
+import AdminPostList from "./AdminPostList";
 import toast from "react-hot-toast";
+import AddPost from "./AddPost";
+import AddImagetoPost from "./AddImagetoPost";
+import AddPostCategories from "./AddPostCategories";
+import AddPostCategoriesTypes from "./AddPostCategoriesTypes";
 
-function Admin({ location, categories, posts }) {
+function UserProfilePostImage({
+  posts,
+  userprofile,
+  location,
+  categories,
+  authorPostCount,
+  userRating,
+  userAverageRating,
+  userId,
+}) {
+  console.log("categories", categories);
+  const router = useRouter();
+  const email = router.query.id;
+  console.log(
+    "authorPostCount",
+    authorPostCount,
+    "userRating",
+    userRating,
+    "userAverageRating",
+    userAverageRating,
+    userId
+  );
+
   const darkMode = useSelector(selectDarkmode);
-  const user = useSelector(selectUser);
 
   const [phase, setPhase] = useState("Post");
-  const [selectPost, setSelectPost] = useState(null);
   const [refetchpost, setRefetchPost] = useState(posts);
+  const [selectPost, setSelectPost] = useState(null);
   const [refetchLocation, setRefetchLocation] = useState(location);
-  const locationModalisOpen = useSelector(selectLocationModalIsOpen);
-  const categoryModalisOpen = useSelector(selectCategoryModalIsOpen);
-  const [authorPost, setAuthorPost] = useState([]);
-  const [authorPostCount, setAuthorPostCount] = useState([]);
-  const [userRating, setUserRating] = useState(null);
-  const [userAverageRating, setUserAverageRating] = useState(null);
-  const userId = user?.id;
-
-  useEffect(() => {
-    if (user) {
-      const getuserPost = async () => {
-        const email = user?.email;
-        const newdata = await fetchgeopostwithemail(email);
-        setAuthorPost(newdata);
-      };
-      getuserPost();
-    }
-  }, [user]);
-
-  useEffect(() => {
-    const postCount = authorPost?.length;
-    const currentRating = authorPost?.reduce(
-      (total, item) => (total += item.rating),
-      0
-    );
-    const rating = Number(currentRating) / Number(postCount);
-    setUserRating(Number(currentRating));
-    setAuthorPostCount(postCount);
-    setUserAverageRating(rating);
-  }, [authorPost]);
 
   const Phase = ({ name, isActive, setPhase }) => {
     return (
@@ -92,10 +66,9 @@ function Admin({ location, categories, posts }) {
       </div>
     );
   };
-
   const handleRefresh = async () => {
     const refresnToast = toast.loading("Refreshing Post...");
-    await fetchPost().then((posts) => {
+    await fetchgeopostwithemail(email).then((posts) => {
       setRefetchPost(posts);
     });
 
@@ -117,34 +90,9 @@ function Admin({ location, categories, posts }) {
     refreshAllLocation();
   };
 
-  // if (!user?.admin)
-  //   return (
-  //     <div
-  //       className={`flex flex-col items-center justify-center h-[93vh]  ${
-  //         darkMode ? "page-bg-dark text-white" : "bg-std text-black"
-  //       }`}
-  //     >
-  //       <h1 className="text-3xl font-bold mb-8">You are not Admin</h1>
-  //       <Link href="/">
-  //         <p className="cursor-pointer hover:underline">
-  //           Click here to Home Page
-  //         </p>
-  //       </Link>
-  //     </div>
-  //   );
-
   return (
-    <div
-      className={`flex flex-col h-screen overflow-y-scroll scrollbar-hide ${
-        darkMode ? "page-bg-dark text-white" : "bg-std text-black"
-      }`}
-    >
-      <Head>
-        <title>Zong Hong PhotoTravel Map Admin</title>
-        <meta name="description" content="Generated by create next app" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-      <div className="grid gap-3 grid-flow-row-dense grid-cols-3 lg:grid-cols-5 mt-1 mb-5">
+    <div>
+      <div className="grid gap-3 grid-flow-row-dense grid-cols-3 lg:grid-cols-6 mt-1 mb-5">
         <Phase
           setPhase={setPhase}
           name="Post"
@@ -178,7 +126,7 @@ function Admin({ location, categories, posts }) {
           />
         </div>
       </div>
-      <main className="h-screen">
+      <div>
         {phase == "Post" && (
           <AdminPostList
             posts={refetchpost}
@@ -227,27 +175,9 @@ function Admin({ location, categories, posts }) {
             posts={refetchpost}
           />
         )}
-      </main>
-
-      {locationModalisOpen && <AddLocationModal handleRefresh={refeshAll} />}
-      {categoryModalisOpen && <AddCategoryModal />}
+      </div>
     </div>
   );
 }
-export default Admin;
-export const getServerSideProps = async (context) => {
-  const categoriesquery = `*[_type == "category"]{
-        ...
-       }| order(_createdAt desc)`;
-  const posts = await fetchPost();
-  const location = await fetchlocation();
-  const categories = await sanityClient.fetch(categoriesquery);
 
-  return {
-    props: {
-      posts,
-      location,
-      categories,
-    },
-  };
-};
+export default UserProfilePostImage;

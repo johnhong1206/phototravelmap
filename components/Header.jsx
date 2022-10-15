@@ -19,6 +19,8 @@ import { selectUser, logout } from "../features/userSlice";
 import { useRouter } from "next/router";
 import { selectDarkmode, updateDarkMode } from "../features/darkmodeSlice";
 import { removeInfo } from "../features/placeinfoSlice";
+import HeaderItems from "./HeaderItems";
+import HeaderItemsMobile from "./HeaderItemsMobile";
 
 function Header() {
   const router = useRouter();
@@ -62,164 +64,15 @@ function Header() {
       ) : (
         <></>
       )}
+      <HeaderItems />
 
-      <div className="hidden lg:flex items-center space-x-4">
-        <Link href="/food">
-          <IoRestaurantOutline
-            className={`w-6 h-6 hover:text-green-400  cursor-pointer ${
-              darkMode ? "text-white" : "text-gray-500/90"
-            }`}
-          />
-        </Link>
-        <Link href="/travel">
-          <IoCameraOutline
-            className={`w-6 h-6 hover:text-purple-400  cursor-pointer ${
-              darkMode ? "text-white" : "text-gray-500/90"
-            }`}
-          />
-        </Link>
-        <Link href="/blog">
-          <IoMapOutline
-            className={`w-6 h-6 hover:text-teal-400  cursor-pointer ${
-              darkMode ? "text-white" : "text-gray-500/90"
-            }`}
-          />
-        </Link>
-        <Link href="/leaderboard">
-          <GiChampions
-            className={`w-6 h-6 hover:text-rose-400  cursor-pointer ${
-              darkMode ? "text-white" : "text-gray-500/90"
-            }`}
-          />
-        </Link>
-        <Link href={`/userprofile/${user?.email}`}>
-          <IoPersonOutline
-            className={`w-6 h-6 hover:text-fuchsia-400  cursor-pointer ${
-              darkMode ? "text-white" : "text-gray-500/90"
-            }`}
-          />
-        </Link>
-        {user && (
-          <Link href={`/tripplans/${user?.email}`}>
-            <IoClipboardOutline
-              className={`w-6 h-6 hover:text-teal-400  cursor-pointer ${
-                darkMode ? "text-white" : "text-gray-500/90"
-              }`}
-            />
-          </Link>
-        )}
-        {user ? (
-          <IoLogInOutline
-            onClick={userLogout}
-            className={`w-7 h-7 hover:text-fuchsia-400  cursor-pointer ${
-              darkMode ? "text-white" : "text-gray-500/90"
-            }`}
-          />
-        ) : (
-          <Link href="/signin">
-            <IoLogOutOutline
-              className={`w-7 h-7 hover:text-red-400  IoLogOutOutline cursor-pointer ${
-                darkMode ? "text-white" : "text-gray-500/90"
-              }`}
-            />
-          </Link>
-        )}
-        {darkMode ? (
-          <IoMoon
-            onClick={() => dispatch(updateDarkMode(false))}
-            className="w-6 h-6 text-yellow-200 cursor-pointer"
-          />
-        ) : (
-          <IoSunnyOutline
-            onClick={() => dispatch(updateDarkMode(true))}
-            className="w-6 h-6 text-orange-400 cursor-pointer"
-          />
-        )}
-      </div>
       {!open ? (
         <IoChevronBackOutline
           onClick={() => setOpen(!open)}
           className="w-6 h-6 text-orange-400 cursor-pointer inline-flex lg:hidden"
         />
       ) : (
-        <div className="flex lg:hidden items-center space-x-8 w-full overflow-x-scroll scrollbar-hide">
-          <Link href="/food">
-            <IoRestaurantOutline
-              className={`w-6 h-6 hover:text-green-400  cursor-pointer ${
-                darkMode ? "text-white" : "text-gray-500/90"
-              }`}
-            />
-          </Link>
-          <Link href="/travel">
-            <IoCameraOutline
-              className={`w-6 h-6 hover:text-purple-400  cursor-pointer ${
-                darkMode ? "text-white" : "text-gray-500/90"
-              }`}
-            />
-          </Link>
-          <Link href="/blog">
-            <IoMapOutline
-              className={`w-6 h-6 hover:text-teal-400  cursor-pointer ${
-                darkMode ? "text-white" : "text-gray-500/90"
-              }`}
-            />
-          </Link>
-          <Link href="/leaderboard">
-            <GiChampions
-              className={`w-6 h-6 hover:text-rose-400  cursor-pointer ${
-                darkMode ? "text-white" : "text-gray-500/90"
-              }`}
-            />
-          </Link>
-          <Link href="/leaderboard">
-            <IoPersonOutline
-              className={`w-6 h-6 hover:text-rose-400  cursor-pointer ${
-                darkMode ? "text-white" : "text-gray-500/90"
-              }`}
-            />
-          </Link>
-
-          {user && (
-            <Link href={`/tripplans/${user?.email}`}>
-              <IoClipboardOutline
-                className={`w-6 h-6 hover:text-teal-400  cursor-pointer ${
-                  darkMode ? "text-white" : "text-gray-500/90"
-                }`}
-              />
-            </Link>
-          )}
-          {user ? (
-            <IoLogInOutline
-              onClick={userLogout}
-              className={`w-7 h-7 hover:text-fuchsia-400  cursor-pointer ${
-                darkMode ? "text-white" : "text-gray-500/90"
-              }`}
-            />
-          ) : (
-            <Link href="/signin">
-              <IoLogOutOutline
-                className={`w-7 h-7 hover:text-red-400  IoLogOutOutline cursor-pointer ${
-                  darkMode ? "text-white" : "text-gray-500/90"
-                }`}
-              />
-            </Link>
-          )}
-          {darkMode ? (
-            <IoMoon
-              onClick={() => dispatch(updateDarkMode(false))}
-              className="w-6 h-6 text-yellow-200 cursor-pointer"
-            />
-          ) : (
-            <IoSunnyOutline
-              onClick={() => dispatch(updateDarkMode(true))}
-              className="w-6 h-6 text-orange-400 cursor-pointer"
-            />
-          )}
-          <IoChevronForwardOutline
-            onClick={() => setOpen(!open)}
-            className="w-6 h-6 text-orange-400 cursor-pointer"
-          />
-        </div>
+        <HeaderItemsMobile open={open} setOpen={setOpen} />
       )}
     </header>
   );

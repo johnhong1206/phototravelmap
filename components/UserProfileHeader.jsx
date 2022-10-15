@@ -1,9 +1,17 @@
 import React from "react";
 import { AiOutlineFire, AiOutlineStar, AiOutlinePicture } from "react-icons/ai";
+import { useSelector } from "react-redux";
+import { selectDarkmode } from "../features/darkmodeSlice";
 
 function UserProfileHeader({ name, email, averageRating, rating, postCount }) {
+  const darkMode = useSelector(selectDarkmode);
+
   return (
-    <div className="text-white p-4 flex flex-col items-center justify-center">
+    <div
+      className={`${
+        darkMode ? "text-white" : "text-black"
+      } p-4 flex flex-col items-center justify-center`}
+    >
       <div className="mb-4">
         <h2 className="text-xl lg:text-3xl text-center font-bold tracking-wide">
           {name}

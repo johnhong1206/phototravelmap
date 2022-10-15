@@ -190,11 +190,11 @@ function AddPostCategoriesTypes({
       </div>
       <div className="w-full px-10">
         <button
-          disabled={!newCategoryTags}
+          disabled={!newCategoryTags || !selectPost}
           className=" bg-pink-400 disabled:bg-opacity-50 w-full px-1 py-2 rounded-lg mt-10 shadow-lg hover:shadow-xl font-bold hover:text-white"
           onClick={addCategoryTypes}
         >
-          Add
+          {!selectPost ? "please pick a post" : "Add"}
         </button>
       </div>
     </div>

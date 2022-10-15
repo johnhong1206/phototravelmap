@@ -400,12 +400,6 @@ function AddPost({
           >
             Post
           </button>
-          {/* <button
-            className=" bg-pink-400 disabled:bg-opacity-50 w-full px-1 py-2 rounded-lg mt-10 shadow-lg hover:shadow-xl font-bold hover:text-white"
-            onClick={updateuserRating}
-          >
-            Post
-          </button> */}
         </div>
       </div>
     </div>
