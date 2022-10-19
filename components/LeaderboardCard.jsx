@@ -1,11 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { AiOutlineFire, AiOutlineStar, AiOutlinePicture } from "react-icons/ai";
+import {
+  AiOutlineFire,
+  AiOutlineStar,
+  AiOutlinePicture,
+  AiOutlineCrown,
+} from "react-icons/ai";
 import Link from "next/link";
 import { fetchgeopostwithemailrating } from "../utils/fetchposts";
 import PostFeeds from "./PostFeeds";
+import { useSelector } from "react-redux";
+import { selectDarkmode } from "../features/darkmodeSlice";
 
 function LeaderboardCard({
   key,
+  idx,
   id,
   name,
   email,
@@ -13,6 +21,7 @@ function LeaderboardCard({
   rating,
   postCount,
 }) {
+  const darkMode = useSelector(selectDarkmode);
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -27,16 +36,31 @@ function LeaderboardCard({
     }
   }, [email]);
 
+  const renderCrown = () => {
+    if (idx === 0) {
+      return <AiOutlineCrown className="w-6 h-6 text-[#FFD700]" />;
+    }
+    if (idx === 1) {
+      return <AiOutlineCrown className="w-6 h-6 text-[#C0C0C0]" />;
+    }
+    if (idx === 2) {
+      return <AiOutlineCrown className="w-6 h-6 text-[#CD7F32]" />;
+    }
+  };
+
   return (
     <Link href={`/userprofile/${email}`}>
       <div
         key={key}
-        className="text-white border cursor-pointer hover:shadow-xl hover:border-cyan-300 m-2 rounded-xl border-gray-200 p-10 flex flex-col items-center justify-center w-full"
+        className={`border cursor-pointer hover:shadow-xl hover:border-cyan-300 m-2 rounded-xl border-gray-200 p-10 flex flex-col items-center justify-center w-full ${
+          darkMode ? "text-white" : "text-gray-700"
+        }`}
       >
-        <div className="mb-4">
+        <div className="mb-4 flex items-center justify-center space-x-2">
           <h2 className="text-xl lg:text-3xl text-center font-bold tracking-wide">
             {name}
           </h2>
+          {renderCrown()}
         </div>
         <div className="flex items-center justify-start space-x-8">
           <div className="flex items-center space-x-1">
@@ -69,6 +93,7 @@ function LeaderboardCard({
                     location={post?.location}
                     body={post?.body}
                     rating={post?.rating}
+                    noroute
                   />
                 )}
               </div>

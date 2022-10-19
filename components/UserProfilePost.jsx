@@ -5,7 +5,7 @@ import { AiOutlinePicture, AiOutlineCamera } from "react-icons/ai";
 
 function UserProfilePost({ posts, userprofile, phase, setPhase }) {
   return (
-    <div className="px-1 lg:px-4 py-1 gap-4 grid md:grid-cols-2 xl:grid-cols-3 3xl:flex flex-wrap items-center justify-center w-full">
+    <div className="grid grid-flow-row-dense grid-cols-1 gap-3 p-2 sm:grid-cols-2 md:gap-6 md:p-6 lg:grid-cols-3 xl:grid-cols-4">
       {posts?.map((post) => (
         <>
           {post?.mainImage && (

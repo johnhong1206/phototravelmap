@@ -24,8 +24,9 @@ function Leaderboard({ profiles }) {
       </div>
       <main className="flex-1 h-full w-full">
         <div className="w-full flex p-4 flex-col items-center justify-center">
-          {profiles.slice(0, 10).map((profile) => (
+          {profiles.slice(0, 10).map((profile, idx) => (
             <LeaderboardCard
+              idx={idx}
               key={profile?._id}
               name={profile.name}
               email={profile.email}

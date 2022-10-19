@@ -22,7 +22,7 @@
     "mapbox-gl": "^2.8.2",
     "middleware": "^1.0.0",
     "multiparty": "^4.2.3",
-    "next": "12.1.6",
+    "next": "^12.3.1",
     "next-auth": "^4.3.4",
     "next-connect": "^0.12.2",
     "next-sanity": "^0.5.2",

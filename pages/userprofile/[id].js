@@ -107,7 +107,8 @@ function Index({ posts, userprofile, location, categories }) {
             />
           </div>
         )}
-
+      </div>
+      <main className="max-w-screen mx-auto">
         {phase === "photo" && (
           <UserProfilePost
             posts={posts}
@@ -116,19 +117,20 @@ function Index({ posts, userprofile, location, categories }) {
             setPhase={setPhase}
           />
         )}
-        {phase === "upload" && (
-          <UserProfilePostImage
-            posts={posts}
-            userprofile={userprofile}
-            location={location}
-            categories={categories}
-            authorPostCount={authorPostCount}
-            userRating={userRating}
-            userAverageRating={userAverageRating}
-            userId={userId}
-          />
-        )}
-      </div>
+      </main>
+
+      {phase === "upload" && (
+        <UserProfilePostImage
+          posts={posts}
+          userprofile={userprofile}
+          location={location}
+          categories={categories}
+          authorPostCount={authorPostCount}
+          userRating={userRating}
+          userAverageRating={userAverageRating}
+          userId={userId}
+        />
+      )}
     </div>
   );
 }

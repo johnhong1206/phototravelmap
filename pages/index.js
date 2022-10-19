@@ -16,6 +16,9 @@ import { RiHotelLine } from "react-icons/ri";
 import { IoRestaurantOutline, IoCameraOutline } from "react-icons/io5";
 import { MdOutlineTour } from "react-icons/md";
 import { AiOutlineSearch } from "react-icons/ai";
+import { FaSearchPlus } from "react-icons/fa";
+import toast from "react-hot-toast";
+
 // components
 const OptionCard = dynamic(() => import("../components/OptionCard"));
 const PostFeeds = dynamic(() => import("../components/PostFeeds"), {
@@ -31,6 +34,7 @@ export default function Home({ posts, foodPost, latestPost }) {
   const [searchType, setSearchType] = useState(null);
   const darkMode = useSelector(selectDarkmode);
   const [currentpage, setCurrentPage] = useState(1);
+  const [advanceSearch, setAdvanceSearch] = useState(false);
   const [postsPerPage] = useState(4);
   const indexOfLastPost = currentpage * postsPerPage;
   const indexOfFirstPost = indexOfLastPost - postsPerPage;
@@ -38,10 +42,45 @@ export default function Home({ posts, foodPost, latestPost }) {
 
   const searchInfo = (e) => {
     e.preventDefault();
+    const notification = toast.loading("search...");
+
+    if (!searchTerm) {
+      toast.error("please fill in your search", {
+        id: notification,
+      });
+      return false;
+    }
     if (!searchType) {
       router.push(`/search/${searchTerm}`);
+      toast.success(`search ${searchTerm}`, {
+        id: notification,
+      });
     } else {
       router.push(`/search/${searchTerm}/${searchType}`);
+      toast.success(`search ${searchType} in ${searchTerm}`, {
+        id: notification,
+      });
+    }
+  };
+  const advanceSearchInfo = (e) => {
+    e.preventDefault();
+    const notification = toast.loading("search...");
+    if (!searchTerm) {
+      toast.error("please fill in your search", {
+        id: notification,
+      });
+      return false;
+    }
+    if (!searchType) {
+      router.push(`/searchresult/${searchTerm}`);
+      toast.success(`search ${searchTerm}`, {
+        id: notification,
+      });
+    } else {
+      router.push(`/searchresult/${searchTerm}/${searchType}`);
+      toast.success(`search ${searchType} in ${searchTerm}`, {
+        id: notification,
+      });
     }
   };
 
@@ -100,19 +139,43 @@ export default function Home({ posts, foodPost, latestPost }) {
 
           <form
             onSubmit={searchInfo}
-            className="w-full flex flex-row items-center mt-5 mb-10"
+            className="w-full flex flex-col items-center mt-5 mb-10"
           >
             <input
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Where To?"
-              className="flex-1 px-4 py-2 rounded-lg shadow-md focus:shadow-xl  outline-none border-none text-black tracking-widest font-medium"
+              className="flex-1 w-full px-4 py-2 rounded-lg shadow-md focus:shadow-xl  outline-none border-none text-black tracking-widest font-medium"
             />
             <button hidden onSubmit={searchInfo}></button>
-            <AiOutlineSearch
-              className="w-8 h-8 hover:text-cyan-500 cursor-pointer"
-              onClick={searchInfo}
-            />
+            <div className="flex flex-row items-center my-2 space-x-6">
+              <div
+                onClick={searchInfo}
+                className={`flex flex-row items-center my-2 space-x-2 group hover:text-cyan-500 cursor-pointer tracking-widest rounded-xl px-4 py-2 hover:border border-cyan-300 ${
+                  !advanceSearch ? "border" : ""
+                }`}
+              >
+                <AiOutlineSearch
+                  className={`w-8 h-8 cursor-pointer group-hover:text-cyan-400 ${
+                    !advanceSearch ? "text-cyan-400" : "text-white"
+                  }`}
+                />
+                <p>search</p>
+              </div>
+              <div
+                onClick={advanceSearchInfo}
+                className={`flex flex-row items-center my-2 space-x-2 group hover:text-rose-500 cursor-pointer tracking-widest rounded-xl px-4 py-2 hover:border border-rose-300 ${
+                  advanceSearch ? "border" : ""
+                }`}
+              >
+                <AiOutlineSearch
+                  className={`w-8 h-8 cursor-pointer group-hover:text-rose-400 ${
+                    advanceSearch ? "text-rose-400" : "text-white"
+                  }`}
+                />
+                <p>advance search</p>
+              </div>
+            </div>
           </form>
         </div>
         <div className="my-4 space-y-2">

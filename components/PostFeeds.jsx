@@ -15,11 +15,13 @@ function PostFeeds({
   location,
   publishedAt,
   rating,
+  noroute,
 }) {
   const router = useRouter();
   const darkMode = useSelector(selectDarkmode);
 
   const navDetails = () => {
+    if (noroute) return false;
     router.push(`/post/${slug.current}`);
   };
   function truncate(str, n) {

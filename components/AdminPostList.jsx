@@ -10,9 +10,10 @@ function AdminPostList({ posts, setSelectPost, selectPost }) {
   const router = useRouter();
   const darkMode = useSelector(selectDarkmode);
 
-  const navDetails = () => {
-    router.push(`/post/${selectPost?.slug.current}`);
-  };
+  // const navDetails = () => {
+  //   router.push(`/post/${selectPost?.slug.current}`);
+  // };
+  console.log(selectPost);
 
   return (
     <div className={`flex flex-col lg:flex-row`}>
@@ -120,6 +121,13 @@ function AdminPostList({ posts, setSelectPost, selectPost }) {
                 </div>
               ))}
           </div>
+        </div>
+        <div className="flex flex-row items-center space-x-2 w-full">
+          <h2 className="text-xl font-medium">Posted By:</h2>
+          <p className="font-light">
+            {selectPost?.author?.name}
+            <span className="ml-4">{selectPost?.author?.email}</span>
+          </p>
         </div>
       </div>
     </div>
