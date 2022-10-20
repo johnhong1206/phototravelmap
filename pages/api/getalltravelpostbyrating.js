@@ -7,7 +7,7 @@ const config = {
 };
 const client = sanityClient(config);
 export default async function handler(req, res) {
-  const query = `*[_type == "post"]{
+  const query = `*[_type == "post" && postType == 'public' && count((categories[]->slug.current)[@ in ['travel']]) > 0  ]{
     ...,
     author->{
       _id,
@@ -19,11 +19,13 @@ export default async function handler(req, res) {
       ...,
     },
     mainImage,
+    totalrating,
     location->{
           ...,
     },
-  }| order(rating desc)`;
-  const posts = await client.fetch(query);
+  }| order(totalrating desc)`;
+  const postsRes = await client.fetch(query);
+  const posts = postsRes.sort((b, a) => a.rating - b.rating);
 
   res.status(200).json({ posts });
 }

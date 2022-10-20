@@ -24,13 +24,13 @@ export default async function handler(req, res) {
     location->{
           ...,
     },
-  }| order(_createdAt desc)`;
+  }| order(totalrating desc)`;
 
   const postsRes = await client.fetch(query, {
     email: email,
   });
 
-  const posts = postsRes.slice().sort((b, a) => a.rating - b.rating);
+  const posts = postsRes.slice().sort((b, a) => a.totalrating - b.totalrating);
 
   res.status(200).json({ posts });
 }

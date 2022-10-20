@@ -38,7 +38,7 @@ function PostDetails({ post }) {
   const [comment, setComment] = useState("");
   const [refetchpost, setRefetchPost] = useState(post);
   const id = post?._id;
-  const postAuthorId = post?.author._id;
+  const postAuthorId = post?.author?._id;
   const postAuthorEmail = post?.author?.email;
   const [authorPost, setAuthorPost] = useState([]);
   const [authorPostCount, setAuthorPostCount] = useState([]);
@@ -58,6 +58,7 @@ function PostDetails({ post }) {
       getuserPost();
     }
   }, [postAuthorEmail]);
+
   useEffect(() => {
     const postCount = authorPost?.length;
     const currentRating = authorPost?.reduce(
@@ -70,20 +71,9 @@ function PostDetails({ post }) {
     setUserAverageRating(rating);
   }, [authorPost]);
 
-  console.log(
-    "totalRating",
-    userRating,
-    "postCount",
-    authorPostCount,
-    "userAverageRating",
-    userAverageRating,
-    " to rate",
-    rate
-  );
-
   useEffect(() => {
     if (rate) {
-      const currentPostCount = authorPostCount;
+      const currentPostCount = Number(authorPostCount) + Number(1);
       const authorTotalRating = authorPost?.reduce(
         (total, item) => (total += item.rating),
         0
@@ -99,6 +89,7 @@ function PostDetails({ post }) {
         (total, item) => (total += item.rating),
         0
       );
+
       const finalTotalRating = Number(authorTotalRating);
       const finalAvarageRating =
         Number(finalTotalRating) / Number(currentPostCount);
@@ -106,84 +97,6 @@ function PostDetails({ post }) {
       setFinalAvgRatingUpdate(finalAvarageRating);
     }
   }, [authorPostCount, authorPost, rate]);
-
-  console.log(
-    "totalRatingUpdate",
-    totalRatingUpdate,
-    "finalAvgRatingUpdate",
-    finalAvgRatingUpdate
-  );
-
-  // useEffect(() => {
-  //   if (!rate) {
-  //     if (authorPost?.length > 1) {
-  //       const postCount = Number(authorPost?.length);
-  //       const currentRating = authorPost?.reduce(
-  //         (total, item) => (total += item.rating),
-  //         0
-  //       );
-  //       const rating = Number(currentRating) / Number(postCount);
-  //       setAuthorRating(rating);
-  //     } else {
-  //       const postCount = Number(authorPost?.length);
-  //       const currentRating = authorPost?.reduce(
-  //         (total, item) => (total += item.rating),
-  //         0
-  //       );
-  //       const rating = Number(currentRating) / Number(postCount);
-  //       setAuthorRating(rating);
-  //     }
-  //   }
-  //   if (rate) {
-  //     if (authorPost?.length > 1) {
-  //       const postCount = Number(authorPost?.length) + 1;
-  //       console.log(postCount);
-  //       const currentRating = authorPost?.reduce(
-  //         (total, item) => (total += item.rating),
-  //         0
-  //       );
-
-  //       const finalTotalRating = Number(currentRating) + Number(rate);
-
-  //       const rating = Number(finalTotalRating) / Number(postCount);
-  //       console.log(
-  //         "currentRating total",
-  //         currentRating,
-  //         "postCount",
-  //         postCount,
-  //         "finalTotalRating ",
-  //         finalTotalRating,
-  //         "rating",
-  //         rating
-  //       );
-  //       setAuthorRating(rating);
-  //     } else {
-  //       const postCount = Number(authorPost?.length);
-
-  //       const currentRating = authorPost?.reduce(
-  //         (total, item) => (total += item.rating),
-  //         0
-  //       );
-
-  //       const finalTotalRating = Number(currentRating) + Number(rate);
-
-  //       const rating = Number(finalTotalRating) / Number(postCount);
-  //       console.log(
-  //         "currentRating total",
-  //         currentRating,
-  //         "postCount",
-  //         postCount,
-  //         "finalTotalRating ",
-  //         finalTotalRating,
-  //         "rating to rate",
-  //         rating
-  //       );
-  //       setAuthorRating(rating);
-  //     }
-  //   }
-  // }, [authorPost, rate]);
-
-  // console.log("authorRating", authorRating);
 
   const updateuserRating = async () => {
     const postInfo = {
@@ -261,10 +174,13 @@ function PostDetails({ post }) {
     });
   };
 
-  const rateThePost = async (e) => {
+  const rateThePostN = async (e) => {
     e.preventDefault();
     const notification = toast.loading("Rate the post...");
-
+    if (!rate) {
+      toast.error("Please includes the rate...");
+      return false;
+    }
     if (!user) {
       toast.error("Please Login to rate...");
     }
@@ -278,30 +194,38 @@ function PostDetails({ post }) {
       user ? user?.username : email
     );
     const ratings = await fetchpostrating(id);
-    let totalRating = 0;
-    ratings?.forEach((item) => {
-      totalRating = totalRating + item.rating;
-    });
-    const currentRating = Number(totalRating);
+    const currentTotalRating = ratings?.reduce(
+      (total, item) => (total += item.rating),
+      0
+    );
+    const curentRating = Number(currentTotalRating);
     const inputRating = Number(rate);
-    const totalUserRate = Number(ratings?.length) + Number(1);
-    const finalRating = (currentRating + inputRating) / totalUserRate;
+    const newTotal = Number(curentRating) + Number(inputRating);
+    const totalUserRate = rate
+      ? Number(ratings?.length) + Number(1)
+      : Number(ratings?.length);
+    const finalRating = Number(newTotal) / Number(totalUserRate);
+    console.log("finalRating", finalRating);
 
     const rateInfo = {
       _id: refetchpost?._id,
-      ratedUserName: user?.username,
-      ratedUserEmail: user?.email,
-      ratedUserId: user?.id,
-      rating: rate,
+      ratedUserName: user ? user?.username : username,
+      ratedUserEmail: user ? user?.email : email,
+      ratedUserId: user ? user?.id : "",
+      rating: Number(rate),
       ratingTitle: ratingTitle,
       comment: comment,
     };
+    console.log("rateInfo", rateInfo);
 
     const updaterateInfo = {
       _id: post?._id,
       rating: Number(finalRating),
+      totalrating: Number(newTotal),
+      totaluserrate: Number(totalUserRate),
     };
 
+    console.log("updaterateInfo", updaterateInfo);
     if (rate > Number(5)) {
       toast.error("Maximum rating is 5", { id: notification });
       setRate(Number(5));
@@ -309,7 +233,7 @@ function PostDetails({ post }) {
     const userRatedThePost = ratings?.find(
       (rating) => rating?.ratedUserEmail == email
     );
-
+    console.log(!!userRatedThePost);
     if (!!userRatedThePost == false) {
       try {
         await fetch("/api/ratethepost", {
@@ -404,7 +328,7 @@ function PostDetails({ post }) {
               </div>
               {refetchpost?.rating > 0 ? (
                 <div className="flex items-center space-x-1">
-                  <p>{refetchpost?.rating}</p>
+                  <p>{refetchpost?.rating.toFixed(2)}</p>
                   <AiTwotoneFire className=" w-4 h-4 text-red-500/80" />
                 </div>
               ) : (
@@ -463,8 +387,8 @@ function PostDetails({ post }) {
               placeholder="Please Comment (optional)"
             />
             <button
-              disabled={!user || rate == null || !email}
-              onClick={rateThePost}
+              // disabled={!user || rate == null || !email}
+              onClick={rateThePostN}
               className="bg-red-300 text-white font-bold px-2 py-1 rounded-xl disabled:bg-opacity-50"
             >
               Submit Rating

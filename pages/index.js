@@ -4,7 +4,7 @@ import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 //fetching
 import {
-  fetchPostOrderByRating,
+  fetchTravelPostOrderByRating,
   fetchFoodPostOrderByRating,
   fetchPost,
 } from "../utils/fetchposts";
@@ -270,7 +270,7 @@ export const getServerSideProps = async ({ req, res }) => {
     "public, s-maxage=10, stale-while-revalidate=59"
   );
 
-  const posts = await fetchPostOrderByRating();
+  const posts = await fetchTravelPostOrderByRating();
   const foodPost = await fetchFoodPostOrderByRating();
   const latestPost = await fetchPost();
 

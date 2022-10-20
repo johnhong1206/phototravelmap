@@ -26,6 +26,8 @@ export default async function handler(req, res) {
         _type: "post",
         title: title,
         rating: rating,
+        totalrating: Number(0),
+        totaluserrate: Number(0),
         postType: postType.toString(),
         author: {
           _type: "reference",

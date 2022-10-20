@@ -40,7 +40,7 @@ function PostFeeds({
     >
       {rating > 0 && (
         <div className="absolute top-1 right-2 flex flex-row items-center">
-          <p>{rating}</p>
+          <p>{rating.toFixed(2)}</p>
           <AiTwotoneFire className=" w-4 h-4 text-rose-400" />
         </div>
       )}

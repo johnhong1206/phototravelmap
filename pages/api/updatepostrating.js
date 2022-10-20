@@ -7,14 +7,18 @@ const config = {
 };
 const client = sanityClient(config);
 export default async function handler(req, res) {
-  const { _id, rating } = JSON.parse(req.body);
+  const { _id, rating, totalrating, totaluserrate } = JSON.parse(req.body);
 
   console.log(req.body);
 
   try {
     await client
       .patch(_id)
-      .set({ rating: Number(rating) })
+      .set({
+        rating: Number(rating),
+        totalrating: Number(totalrating),
+        totaluserrate: Number(totaluserrate),
+      })
       .commit({
         // Adds a `_key` attribute to array items, unique within the array, to
         // ensure it can be addressed uniquely in a real-time collaboration context

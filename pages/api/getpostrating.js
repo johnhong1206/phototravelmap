@@ -14,6 +14,7 @@ export default async function handler(req, res) {
   const rating = await client.fetch(query, {
     id: id,
   });
+  console.log(rating);
 
   res.status(200).json({ rating });
 }

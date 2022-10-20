@@ -5,9 +5,9 @@ export const fetchPost = async () => {
   return post;
 };
 
-export const fetchPostOrderByRating = async () => {
+export const fetchTravelPostOrderByRating = async () => {
   const res = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/api/getallpostbyrating`
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/getalltravelpostbyrating`
   );
   const data = await res.json();
   const post = data.posts;
@@ -44,6 +44,7 @@ export const fetchpostrating = async (postId) => {
     { body: JSON.stringify(postInfo), method: "POST" }
   );
   const data = await res.json();
+  console.log("data", data);
   const rating = data.rating;
   return rating;
 };

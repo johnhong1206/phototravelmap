@@ -26,8 +26,10 @@ export default async function handler(req, res) {
           _id,
           ...,
         },
-      }| order(rating desc)`;
-  const posts = await client.fetch(query);
+      }| order(totalrating desc)`;
+
+  const postsRes = await client.fetch(query);
+  const posts = postsRes.sort((b, a) => a.rating - b.rating);
 
   res.status(200).json({ posts });
 }
