@@ -17,6 +17,7 @@ import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
 // components
 const PostFeeds = dynamic(() => import("../../components/PostFeeds"));
 const Footer = dynamic(() => import("../../components/Footer"));
+import blurImg from "../../images/blur.png";
 
 function Category({ posts, category }) {
   const topRef = useRef(null);
@@ -153,6 +154,8 @@ function Category({ posts, category }) {
                         alt="img"
                         objectFit="contain"
                         className=""
+                        placeholder="blur"
+                        blurDataURL={blurImg}
                       />
                     </div>
                   )}

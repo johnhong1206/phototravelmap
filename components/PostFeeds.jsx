@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
 import { selectDarkmode } from "../features/darkmodeSlice";
 import { AiTwotoneFire } from "react-icons/ai";
+import blurImg from "../images/blur.png";
 
 function PostFeeds({
   key,
@@ -67,6 +68,8 @@ function PostFeeds({
                 src={urlFor(author?.image).url()}
                 alt="author"
                 className="h-10 w-10 rounded-full"
+                placeholder="blur"
+                blurDataURL={blurImg}
               />
               <div
                 className="ml-1 
@@ -91,6 +94,8 @@ function PostFeeds({
             className="h-60 w-full object-contain transition-transform duration-200 ease-in-out group-hover:scale-105"
             src={urlFor(mainImage).url()}
             alt="img"
+            placeholder="blur"
+            blurDataURL={blurImg}
           />
         )}
       </div>

@@ -24,6 +24,7 @@ import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
 // components
 const PostFeeds = dynamic(() => import("../../components/PostFeeds"));
 const Footer = dynamic(() => import("../../components/Footer"));
+import blurImg from "../../images/blur.png";
 
 function PlaceDetail({ posts, location }) {
   const scrollbarRef = useRef(null);
@@ -293,6 +294,8 @@ function PlaceDetail({ posts, location }) {
                         alt="img"
                         objectFit="contain"
                         className=""
+                        placeholder="blur"
+                        blurDataURL={blurImg}
                       />
                     </div>
                   </Marker>

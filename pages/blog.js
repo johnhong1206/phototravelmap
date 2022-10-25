@@ -17,6 +17,7 @@ const PostFeeds = dynamic(() => import("../components/PostFeeds"), {
   ssr: true,
 });
 const Footer = dynamic(() => import("../components/Footer"), { ssr: false });
+import blurImg from "../images/blur.png";
 
 export default function Blog({ posts }) {
   const topRef = useRef(null);
@@ -255,6 +256,8 @@ export default function Blog({ posts }) {
                         alt="img"
                         objectFit="contain"
                         className=""
+                        placeholder="blur"
+                        blurDataURL={blurImg}
                       />
                     )}
                   </div>

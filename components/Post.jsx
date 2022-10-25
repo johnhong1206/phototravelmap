@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import { urlFor } from "../sanity";
 import Image from "next/image";
 import { useRouter } from "next/router";
+import blurImg from "../images/blur.png";
 
 function Post({ post, key }) {
   const router = useRouter();
@@ -38,6 +39,8 @@ function Post({ post, key }) {
                 src={urlFor(post?.author?.image).url()}
                 alt="author"
                 className="h-10 w-10 rounded-full"
+                placeholder="blur"
+                blurDataURL={blurImg}
               />
               <div
                 className="ml-1 
@@ -72,6 +75,8 @@ function Post({ post, key }) {
             className="h-60 w-full object-contain transition-transform duration-200 ease-in-out group-hover:scale-105"
             src={urlFor(post?.mainImage).url()}
             alt="img"
+            placeholder="blur"
+            blurDataURL={blurImg}
           />
         )}
       </div>

@@ -24,6 +24,7 @@ import { IoChevronUpOutline } from "react-icons/io5";
 import { AiTwotoneFire } from "react-icons/ai";
 // components
 import Footer from "../../components/Footer";
+import blurImg from "../../images/blur.png";
 
 function PostDetails({ post }) {
   const router = useRouter();
@@ -287,6 +288,8 @@ function PostDetails({ post }) {
                 height={700}
                 objectFit="contain"
                 alt="profile"
+                placeholder="blur"
+                blurDataURL={blurImg}
               />
             )}
             <div className="p-4 w-full">
@@ -428,6 +431,8 @@ function PostDetails({ post }) {
                     alt="img"
                     objectFit="contain"
                     className=""
+                    placeholder="blur"
+                    blurDataURL={blurImg}
                   />
                 )}
               </div>

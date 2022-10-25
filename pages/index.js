@@ -18,6 +18,7 @@ import { MdOutlineTour } from "react-icons/md";
 import { AiOutlineSearch } from "react-icons/ai";
 import { FaSearchPlus } from "react-icons/fa";
 import toast from "react-hot-toast";
+import blurImg from "../images/blur.png";
 
 // components
 const OptionCard = dynamic(() => import("../components/OptionCard"));
